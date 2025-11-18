@@ -1,0 +1,117 @@
+'use client';
+import { SignIn, useStackApp } from '@stackframe/stack';
+import { NextPage } from 'next';
+import { Accordion, AccordionTab } from 'primereact/accordion';
+import { Button } from 'primereact/button';
+import { RationesOrganisation, RationesUser } from '@/types';
+import { InputText } from 'primereact/inputtext';
+import { Controller, useForm } from 'react-hook-form';
+import { JSX, useState } from 'react';
+import { Card } from 'primereact/card';
+import { classNames } from 'primereact/utils';
+import {
+  organisationCategoryType,
+  organisationIdType,
+} from '@/app/constants/constants';
+
+import UserSignUpPage from '@/app/components/auth/UserSignUpPage';
+import { Steps } from 'primereact/steps';
+import OrganisationSignUpPage from './OrganisationSignUp';
+
+const SignUpPage: NextPage = () => {
+  let activeTab = 0;
+  const [step, setStep] = useState<number>(0);
+
+  // const defaultOrganisationValues: RationesOrganisation = {
+  //   organisationCaterory: organisationCategoryType.Company,
+  //   organisationIdType: organisationIdType.CompanyNum,
+  //   organisationId: '',
+  //   created: false,
+  // };
+
+  /** User submit button */
+
+  /** Organisation submit */
+  const onOrgSubmit = async (formdata: RationesOrganisation) => {};
+
+  // const organisationEntry = (): JSX.Element => {
+  //   return (
+  //     <form onSubmit={handleSubmit(onUserSubmit)}>
+  //       <div className='field'>
+  //         {/* <Controller
+  // 							name="country"
+  // 							control={control}
+  // 							render={({ field, fieldState }) => (
+  // 								<>
+  // 									<label
+  // 										htmlFor={field.name}
+  // 										className={classNames({
+  // 											'p-error': errors.country,
+  // 										})}
+  // 									/>
+  // 									<span className="p-float-label">
+  // 										<Dropdown
+  // 											id={field.name}
+  // 											onChange={handleCountryChange}
+  // 											defaultValue={232}
+  // 											value={countryEntered}
+  // 											optionValue="id"
+  // 											optionLabel="name"
+  // 											options={props.countries}
+  // 											className={classNames({
+  // 												'p-invalid': fieldState.error,
+  // 											})}
+  // 										/>
+  // 										<label htmlFor={field.name}>Country</label>
+  // 									</span>
+  // 									{getFormErrorMessage(field.name)}
+  // 								</>
+  // 							)}
+  // 						/> */}
+  //       </div>
+  //     </form>
+  //   );
+  // };
+  const stepsItems = [
+    {
+      label: 'Organisation details',
+    },
+    {
+      label: 'User account details',
+    },
+  ];
+
+  const stepsBody = () => {
+    switch (step) {
+      case 0:
+        return <OrganisationSignUpPage step={step} setStep={setStep} />;
+
+      case 1:
+        return <UserSignUpPage step={step} setStep={setStep} />;
+    }
+  };
+  return (
+    <>
+      <div className='flex justify-content-center'>
+        <span className='text-900 block font-bold text-xl'>Sign-up</span>
+      </div>
+      <div className='card'>
+        <Steps model={stepsItems} activeIndex={step} />
+        {stepsBody()}
+      </div>
+    </>
+    // <div className='card'>
+    //   <Accordion activeIndex={activeTab}>
+    //     <AccordionTab header='Organisation details'>
+    //       {/* {organisationEntry()} */}
+    //     </AccordionTab>
+    //     <AccordionTab header='Personal details'>
+    //       <UserSignUpPage step={step} setStep={setStep} />
+    //       <div>Step {step}</div>
+    //     </AccordionTab>
+    //   </Accordion>
+    // </div>
+  );
+};
+
+export default SignUpPage;

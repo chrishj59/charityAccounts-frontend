@@ -32,3 +32,59 @@ model Post {
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String
 }
+
+// Todo list
+model List {
+  id        String        @id @default(cuid())
+  createdAt DateTime      @default(now())
+  updatedAt DateTime @updatedAt()
+  title     String
+  private   Boolean       @default(false)
+  orgId     String?
+  ownerId   String
+  todos     Todo[]
+
+  // deny anonymous access
+  @@deny('all', auth() == null)
+
+  // tenant segregation: deny access if the user's current org doesn't match
+  @@deny('all', auth().currentTeamId != orgId)
+
+  // owner/admin has full access
+  @@allow('all', auth().userId == ownerId || auth().currentTeamRole == 'org:admin')
+
+  // can be read by org members if not private
+  @@allow('read', !private)
+
+  // when create, owner must be set to current user
+  @@allow('create', ownerId == auth().userId)
+}
+
+// Todo item
+model Todo {
+  id          String    @id @default(cuid())
+  title       String
+  completedAt DateTime?
+  list        List      @relation(fields: [listId], references: [id], onDelete: Cascade)
+  listId      String
+}
+// The shape of `auth()`
+type Auth {
+  // Current user's ID
+  userId         String  @id
+
+  // User's current team ID
+  currentTeamId   String?
+
+  // User's role in the current team
+  currentTeamRole String?
+
+  @@auth
+}
+
+plugin hooks {
+  provider = '@zenstackhq/tanstack-query'
+  target = 'react'
+  version = 'v5'
+  output = "./src/lib/hooks"
+}

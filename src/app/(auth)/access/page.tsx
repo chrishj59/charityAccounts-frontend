@@ -1,5 +1,5 @@
 'use client';
-import type { Page } from '@/types';
+import type { Page } from '~/types';
 import { useRouter } from 'next/navigation';
 import { Button } from 'primereact/button';
 

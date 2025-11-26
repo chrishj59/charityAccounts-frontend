@@ -1,20 +1,12 @@
 'use client';
-import { SignIn, useStackApp } from '@stackframe/stack';
-import { NextPage } from 'next';
-import { Accordion, AccordionTab } from 'primereact/accordion';
-import { Button } from 'primereact/button';
-import { RationesOrganisation, RationesUser } from '@/types';
-import { InputText } from 'primereact/inputtext';
-import { Controller, useForm } from 'react-hook-form';
-import { JSX, useState } from 'react';
-import { Card } from 'primereact/card';
-import { classNames } from 'primereact/utils';
-import {
-  organisationCategoryType,
-  organisationIdType,
-} from '@/app/constants/constants';
 
-import UserSignUpPage from '@/app/components/auth/UserSignUpPage';
+import { NextPage } from 'next';
+
+import { RationesOrganisation, RationesUser } from '~/types';
+
+import { JSX, useState } from 'react';
+
+import UserSignUpPage from '~/app/components/auth/UserSignUpPage';
 import { Steps } from 'primereact/steps';
 import OrganisationSignUpPage from './OrganisationSignUp';
 
@@ -92,25 +84,17 @@ const SignUpPage: NextPage = () => {
   };
   return (
     <>
-      <div className='flex justify-content-center'>
-        <span className='text-900 block font-bold text-xl'>Sign-up</span>
-      </div>
-      <div className='card'>
-        <Steps model={stepsItems} activeIndex={step} />
-        {stepsBody()}
-      </div>
+      {/* <div className='card'> */}
+      <Steps
+        model={stepsItems}
+        activeIndex={step}
+        pt={{
+          root: { className: 'w-30rem' },
+        }}
+      />
+      {stepsBody()}
+      {/* </div> */}
     </>
-    // <div className='card'>
-    //   <Accordion activeIndex={activeTab}>
-    //     <AccordionTab header='Organisation details'>
-    //       {/* {organisationEntry()} */}
-    //     </AccordionTab>
-    //     <AccordionTab header='Personal details'>
-    //       <UserSignUpPage step={step} setStep={setStep} />
-    //       <div>Step {step}</div>
-    //     </AccordionTab>
-    //   </Accordion>
-    // </div>
   );
 };
 

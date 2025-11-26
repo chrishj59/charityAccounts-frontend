@@ -227,7 +227,8 @@ export default function IntroPage() {
         </div>
 
         <div className='flex justify-content-center flex-wrap gap-3'>
-          <Button onClick={() => router.push('/signin')}>Sign in</Button>
+          {/* <Button onClick={() => router.push('/signin')}>Sign in</Button> */}
+          <Button onClick={() => router.push('/signin')}>Sign in new</Button>
         </div>
       </Panel>
 

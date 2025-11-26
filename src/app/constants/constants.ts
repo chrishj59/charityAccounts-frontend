@@ -6,7 +6,7 @@ export enum saluationEnum {
   'Professor',
 }
 
-export enum organisationCategoryType {
+export enum organisationCategoryEnum {
   'Company',
   'Partnership',
   'Person',
@@ -19,7 +19,7 @@ export enum organisationType {
   'TradingName',
 }
 
-export enum organisationIdType {
+export enum organisationIdTypeEnum {
   'CompanyNum',
   'CharityNum',
   'TaxId',

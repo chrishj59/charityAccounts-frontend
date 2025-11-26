@@ -37,9 +37,10 @@ export interface RationesUser {
 }
 
 export interface RationesOrganisation {
-  organisationCaterory: organisationCategoryType;
+  organisationCategory: organisationCategoryType;
   organisationIdType: organisationIdType;
   organisationId: string;
+  displayName: string;
   address: Address;
   created: boolean;
 }

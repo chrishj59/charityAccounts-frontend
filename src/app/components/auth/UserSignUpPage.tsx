@@ -81,75 +81,77 @@ const UserSignUpPage = ({ step, setStep }: ChildProps) => {
       {/* display Name line */}
       {/* <div className='formgrid grid'>
             <div className='field col-12 '> */}
-      <div className='field '>
-        <Controller
-          name='displayName'
-          control={control}
-          rules={{
-            required: 'Name is required.',
-          }}
-          render={({ field, fieldState }) => (
-            <>
-              <label
-                htmlFor={field.name}
-                className={classNames({
-                  'p-error': errors.displayName,
-                })}
-              ></label>
-              <span className='p-float-label'>
-                <InputText
-                  id={field.name}
-                  autoFocus={true}
-                  width={'100%'}
+      <div className='formgrid grid'>
+        {/* ** Display name row ** */}
+        <div className='field col-12 w-full'>
+          <Controller
+            name='displayName'
+            control={control}
+            rules={{
+              required: 'Name is required.',
+            }}
+            render={({ field, fieldState }) => (
+              <>
+                <label
+                  htmlFor={field.name}
                   className={classNames({
-                    'p-invalid': fieldState.error,
+                    'p-error': errors.displayName,
                   })}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
-                <label htmlFor={field.name}>Display Name</label>
-              </span>
-              {getFormErrorMessage(field.name)}
-            </>
-          )}
-        />
-      </div>
-      {/* </div>
+                ></label>
+                <span className='p-float-label'>
+                  <InputText
+                    id={field.name}
+                    autoFocus={true}
+                    width={'100%'}
+                    className={classNames({
+                      'p-invalid': fieldState.error,
+                    })}
+                    onChange={(e) => field.onChange(e.target.value)}
+                  />
+                  <label htmlFor={field.name}>Display Name</label>
+                </span>
+                {getFormErrorMessage(field.name)}
+              </>
+            )}
+          />
+        </div>
+        {/* </div>
           </div> */}
 
-      {/* first Name line */}
-      {/* <div className='formgrid grid'>
-            <div className='field col-12 '> */}
-      <div className='field'>
-        <Controller
-          name='firstName'
-          control={control}
-          rules={{
-            required: 'First Name is required.',
-          }}
-          render={({ field, fieldState }) => (
-            <>
-              <label
-                htmlFor={field.name}
-                className={classNames({
-                  'p-error': errors.displayName,
-                })}
-              ></label>
-              <span className='p-float-label'>
-                <InputText
-                  id={field.name}
-                  autoFocus={true}
-                  width={'100%'}
+        {/* first Name line */}
+
+        <div className='field col-12'>
+          <Controller
+            name='firstName'
+            control={control}
+            rules={{
+              required: 'First Name is required.',
+            }}
+            render={({ field, fieldState }) => (
+              <>
+                <label
+                  htmlFor={field.name}
                   className={classNames({
-                    'p-invalid': fieldState.error,
+                    'p-error': errors.displayName,
                   })}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
-                <label htmlFor={field.name}>First Name</label>
-              </span>
-              {getFormErrorMessage(field.name)}
-            </>
-          )}
-        />
+                ></label>
+                <span className='p-float-label'>
+                  <InputText
+                    id={field.name}
+                    autoFocus={true}
+                    width={'100%'}
+                    className={classNames({
+                      'p-invalid': fieldState.error,
+                    })}
+                    onChange={(e) => field.onChange(e.target.value)}
+                  />
+                  <label htmlFor={field.name}>First Name</label>
+                </span>
+                {getFormErrorMessage(field.name)}
+              </>
+            )}
+          />
+        </div>
       </div>
       <div>
         <div className='flex justify-content-center flex-wrap'>

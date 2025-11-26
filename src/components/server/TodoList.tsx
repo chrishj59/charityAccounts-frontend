@@ -1,5 +1,9 @@
 // Component showing Todo list for the current user
 
+import { getUserDb } from '~/server/db';
+import CreateList from '../client/CreateList';
+import Link from 'next/link';
+
 export default async function TodoLists() {
   const db = await getUserDb();
 
@@ -16,7 +20,7 @@ export default async function TodoLists() {
         <CreateList />
 
         <ul>
-          {lists?.map((list) => (
+          {lists?.map((list: any) => (
             <Link href={`/lists/${list.id}`} key={list.id}>
               <li>{list.title}</li>
             </Link>

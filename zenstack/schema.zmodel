@@ -1,16 +1,18 @@
- generator client {
-  provider = "prisma-client-js"
-}
+ 
 
 datasource db {
   provider = "postgresql"
   url      = env('DATABASE_URL')
 }
 
-plugin hooks {
-  provider = '@zenstackhq/tanstack-query'
-  target = 'react'
-  output = './hooks/model'
+// plugin hooks {
+//   provider = '@zenstackhq/tanstack-query'
+//   target = 'react'
+//   output = './hooks/model'
+// }
+
+plugin policy {
+    provider = '@zenstackhq/plugin-policy'
 }
 
 /// Shape of the `auth()` function
@@ -28,9 +30,9 @@ model TodoList {
   updatedAt      DateTime      @updatedAt
   name           String
   owner          User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId        String        @default(auth().userId) @allow('update', false)
+  ownerId        String        @default(auth().userId) //@allow('update', false)
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String?       @default(auth().organizationId) @allow('update', false)
+  organizationId String?       @default(auth().organizationId) //@allow('update', false)
   todos          Todo[]
 
   // deny anonymous users

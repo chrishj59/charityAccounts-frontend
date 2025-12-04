@@ -1,9 +1,9 @@
 import {
   organisationCategoryEnum,
   organisationIdTypeEnum,
-} from '~/app/constants/constants';
-import { RationesOrganisation } from '~/types';
-import { Address } from '~/types/user';
+} from '~/src/app/constants/constants';
+import { RationesOrganisation } from '~/src/types';
+import { Address } from '~/src/types/user';
 import { NextPage } from 'next';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';

@@ -27,6 +27,7 @@ export interface RationesUser {
   familyName?: string;
   organisationName?: string;
   organistionId?: string;
+  email?: string;
   address: Address;
 
   town?: string;

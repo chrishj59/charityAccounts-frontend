@@ -2,11 +2,11 @@
 
 import { NextPage } from 'next';
 
-import { RationesOrganisation, RationesUser } from '~/types';
+import { RationesOrganisation, RationesUser } from '~/src/types';
 
 import { JSX, useState } from 'react';
 
-import UserSignUpPage from '~/app/components/auth/UserSignUpPage';
+import UserSignUpPage from '~/src/app/components/auth/UserSignUpPage';
 import { Steps } from 'primereact/steps';
 import OrganisationSignUpPage from './OrganisationSignUp';
 

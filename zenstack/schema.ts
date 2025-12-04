@@ -555,11 +555,13 @@ const _schema = {
                 },
                 houseNumber: {
                     name: "houseNumber",
-                    type: "Int"
+                    type: "Int",
+                    optional: true
                 },
                 street: {
                     name: "street",
-                    type: "String"
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Street must be upto 50 char") }] }]
                 },
                 town: {
                     name: "town",
@@ -671,7 +673,8 @@ const _schema = {
                 },
                 email: {
                     name: "email",
-                    type: "String"
+                    type: "String",
+                    attributes: [{ name: "@email" }]
                 },
                 role: {
                     name: "role",

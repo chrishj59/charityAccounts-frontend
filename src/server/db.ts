@@ -1,5 +1,5 @@
 import { ZenStackClient } from '@zenstackhq/orm';
-import { schema } from '../../zenstack/schema';
+import { schema } from '~/zenstack/schema';
 import { PostgresDialect } from 'kysely';
 import { PolicyPlugin } from '@zenstackhq/plugin-policy';
 import { Pool } from 'pg';

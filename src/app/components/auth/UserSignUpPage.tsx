@@ -1,7 +1,7 @@
-import { saluationEnum } from '~/app/constants/constants';
-import { RationesUser } from '~/types';
-import { Dispatcher } from '~/types/helper';
-import { Address } from '~/types/user';
+import { saluationEnum } from '~/src/app/constants/constants';
+import { RationesUser } from '~/src/types';
+import { Dispatcher } from '~/src/types/helper';
+import { Address } from '~/src/types/user';
 import { NextPage } from 'next';
 import { Button } from 'primereact/button';
 import { InputNumberProps } from 'primereact/inputnumber';

@@ -1,6 +1,6 @@
-import SignUpPage from '~/app/components/auth/SignupPage';
-import { RationesUser } from '~/types';
-import { RationesOrganisation } from '~/types';
+import SignUpPage from '~/src/app/components/auth/SignupPage';
+import { RationesUser } from '~/src/types';
+import { RationesOrganisation } from '~/src/types';
 import { NextPage } from 'next';
 
 const SignUp: NextPage = () => {

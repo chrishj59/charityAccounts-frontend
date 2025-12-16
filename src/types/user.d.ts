@@ -23,11 +23,11 @@ export type Address = {
 export interface RationesUser {
   displayName: string;
   saluation?: saluationEnum;
-  firstName?: string;
-  familyName?: string;
+  firstName: string;
+  familyName: string;
   organisationName?: string;
   organistionId?: string;
-  email?: string;
+  email: string;
   address: Address;
 
   town?: string;

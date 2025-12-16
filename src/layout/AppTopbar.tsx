@@ -1,5 +1,5 @@
 'use client';
-import type { AppTopbarRef } from '@/types';
+import type { AppTopbarRef } from '~/src/types';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { forwardRef, useContext, useImperativeHandle, useRef } from 'react';

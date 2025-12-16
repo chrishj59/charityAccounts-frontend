@@ -1,12 +1,17 @@
 'use client';
 
-import { RationesOrganisation, RationesUser } from '@/types';
+import { RationesOrganisation, RationesUser } from '~/src/types';
 import {
-  organisationCategoryType,
-  organisationIdType,
-} from '../constants/constants';
+  organisationCategoryEnum,
+  organisationIdTypeEnum,
+} from '~/src/app/constants/constants';
 import { createContext, ReactNode, useContext, useState } from 'react';
+import { Address } from '~/src/types/user';
 
+const address: Address = {
+  houseNumber: 0,
+  postCode: '',
+};
 export type userContextType = {
   user: RationesUser;
   createUser: (user: RationesUser) => void;
@@ -22,14 +27,20 @@ export type organisationContextType = {
 };
 const defaultUser = {
   displayName: '',
+  firstName: '',
+  familyName: '',
+  email: '',
   created: false,
+  address: address,
   loggedin: false,
 };
 
 const defaultOrg = {
-  organisationCaterory: organisationCategoryType.Company,
-  organisationIdType: organisationIdType.CompanyNum,
+  organisationCategory: organisationCategoryEnum.Company,
+  organisationIdType: organisationIdTypeEnum.CompanyNum,
+  displayName: '',
   organisationId: '',
+  address: address,
   created: false,
 };
 

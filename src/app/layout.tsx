@@ -6,14 +6,13 @@ import { PrimeReactProvider } from 'primereact/api';
 import 'primereact/resources/primereact.css';
 import { twMerge } from 'tailwind-merge';
 import Tailwind from 'primereact/passthrough/tailwind';
-import '~/styles/layout/layout.scss';
-import '~/styles/globals.css';
-import { StackProvider, StackTheme } from '@stackframe/stack';
-import { stackServerApp } from '~/stack/server';
+import '~/src/styles/layout/layout.scss';
+import '~/src/styles/globals.css';
+
 import Footer from './components/footer';
 import { Suspense } from 'react';
 
-import '../styles/globals.css';
+import '~/src/styles/globals.css';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -23,6 +22,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   const value = {
     ripple: true,
   };
+  console.log('/src/app/layout root layout has justify content center');
   return (
     <html lang='en' suppressHydrationWarning>
       <head>
@@ -34,10 +34,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
       </head>
       <body>
         <Suspense>
-          <StackProvider app={stackServerApp}>
-            <StackTheme>
-              <PrimeReactProvider>
-                {/* <PrimeReactProvider
+          <PrimeReactProvider>
+            {/* <PrimeReactProvider
                 value={{
                   unstyled: true,
                   pt: Tailwind,
@@ -48,18 +46,16 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   },
                 }}
               > */}
-                {/* {children} */}
-                {/* <div className='flex  min-h-screen  justify-content-center align-items-center '> */}
-                <LayoutProvider>{children}</LayoutProvider>
-                {/* </div> */}
-                <div className='fixed bottom-0  right-0 left-0 '>
-                  <div className='flex align-self-center align-items-center justify-content-center '>
-                    <Footer />
-                  </div>
-                </div>
-              </PrimeReactProvider>
-            </StackTheme>
-          </StackProvider>
+            {/* {children} */}
+            <div className='flex  min-h-screen '>
+              <LayoutProvider>{children}</LayoutProvider>
+            </div>
+            <div className='fixed bottom-0  right-0 left-0 '>
+              <div className='flex align-self-center align-items-center justify-content-center '>
+                <Footer />
+              </div>
+            </div>
+          </PrimeReactProvider>
         </Suspense>
       </body>
     </html>

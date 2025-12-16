@@ -35,6 +35,7 @@ export function SignUp() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const router = useRouter();
   const [defaultUser, setDefaultUser] = useState<RationesUser>();
+  const [loading, setLoading] = useState(false);
 
   const defaultUserAddress: Address = {
     houseNumber: defaultUser?.address.houseNumber
@@ -46,6 +47,9 @@ export function SignUp() {
   };
   const defaultUserValues: RationesUser = {
     displayName: defaultUser?.displayName ? defaultUser?.displayName : '',
+    email: defaultUser?.email ? defaultUser?.email : '',
+    firstName: defaultUser?.firstName ? defaultUser?.firstName : '',
+    familyName: defaultUser?.familyName ? defaultUser?.familyName : '',
     created: defaultUser?.created ? defaultUser.created : false,
     loggedin: defaultUser?.loggedin ? defaultUser?.loggedin : false,
     address: defaultUserAddress,
@@ -62,7 +66,7 @@ export function SignUp() {
       reader.readAsDataURL(file);
     }
   };
-  const [loading, setLoading] = useState(false);
+
   const footer = (
     <div className='flex justify-center w-full border-t py-4'>
       <p className='text-center text-xs text-neutral-500'>
@@ -82,7 +86,27 @@ export function SignUp() {
   } = useForm<RationesUser>({ defaultValues: defaultUserValues });
 
   const onUserSubmit = async (formData: RationesUser) => {
-    alert(`submit called with ${JSON.stringify(formData)}`);
+    alert(`onUserSubmit submit called with ${JSON.stringify(formData)}`);
+    const { firstName, familyName, email } = formData;
+    const res = await signUp.email({
+      email,
+      password,
+      name: `${firstName} ${familyName}`,
+      fetchOptions: {
+        onResponse: () => {
+          setLoading(false);
+        },
+        onRequest: () => {
+          setLoading(true);
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message);
+        },
+        onSuccess: async () => {
+          router.push('/secure');
+        },
+      },
+    });
   };
 
   const getFormErrorMessage = (name: string) => {
@@ -108,9 +132,9 @@ export function SignUp() {
                 </CardDescription>
             </CardHeader> */}
       {/* <CardContent> */}
-      <form onSubmit={handleSubmit(onUserSubmit)}>
+      {/* <form onSubmit={handleSubmit(onUserSubmit)}>
         <div className='formgrid grid'>
-          {/* ** Display name row ** */}
+          {/* ** Display name row 
           <div className='field col-12 w-full'>
             <Controller
               name='displayName'
@@ -131,6 +155,7 @@ export function SignUp() {
                       id={field.name}
                       autoFocus={true}
                       width={'100%'}
+                      value={field.value}
                       className={classNames({
                         'p-invalid': fieldState.error,
                       })}
@@ -144,7 +169,7 @@ export function SignUp() {
             />
           </div>
 
-          {/* first Name line */}
+          {/* first Name line
 
           <div className='field col-12'>
             <Controller
@@ -166,6 +191,7 @@ export function SignUp() {
                       id={field.name}
                       autoFocus={true}
                       width={'100%'}
+                      value={field.value}
                       className={classNames({
                         'p-invalid': fieldState.error,
                       })}
@@ -179,7 +205,7 @@ export function SignUp() {
             />
           </div>
 
-          {/* family Name line */}
+          {/* family Name li
 
           <div className='field col-12'>
             <Controller
@@ -199,7 +225,8 @@ export function SignUp() {
                   <span className='p-float-label'>
                     <InputText
                       id={field.name}
-                      autoFocus={true}
+                      autoFocus={false}
+                      value={field.value}
                       width={'100%'}
                       className={classNames({
                         'p-invalid': fieldState.error,
@@ -214,7 +241,7 @@ export function SignUp() {
             />
           </div>
 
-          {/* Email address */}
+          {/* Email address 
           <div className='field'>
             <Controller
               name='email'
@@ -254,7 +281,7 @@ export function SignUp() {
             />
           </div>
 
-          {/* Password  */}
+          {/* Password  
           <div className='field'>
             <Controller
               name='password'
@@ -302,7 +329,7 @@ export function SignUp() {
             />
           </div>
 
-          {/* Confirm Password  */}
+          {/* Confirm Password  
           <div className='field'>
             <Controller
               name='confirmpassword'
@@ -349,8 +376,49 @@ export function SignUp() {
               )}
             />
           </div>
+          <Button
+            type='submit'
+            className='w-full'
+            disabled={loading}
+            // onClick={async () => {
+            //   const res = await signUp.email({
+            //     email,
+            //     password,
+            //     name: `${firstName} ${lastName}`,
+            //     // image: image ? await convertImageToBase64(image) : '',
+            //     callbackURL: '/secure',
+            //     fetchOptions: {
+            //       onResponse: () => {
+            //         console.log('onResponse');
+            //         setLoading(false);
+            //       },
+            //       onRequest: () => {
+            //         console.log('onRequest');
+            //         setLoading(true);
+            //       },
+            //       onError: (ctx) => {
+            //         console.error(
+            //           `Could not create user ${JSON.stringify(ctx.error.message)}`,
+            //         );
+            //         toast.error(ctx.error.message);
+            //       },
+            //       onSuccess: async () => {
+            //         router.push('/secure');
+            //       },
+            //     },
+            //   });
+            // }}
+          >
+            {' '}
+            console.log('called signup')
+            {loading ? (
+              <Loader2 size={16} className='animate-spin' />
+            ) : (
+              'Create an account'
+            )}
+          </Button>
         </div>
-      </form>
+      </form> */}
       {/* <div className='grid gap-4'>
         <div className='grid grid-cols-2 gap-4'>
           <div className='grid gap-2'>
@@ -479,6 +547,135 @@ export function SignUp() {
           )}
         </Button>
       </div> */}
+      <div className='grid gap-4'>
+        <div className='grid grid-cols-2 gap-4'>
+          <div className='grid gap-2'>
+            <label htmlFor='first-name'>First name</label>
+            <InputText
+              id='first-name'
+              placeholder='Max'
+              required
+              onChange={(e) => {
+                setFirstName(e.target.value);
+              }}
+              value={firstName}
+            />
+          </div>
+          <div className='grid gap-2'>
+            <label htmlFor='last-name'>Last name</label>
+            <InputText
+              id='last-name'
+              placeholder='Robinson'
+              required
+              onChange={(e) => {
+                setLastName(e.target.value);
+              }}
+              value={lastName}
+            />
+          </div>
+        </div>
+        <div className='grid gap-2'>
+          <label htmlFor='email'>Email</label>
+          <InputText
+            id='email'
+            type='email'
+            placeholder='m@example.com'
+            required
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
+            value={email}
+          />
+        </div>
+        <div className='grid gap-2'>
+          <label htmlFor='password'>Password</label>
+          <Password
+            id='password'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete='new-password'
+            placeholder='Password'
+          />
+        </div>
+        <div className='grid gap-2'>
+          <label htmlFor='password'>Confirm Password</label>
+          <Password
+            id='password_confirmation'
+            value={passwordConfirmation}
+            onChange={(e) => setPasswordConfirmation(e.target.value)}
+            autoComplete='new-password'
+            placeholder='Confirm Password'
+          />
+        </div>
+        <div className='grid gap-2'>
+          <label htmlFor='image'>Profile Image (optional)</label>
+          <div className='flex items-end gap-4'>
+            {imagePreview && (
+              <div className='relative w-16 h-16 rounded-sm overflow-hidden'>
+                <Image
+                  src={imagePreview}
+                  alt='Profile preview'
+                  layout='fill'
+                  objectFit='cover'
+                />
+              </div>
+            )}
+            <div className='flex items-center gap-2 w-full'>
+              <InputText
+                id='image'
+                type='file'
+                accept='image/*'
+                onChange={handleImageChange}
+                className='w-full'
+              />
+              {imagePreview && (
+                <X
+                  className='cursor-pointer'
+                  onClick={() => {
+                    setImage(null);
+                    setImagePreview(null);
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+        <Button
+          type='submit'
+          className='w-full'
+          disabled={loading}
+          onClick={async () => {
+            await signUp.email({
+              email,
+              password,
+              name: `${firstName} ${lastName}`,
+              image: image ? await convertImageToBase64(image) : '',
+              callbackURL: '/secure',
+              fetchOptions: {
+                onResponse: () => {
+                  setLoading(false);
+                },
+                onRequest: () => {
+                  setLoading(true);
+                },
+                onError: (ctx) => {
+                  toast.error(ctx.error.message);
+                },
+                onSuccess: async () => {
+                  router.push('/secure');
+                },
+              },
+            });
+          }}
+        >
+          {loading ? (
+            <Loader2 size={16} className='animate-spin' />
+          ) : (
+            'Create an account'
+          )}
+        </Button>
+      </div>
+
       {/* </CardContent> */}
       {/* <CardFooter>
         <div className='flex justify-center w-full border-t py-4'>

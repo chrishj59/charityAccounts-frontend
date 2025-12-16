@@ -108,6 +108,7 @@ export default function IntroPage() {
   return (
     <div className='flex  min-h-screen  justify-content-center align-items-start '>
       {/* <div className="flex min-h-screen " style={{ minHeight: '300px' }}> */}
+
       <Panel>
         <div className='flex justify-content-center text-primary'>
           <div className='text-2xl text-primary-400'>
@@ -119,17 +120,20 @@ export default function IntroPage() {
           {/* Payables Card */}
           <div className='col-12 md:col-6'>
             <div className='card'>
-              <Card title='Payables and expenses'>
-                <div className='relative size-32 ...'>
-                  <div className='absolute top-0 right-0 size-16 ...'>
-                    <i
-                      onClick={onPayablesClick}
-                      className='pi pi-info-circle cursor-pointer '
-                      style={{ fontSize: '1.5rem' }}
-                    ></i>
-                  </div>
-                </div>
-                <p>Manage suppliers and staff expenses</p>
+              <Card
+                title='Payables and expenses'
+                pt={{
+                  root: { className: 'h-40' },
+                }}
+              >
+                <span className='mr-4 text-primary'>
+                  Manage suppliers and staff expenses
+                </span>
+                <i
+                  onClick={onPayablesClick}
+                  className='pi pi-info-circle cursor-pointer '
+                  style={{ fontSize: '1.5rem' }}
+                />
               </Card>
             </div>
           </div>
@@ -137,17 +141,20 @@ export default function IntroPage() {
           {/* Receivables */}
           <div className='col-12 md:col-6'>
             <div className='card'>
-              <Card title='Receivables'>
-                <div className='relative size-32 ...'>
-                  <div className='absolute top-0 right-0 size-16 ...'>
-                    <i
-                      onClick={onReceivablesClick}
-                      className='pi pi-info-circle cursor-pointer '
-                      style={{ fontSize: '1.5rem' }}
-                    ></i>
-                  </div>
-                </div>
-                Manage customers and their transactions
+              <Card
+                title='Receivables'
+                pt={{
+                  root: { className: 'h-40' },
+                }}
+              >
+                <span className='mr-4 text-primary'>
+                  Manage customers and their transactions
+                </span>
+                <i
+                  onClick={onReceivablesClick}
+                  className='pi pi-info-circle cursor-pointer '
+                  style={{ fontSize: '1.5rem' }}
+                ></i>
               </Card>
             </div>
           </div>
@@ -155,35 +162,40 @@ export default function IntroPage() {
           {/* Grants Card */}
           <div className='col-12 md:col-6'>
             <div className='card'>
-              <Card title='Manage Funds'>
-                <div className='relative size-32 ...'>
-                  <div className='absolute top-0 right-0 size-16 ...'>
-                    <i
-                      onClick={onGrantsClick}
-                      className='pi pi-info-circle cursor-pointer '
-                      style={{ fontSize: '1.5rem' }}
-                    ></i>
-                  </div>
-                </div>
-                Manage Grants and restricted funds
-                {/*  */}
+              <Card
+                title='Manage Funds'
+                pt={{
+                  root: { className: 'h-40' },
+                }}
+              >
+                <span className='mr-4 text-primary'>
+                  Manage Grants and restricted funds
+                </span>
+                <i
+                  onClick={onGrantsClick}
+                  className='pi pi-info-circle cursor-pointer '
+                  style={{ fontSize: '1.5rem' }}
+                ></i>
               </Card>
             </div>
           </div>
           {/* VAT card */}
           <div className='col-12 md:col-6'>
             <div className='card'>
-              <Card title='VAT - MTD'>
-                <div className='relative size-32 ...'>
-                  <div className='absolute top-0 right-0 size-16 ...'>
-                    <i
-                      onClick={onVatClick}
-                      className='pi pi-info-circle cursor-pointer '
-                      style={{ fontSize: '1.5rem' }}
-                    ></i>
-                  </div>
-                </div>
-                VAT returns and reporting
+              <Card
+                title='VAT - MTD'
+                pt={{
+                  root: { className: 'h-40' },
+                }}
+              >
+                <span className='mr-4 text-primary'>
+                  VAT returns and reporting
+                </span>
+                <i
+                  onClick={onVatClick}
+                  className='pi pi-info-circle cursor-pointer '
+                  style={{ fontSize: '1.5rem' }}
+                ></i>
               </Card>
             </div>
           </div>
@@ -191,36 +203,36 @@ export default function IntroPage() {
           {/* Other Features dialog */}
           <div className='col-12 md:col-6'>
             <div className='card'>
-              <Card title='Other Features'>
-                <div className='relative size-32 ...'>
-                  <div className='absolute top-0 right-0 size-16 ...'>
-                    <i
-                      onClick={onOtherClick}
-                      className='pi pi-info-circle cursor-pointer '
-                      style={{ fontSize: '1.5rem' }}
-                    ></i>
-                  </div>
-                </div>
-                <p>Other Features</p>
-                {/*  */}
+              <Card
+                title='Other Features'
+                pt={{
+                  root: { className: 'h-40' },
+                }}
+              >
+                <span className='mr-4 text-primary'>Other Features</span>
+                <i
+                  onClick={onOtherClick}
+                  className='pi pi-info-circle cursor-pointer '
+                  style={{ fontSize: '1.5rem' }}
+                ></i>
               </Card>
             </div>
           </div>
 
           <div className='col-12 md:col-6'>
             <div className='card'>
-              <Card title='Account types'>
-                <div className='relative size-32 ...'>
-                  <div className='absolute top-0 right-0 size-16 ...'>
-                    <i
-                      onClick={onAccountsClick}
-                      className='pi pi-info-circle cursor-pointer '
-                      style={{ fontSize: '1.5rem' }}
-                    ></i>
-                  </div>
-                </div>
-                <p className='text-primary'>Account type options</p>
-                {/*  */}
+              <Card
+                title='Account types'
+                pt={{
+                  root: { className: 'h-40' },
+                }}
+              >
+                <span className='mr-4 text-primary'>Account type options</span>
+                <i
+                  onClick={onAccountsClick}
+                  className='pi pi-info-circle cursor-pointer '
+                  style={{ fontSize: '1.5rem' }}
+                ></i>
               </Card>
             </div>
           </div>
@@ -228,7 +240,9 @@ export default function IntroPage() {
 
         <div className='flex justify-content-center flex-wrap gap-3'>
           {/* <Button onClick={() => router.push('/signin')}>Sign in</Button> */}
-          <Button onClick={() => router.push('/signin')}>Sign in new</Button>
+          <Button onClick={() => router.push('/sign-in')}>
+            Sign in or Sign up
+          </Button>
         </div>
       </Panel>
 
@@ -312,9 +326,12 @@ export default function IntroPage() {
         <Panel header='Main Restricted fund accounting features'>
           <ul className='list-disc'>
             <li>Manage fund master records</li>
-            <li>Categorise funds into income, capital etc</li>
+            <li>
+              Categorise funds into unrestriced income, Restricted Income Funds,
+              Permanent Endowment, and Expendable Endowment
+            </li>
             <li>Charity SORP accounting support</li>
-            <li>Income & Expenditure and balance by fund reporting</li>
+            <li>Reporting Income & Expenditure and balance by fund </li>
             <li>Generate fund performance reports including funds flow</li>
           </ul>
         </Panel>

@@ -5,19 +5,20 @@
 
 /* eslint-disable */
 
-import { type SchemaType as $Schema } from "./schema";
+import { type SchemaType as $Schema } from "./schema-lite";
 import { type ModelResult as $ModelResult, type TypeDefResult as $TypeDefResult } from "@zenstackhq/orm";
 export type TodoList = $ModelResult<$Schema, "TodoList">;
 export type Todo = $ModelResult<$Schema, "Todo">;
 export type User = $ModelResult<$Schema, "User">;
-export type Session = $ModelResult<$Schema, "Session">;
 export type Account = $ModelResult<$Schema, "Account">;
 export type Verification = $ModelResult<$Schema, "Verification">;
 export type Organization = $ModelResult<$Schema, "Organization">;
-export type ISOCountry = $ModelResult<$Schema, "ISOCountry">;
-export type Address = $ModelResult<$Schema, "Address">;
 export type Member = $ModelResult<$Schema, "Member">;
 export type Invitation = $ModelResult<$Schema, "Invitation">;
+export type Session = $ModelResult<$Schema, "Session">;
+export type ISOCountry = $ModelResult<$Schema, "ISOCountry">;
+export type AddressRegion = $ModelResult<$Schema, "AddressRegion">;
+export type Address = $ModelResult<$Schema, "Address">;
 export type Apikey = $ModelResult<$Schema, "Apikey">;
 /**
  * Shape of the `auth()` function

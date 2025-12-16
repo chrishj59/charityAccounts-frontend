@@ -33,6 +33,7 @@ const UserSignUpPage = ({ step, setStep }: ChildProps) => {
       : saluationEnum.Mr,
     firstName: defaultUser?.firstName ? defaultUser?.firstName : '',
     familyName: defaultUser?.familyName ? defaultUser?.familyName : '',
+    email: defaultUser?.email ? defaultUser?.email : '',
     organisationName: defaultUser?.organisationName
       ? defaultUser?.organisationName
       : '',

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import Layout from '~/layout/layout';
+import { Toolbar } from 'primereact/toolbar';
+import Layout from '~/src/layout/layout';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -28,10 +29,27 @@ export const metadata: Metadata = {
 };
 
 export default function MainLayout({ children }: MainLayoutProps) {
+  console.log('MainLayout (app/(main)/layout');
+  const centerContent = (
+    // <div className='flex flex-wrap align-items-center gap-3'>
+    <span className=' font-bold text-primary-600 text-2xl'>
+      Rationes Charitatis
+    </span>
+    // </div>
+  );
   return (
-    <>
+    <main>
+      {/* <Toolbar
+        center={centerContent}
+        className='bg-green-200 shadow-2 mr-3 ml-3'
+        style={{
+          borderRadius: '3rem',
+          backgroundImage:
+            'linear-gradient(to right, var(--teal-50), var(--teal-200))',
+        }}
+      /> */}
       <Layout>{children}</Layout>)
-    </>
+    </main>
   );
 }
 

@@ -12,7 +12,7 @@ export enum organisationCategoryEnum {
   'Person',
 }
 
-export enum organisationType {
+export enum organisationTypeEnum {
   'Company',
   'Charity',
   'Tax',

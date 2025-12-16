@@ -1,6 +1,3 @@
-// import { PrismaClient } from '../generated/prisma/index';
-
-// export const prisma = new PrismaClient();
 import { ZenStackClient } from '@zenstackhq/orm';
 import { schema } from '~/zenstack/schema';
 import { PostgresDialect } from 'kysely';

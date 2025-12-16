@@ -3,6 +3,7 @@
 datasource db {
   provider = "postgresql"
   url      = env('DATABASE_URL')
+  defaultSchema = 'charitatis'
 }
 
 
@@ -187,13 +188,26 @@ model ISOCountry {
   name String
   description String
   addresses Address[]
+  regions AddressRegion[]
   
 
   
 }
+ model AddressRegion {
+  regionId Int @id @default(autoincrement())
+  isoCountryId Int
+  country ISOCountry @relation(fields: [isoCountryId], references: [countryId])
+  name String
+  
+ }
 
 model Address {
   addressID Int       @id @default(autoincrement())
+  buildingCode String?
+  room String?
+  careOf String?
+  street2 String?
+  street3 String?
   houseNumber Int?
   street String @length(1, 50, 'Street must be upto 50 char')
   town String?
@@ -201,6 +215,7 @@ model Address {
   postCode String?
   isoCountryId Int
   country ISOCountry @relation(fields: [isoCountryId], references: [countryId])
+
 
 }
 

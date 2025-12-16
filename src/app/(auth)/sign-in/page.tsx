@@ -5,34 +5,26 @@ import { SignUp } from '~/src/components/client/sign-up';
 // import { Tabs } from '@/components/ui/tabs2';
 
 import { TabView, TabPanel } from 'primereact/tabview';
+import { Toolbar } from 'primereact/toolbar';
 
 export default function Page() {
   return (
-    <div className='w-full'>
-      <div className='flex items-center flex-col justify-center w-full md:py-10'>
-        <div className='md:w-[400px]'>
-          <TabView>
+    <div className='w-screen'>
+      <div className='flex place-content-center'>
+        <div>
+          <TabView
+            className='mt-6'
+            pt={{
+              root: { className: 'w-2xl' },
+            }}
+          >
             <TabPanel header='Sign in'>
               <SignIn />
             </TabPanel>
             <TabPanel header='Sign up'>
-              <SignIn />
+              <SignUp />
             </TabPanel>
           </TabView>
-          {/* <Tabs
-                        tabs={[
-                            {
-                                title: 'Sign In',
-                                value: 'sign-in',
-                                content: <SignIn />,
-                            },
-                            {
-                                title: 'Sign Up',
-                                value: 'sign-up',
-                                content: <SignUp />,
-                            },
-                        ]}
-                    /> */}
         </div>
       </div>
     </div>

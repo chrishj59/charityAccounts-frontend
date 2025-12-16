@@ -1,5 +1,5 @@
 'use client';
-import type { NodeRef, Page } from '~/types';
+import type { NodeRef, Page } from '~/src/types';
 import Link from 'next/link';
 import { Button } from 'primereact/button';
 import { Ripple } from 'primereact/ripple';

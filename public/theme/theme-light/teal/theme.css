@@ -1,9 +1,9 @@
 /* Error: Undefined variable.
  *    ,
- * 60 |                 color: $inputListItemTextFocusColor;
- *    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ * 61 |                 background: $inputListItemFocusBg;
+ *    |                             ^^^^^^^^^^^^^^^^^^^^^
  *    '
- *   public/theme/theme-base/components/data/_orderlist.scss 60:12  @import
+ *   public/theme/theme-base/components/data/_orderlist.scss 61:17  @import
  *   public/theme/theme-base/_components.scss 47:13                 @import
  *   public/theme/theme-light/teal/theme.scss 15:9                  root stylesheet */
 
@@ -15,5 +15,5 @@ body::before {
   padding: 1em;
   margin-bottom: 1em;
   border-bottom: 2px solid black;
-  content: "Error: Undefined variable.\a    \2577 \a 60 \2502                  color: $inputListItemTextFocusColor;\a    \2502                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\a    \2575 \a   public/theme/theme-base/components/data/_orderlist.scss 60:12  @import\a   public/theme/theme-base/_components.scss 47:13                 @import\a   public/theme/theme-light/teal/theme.scss 15:9                  root stylesheet";
+  content: "Error: Undefined variable.\a    \2577 \a 61 \2502                  background: $inputListItemFocusBg;\a    \2502                              ^^^^^^^^^^^^^^^^^^^^^\a    \2575 \a   public/theme/theme-base/components/data/_orderlist.scss 61:17  @import\a   public/theme/theme-base/_components.scss 47:13                 @import\a   public/theme/theme-light/teal/theme.scss 15:9                  root stylesheet";
 }

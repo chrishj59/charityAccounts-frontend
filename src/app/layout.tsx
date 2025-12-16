@@ -35,21 +35,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body>
         <Suspense>
           <PrimeReactProvider>
-            {/* <PrimeReactProvider
-                value={{
-                  unstyled: true,
-                  pt: Tailwind,
-                  ptOptions: {
-                    mergeSections: true,
-                    mergeProps: true,
-                    // classNameMergeFunction: twMerge,
-                  },
-                }}
-              > */}
-            {/* {children} */}
-            <div className='flex  min-h-screen '>
-              <LayoutProvider>{children}</LayoutProvider>
-            </div>
+            {/* <div className='flex  min-h-screen '> */}
+            <LayoutProvider>{children}</LayoutProvider>
+            {/* </div> */}
             <div className='fixed bottom-0  right-0 left-0 '>
               <div className='flex align-self-center align-items-center justify-content-center '>
                 <Footer />

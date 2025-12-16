@@ -1,4 +1,3 @@
-'use client';
 import type { AppTopbarRef } from '~/src/types';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';

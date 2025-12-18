@@ -63,7 +63,10 @@ model Todo {
 
 model User {
   id            String        @id
-  name          String
+  name          String        @default('')
+  displayName   String        @length(1,40,'Display name is required up to 40 characters') @default('')
+  firstName     String        @length(1,40,'First name is required up to 40 characters') @default('')
+  familyName    String        @length(1,40,'Family name is required up to 40 characters') @default('')
   email         String        @unique    
   emailVerified Boolean       @default(false)
   image         String?
@@ -202,19 +205,19 @@ model ISOCountry {
  }
 
 model Address {
-  addressID Int       @id @default(autoincrement())
-  buildingCode String?
-  room String?
-  careOf String?
-  street2 String?
-  street3 String?
-  houseNumber Int?
-  street String @length(1, 50, 'Street must be upto 50 char')
-  town String?
-  county String?
-  postCode String?
+  addressID Int         @id @default(autoincrement())
+  buildingCode String?  @length(0,10, 'building code can be up 10 characters' )
+  room String?          @length(0,10, 'room can be up 10 characters' )
+  careOf String?        @length(0,50, 'Care of be up 10 characters' )
+  street2 String?       @length(0,50, 'Street2 can be up 10 characters' )
+  street3 String?       @length(0,50, 'Street3 can be up 10 characters' )
+  houseNumber Int?      
+  street String         @length(1, 50, 'Street must be upto 50 char')
+  town String?          @length(0,50, 'Town can be up 10 characters' )
+  county String?        @length(0,50, 'County can be up 10 characters' )
+  postCode String?      @length(1,10, 'Post code must be up 10 characters' )
   isoCountryId Int
-  country ISOCountry @relation(fields: [isoCountryId], references: [countryId])
+  country ISOCountry    @relation(fields: [isoCountryId], references: [countryId])
 
 
 }

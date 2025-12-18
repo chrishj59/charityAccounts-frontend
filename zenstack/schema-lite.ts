@@ -131,7 +131,23 @@ export class SchemaType implements SchemaDef {
                 },
                 name: {
                     name: "name",
-                    type: "String"
+                    type: "String",
+                    default: ""
+                },
+                displayName: {
+                    name: "displayName",
+                    type: "String",
+                    default: ""
+                },
+                firstName: {
+                    name: "firstName",
+                    type: "String",
+                    default: ""
+                },
+                familyName: {
+                    name: "familyName",
+                    type: "String",
+                    default: ""
                 },
                 email: {
                     name: "email",

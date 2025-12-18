@@ -25,6 +25,34 @@ export const auth = betterAuth({
   database: zenstackAdapter(db, {
     provider: 'postgresql',
   }),
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+        required: false,
+        defaultValue: 'user',
+        input: false, // don't allow user to set role
+      },
+      displayName: {
+        type: 'string',
+        required: true,
+        defaultValue: ' ',
+        input: true,
+      },
+      firstName: {
+        type: 'string',
+        required: true,
+        defaultValue: ' ',
+        input: true,
+      },
+      familyName: {
+        type: 'string',
+        required: true,
+        defaultValue: ' ',
+        input: true,
+      },
+    },
+  },
 
   emailVerification: {
     //   async sendVerificationEmail({ user, url }) {

@@ -154,7 +154,27 @@ export class SchemaType implements SchemaDef {
                 },
                 name: {
                     name: "name",
-                    type: "String"
+                    type: "String",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }],
+                    default: ""
+                },
+                displayName: {
+                    name: "displayName",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Display name is required up to 40 characters") }] }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }],
+                    default: ""
+                },
+                firstName: {
+                    name: "firstName",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("First name is required up to 40 characters") }] }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }],
+                    default: ""
+                },
+                familyName: {
+                    name: "familyName",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Family name is required up to 40 characters") }] }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }],
+                    default: ""
                 },
                 email: {
                     name: "email",
@@ -728,27 +748,32 @@ export class SchemaType implements SchemaDef {
                 buildingCode: {
                     name: "buildingCode",
                     type: "String",
-                    optional: true
+                    optional: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(10) }, { name: "message", value: ExpressionUtils.literal("building code can be up 10 characters") }] }]
                 },
                 room: {
                     name: "room",
                     type: "String",
-                    optional: true
+                    optional: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(10) }, { name: "message", value: ExpressionUtils.literal("room can be up 10 characters") }] }]
                 },
                 careOf: {
                     name: "careOf",
                     type: "String",
-                    optional: true
+                    optional: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Care of be up 10 characters") }] }]
                 },
                 street2: {
                     name: "street2",
                     type: "String",
-                    optional: true
+                    optional: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Street2 can be up 10 characters") }] }]
                 },
                 street3: {
                     name: "street3",
                     type: "String",
-                    optional: true
+                    optional: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Street3 can be up 10 characters") }] }]
                 },
                 houseNumber: {
                     name: "houseNumber",
@@ -763,17 +788,20 @@ export class SchemaType implements SchemaDef {
                 town: {
                     name: "town",
                     type: "String",
-                    optional: true
+                    optional: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Town can be up 10 characters") }] }]
                 },
                 county: {
                     name: "county",
                     type: "String",
-                    optional: true
+                    optional: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("County can be up 10 characters") }] }]
                 },
                 postCode: {
                     name: "postCode",
                     type: "String",
-                    optional: true
+                    optional: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(10) }, { name: "message", value: ExpressionUtils.literal("Post code must be up 10 characters") }] }]
                 },
                 isoCountryId: {
                     name: "isoCountryId",

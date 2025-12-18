@@ -1,11 +1,10 @@
 'use client';
 
 import SignIn from '~/src/components/client/sign-in';
-import { SignUp } from '~/src/components/client/sign-up';
-// import { Tabs } from '@/components/ui/tabs2';
 
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Toolbar } from 'primereact/toolbar';
+import { SignUp } from '~/src/components/client/sign-up';
 
 export default function Page() {
   return (

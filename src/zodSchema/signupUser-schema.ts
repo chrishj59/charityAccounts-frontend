@@ -3,13 +3,13 @@ import { z } from 'zod';
 import { addressSchema } from './address-schema';
 import { passwordSchema } from './password';
 const passwordMismatchErrorMessage =
-  'Password and confirmed passwords are different. They must be the same';
+  'Password and confirmed passwords must be identical.';
 
 export const userInputSchema = z
   .object({
-    displayName: z.string().min(1, 'Display Name is required').nullable(),
-    firstName: z.string().min(1, 'First Name is required').nullable(),
-    familyName: z.string().min(1, 'familyName is required').nullable(),
+    displayName: z.string().min(1, 'Display Name is required'),
+    firstName: z.string().min(1, 'First Name is required'),
+    familyName: z.string().min(1, 'familyName is required'),
     password: passwordSchema,
     confirmedPassword: z.string(),
     email: z.email('A valid email is required'),
@@ -23,9 +23,9 @@ export const userInputSchema = z
 
 export type userInputValues = z.infer<typeof userInputSchema>;
 
-export const userInputSchema2 = z.object({
-  name: z.string(),
-  firstName: z.string().min(1, 'First Name is required').nullable(),
-});
+// export const userInputSchema2 = z.object({
+//   name: z.string(),
+//   firstName: z.string().min(1, 'First Name is required').nullable(),
+// });
 
-export type userInputValues2 = z.infer<typeof userInputSchema2>;
+// export type userInputValues2 = z.infer<typeof userInputSchema2>;

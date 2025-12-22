@@ -1,7 +1,12 @@
 import { betterAuth } from 'better-auth';
 
 import { nextCookies } from 'better-auth/next-js';
-import { admin, bearer, organization } from 'better-auth/plugins';
+import {
+  admin,
+  bearer,
+  organization,
+  lastLoginMethod,
+} from 'better-auth/plugins';
 import { db } from './db';
 import { reactInvitationEmail } from './email/invitation';
 
@@ -16,6 +21,7 @@ import {
 } from '@aws-sdk/client-sesv2';
 import { awsVerificationEmail } from '../actions/send-email/send-verification';
 import { resend } from './email/resend';
+import { TruckElectric } from 'lucide-react';
 
 const from = process.env.BETTER_AUTH_EMAIL || 'delivered@resend.dev';
 const to = process.env.TEST_EMAIL || '';
@@ -100,6 +106,73 @@ export const auth = betterAuth({
   plugins: [
     apiKey(),
     organization({
+      schema: {
+        organization: {
+          name: 'Trading name',
+          additionalFields: {
+            tradingName: {
+              type: 'string',
+              input: true,
+              required: true,
+            },
+            legalForm: {
+              type: 'string',
+              input: true,
+              required: true,
+            },
+            legalName: {
+              type: 'string',
+              input: true,
+              required: true,
+            },
+            charityNumber: {
+              type: 'string',
+              input: true,
+              required: false,
+            },
+            taxRef: {
+              type: 'string',
+              input: true,
+              required: false,
+            },
+            companyNumber: {
+              type: 'string',
+              input: true,
+              required: false,
+            },
+            companyName: {
+              type: 'string',
+              input: true,
+              required: false,
+            },
+            idType: {
+              type: 'string',
+              input: true,
+              required: true,
+            },
+            identification: {
+              type: 'string',
+              input: true,
+              required: true,
+            },
+            trial: {
+              type: 'boolean',
+              input: true,
+              required: false,
+            },
+            trialStart: {
+              type: 'date',
+              input: false,
+              required: false,
+            },
+            accountType: {
+              type: 'string',
+              input: true,
+              required: false,
+            },
+          },
+        },
+      },
       async sendInvitationEmail() {
         // const res = await resend.emails.send({
         //   from,
@@ -121,8 +194,11 @@ export const auth = betterAuth({
         // });
         // console.log(res, data.email);
       },
+      // organizationLimit: 1,
     }),
-
+    lastLoginMethod({
+      storeInDatabase: true,
+    }),
     bearer(),
     admin(),
     nextCookies(),

@@ -10,6 +10,7 @@ import { Ripple } from 'primereact/ripple';
 import { Badge } from 'primereact/badge';
 import Link from 'next/link';
 import { Dialog } from 'primereact/dialog';
+import { DivideCircle } from 'lucide-react';
 
 export default function IntroPage() {
   const router = useRouter();
@@ -372,13 +373,13 @@ export default function IntroPage() {
         footer={otherDialogFooter}
       >
         <Panel header='Other Features'>
-          <p className='font-medium'>Multi-organisation</p>
+          <div className='font-medium'>Multi-organisation</div>
           <ul className='list-disc'>
             <li>Supports Sole trader, partnership, and limited company</li>
             <li>The basic tier supports a single organistion</li>
             <li>Premium tiers support many organisations</li>
           </ul>
-          <p className='font-medium'>Security</p>
+          <div className='font-medium'>Security</div>
           <ul className='list-disc'>
             <li>
               Follows best security practices using modern authentication
@@ -414,10 +415,10 @@ export default function IntroPage() {
         <Panel header='Account types'>
           <ul className='list-disc'>
             <li>Trial</li>
-            <p>
+            <div>
               Use this account when you are looking to explore the
               features.{' '}
-            </p>
+            </div>
             <ul className='list-disc'>
               <li>This is a free account that lasts for 1 month</li>
               <li>A single organisation</li>
@@ -425,10 +426,10 @@ export default function IntroPage() {
             </ul>
             <hr />
             <li>Limited</li>
-            <p>
+            <div>
               This is designed for smaller organisations or those staing
               out{' '}
-            </p>
+            </div>
             <ul className='list-disc'>
               <li>There is a discounted charge of £10 per month</li>
               <li>100 transactions per month</li>
@@ -438,7 +439,7 @@ export default function IntroPage() {
             <hr />
             <li>Standard account</li>
 
-            <p>These accounts have the full features of the package</p>
+            <div>These accounts have the full features of the package</div>
             <ul className='list-disc'>
               <li>All the features of the other account types</li>
               <li>Upload attachments to accounting documents </li>

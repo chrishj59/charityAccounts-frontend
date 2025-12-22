@@ -82,6 +82,7 @@ model User {
   invitations   Invitation[]
   todoLists     TodoList[]
   apiKey        Apikey?
+  lastLoginMethod String
 
   
   @@map("user")
@@ -117,19 +118,44 @@ model Verification {
   @@map("verification")
 }
 
+enum OrgLegalForm{
+    SoleTrader
+    Company
+    Partnership
+    }
+enum OrgIdentificationType {
+  UTR_tax_ref
+  Company_Number
+  Charity_number
+}
+ enum OrgPlanType {
+  Trial
+  Free
+  Premium
+ }
+
 model Organization {
-  id          String       @id
-  name        String
-  slug        String?     @unique
-  logo        String?
-  createdAt   DateTime
-  metadata    String?
-  members     Member[]
-  invitations Invitation[]
-  todoLists   TodoList[]
+    id             String       @id
+    name           String
+    slug           String       @unique
+    logo           String?
+    createdAt           DateTime
+    metadata            String?
+    tradingName         String       @length(1,50, "Must be between 1 and 50 characters")
+    legalForm           OrgLegalForm    @default(SoleTrader)
+    legalName           String       @length(1,50, "Must be between 1 and 50 characters")
+    charityNumber       String?
+    taxRef              String?
+    companyNumber       String?
+    companyName         String?
+    idType OrgIdentificationType     @default(UTR_tax_ref)
+    identification      String       @length(1,50, "Must be between 1 and 50 characters")
+    accountType         OrgPlanType  @default(Trial)
+    members             Member[]
+    invitations         Invitation[]
+    todoLists           TodoList[]
 
-
-  @@map("organization")
+    @@map('organization')
 }
 
 model Member {

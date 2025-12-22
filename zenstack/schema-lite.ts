@@ -230,6 +230,10 @@ export class SchemaType implements SchemaDef {
                     type: "Apikey",
                     optional: true,
                     relation: { opposite: "user" }
+                },
+                lastLoginMethod: {
+                    name: "lastLoginMethod",
+                    type: "String"
                 }
             },
             idFields: ["id"],
@@ -371,8 +375,7 @@ export class SchemaType implements SchemaDef {
                 slug: {
                     name: "slug",
                     type: "String",
-                    unique: true,
-                    optional: true
+                    unique: true
                 },
                 logo: {
                     name: "logo",
@@ -387,6 +390,53 @@ export class SchemaType implements SchemaDef {
                     name: "metadata",
                     type: "String",
                     optional: true
+                },
+                tradingName: {
+                    name: "tradingName",
+                    type: "String"
+                },
+                legalForm: {
+                    name: "legalForm",
+                    type: "OrgLegalForm",
+                    default: "SoleTrader"
+                },
+                legalName: {
+                    name: "legalName",
+                    type: "String"
+                },
+                charityNumber: {
+                    name: "charityNumber",
+                    type: "String",
+                    optional: true
+                },
+                taxRef: {
+                    name: "taxRef",
+                    type: "String",
+                    optional: true
+                },
+                companyNumber: {
+                    name: "companyNumber",
+                    type: "String",
+                    optional: true
+                },
+                companyName: {
+                    name: "companyName",
+                    type: "String",
+                    optional: true
+                },
+                idType: {
+                    name: "idType",
+                    type: "OrgIdentificationType",
+                    default: "UTR_tax_ref"
+                },
+                identification: {
+                    name: "identification",
+                    type: "String"
+                },
+                accountType: {
+                    name: "accountType",
+                    type: "OrgPlanType",
+                    default: "Trial"
                 },
                 members: {
                     name: "members",
@@ -880,6 +930,29 @@ export class SchemaType implements SchemaDef {
             attributes: [
                 { name: "@@auth" }
             ]
+        }
+    } as const;
+    enums = {
+        OrgLegalForm: {
+            values: {
+                SoleTrader: "SoleTrader",
+                Company: "Company",
+                Partnership: "Partnership"
+            }
+        },
+        OrgIdentificationType: {
+            values: {
+                UTR_tax_ref: "UTR_tax_ref",
+                Company_Number: "Company_Number",
+                Charity_number: "Charity_number"
+            }
+        },
+        OrgPlanType: {
+            values: {
+                Trial: "Trial",
+                Free: "Free",
+                Premium: "Premium"
+            }
         }
     } as const;
     authType = "Auth" as const;

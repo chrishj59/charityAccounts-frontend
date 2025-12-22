@@ -5,7 +5,7 @@
 
 /* eslint-disable */
 
-import { type SchemaType as $Schema } from "./schema-lite";
+import { schema as $schema, type SchemaType as $Schema } from "./schema-lite";
 import { type ModelResult as $ModelResult, type TypeDefResult as $TypeDefResult } from "@zenstackhq/orm";
 export type TodoList = $ModelResult<$Schema, "TodoList">;
 export type Todo = $ModelResult<$Schema, "Todo">;
@@ -24,3 +24,9 @@ export type Apikey = $ModelResult<$Schema, "Apikey">;
  * Shape of the `auth()` function
  */
 export type Auth = $TypeDefResult<$Schema, "Auth">;
+export const OrgLegalForm = $schema.enums.OrgLegalForm.values;
+export type OrgLegalForm = (typeof OrgLegalForm)[keyof typeof OrgLegalForm];
+export const OrgIdentificationType = $schema.enums.OrgIdentificationType.values;
+export type OrgIdentificationType = (typeof OrgIdentificationType)[keyof typeof OrgIdentificationType];
+export const OrgPlanType = $schema.enums.OrgPlanType.values;
+export type OrgPlanType = (typeof OrgPlanType)[keyof typeof OrgPlanType];

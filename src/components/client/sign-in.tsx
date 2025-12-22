@@ -101,7 +101,7 @@ export default function SignIn() {
             // className='w-full'
             disabled={loading}
             onClick={async () => {
-              await signIn.email(
+              const { data, error } = await signIn.email(
                 {
                   email: email,
                   password: password,
@@ -117,6 +117,9 @@ export default function SignIn() {
                   },
                   onError: (ctx) => {
                     toast.error(ctx.error.message);
+                  },
+                  onSuccess: async () => {
+                    router.push('/secure');
                   },
                 },
               );

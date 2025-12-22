@@ -261,6 +261,10 @@ export class SchemaType implements SchemaDef {
                     type: "Apikey",
                     optional: true,
                     relation: { opposite: "user" }
+                },
+                lastLoginMethod: {
+                    name: "lastLoginMethod",
+                    type: "String"
                 }
             },
             attributes: [
@@ -420,7 +424,6 @@ export class SchemaType implements SchemaDef {
                     name: "slug",
                     type: "String",
                     unique: true,
-                    optional: true,
                     attributes: [{ name: "@unique" }]
                 },
                 logo: {
@@ -436,6 +439,59 @@ export class SchemaType implements SchemaDef {
                     name: "metadata",
                     type: "String",
                     optional: true
+                },
+                tradingName: {
+                    name: "tradingName",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Must be between 1 and 50 characters") }] }]
+                },
+                legalForm: {
+                    name: "legalForm",
+                    type: "OrgLegalForm",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("SoleTrader") }] }],
+                    default: "SoleTrader"
+                },
+                legalName: {
+                    name: "legalName",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Must be between 1 and 50 characters") }] }]
+                },
+                charityNumber: {
+                    name: "charityNumber",
+                    type: "String",
+                    optional: true
+                },
+                taxRef: {
+                    name: "taxRef",
+                    type: "String",
+                    optional: true
+                },
+                companyNumber: {
+                    name: "companyNumber",
+                    type: "String",
+                    optional: true
+                },
+                companyName: {
+                    name: "companyName",
+                    type: "String",
+                    optional: true
+                },
+                idType: {
+                    name: "idType",
+                    type: "OrgIdentificationType",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("UTR_tax_ref") }] }],
+                    default: "UTR_tax_ref"
+                },
+                identification: {
+                    name: "identification",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Must be between 1 and 50 characters") }] }]
+                },
+                accountType: {
+                    name: "accountType",
+                    type: "OrgPlanType",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("Trial") }] }],
+                    default: "Trial"
                 },
                 members: {
                     name: "members",
@@ -976,6 +1032,29 @@ export class SchemaType implements SchemaDef {
             attributes: [
                 { name: "@@auth" }
             ]
+        }
+    } as const;
+    enums = {
+        OrgLegalForm: {
+            values: {
+                SoleTrader: "SoleTrader",
+                Company: "Company",
+                Partnership: "Partnership"
+            }
+        },
+        OrgIdentificationType: {
+            values: {
+                UTR_tax_ref: "UTR_tax_ref",
+                Company_Number: "Company_Number",
+                Charity_number: "Charity_number"
+            }
+        },
+        OrgPlanType: {
+            values: {
+                Trial: "Trial",
+                Free: "Free",
+                Premium: "Premium"
+            }
         }
     } as const;
     authType = "Auth" as const;

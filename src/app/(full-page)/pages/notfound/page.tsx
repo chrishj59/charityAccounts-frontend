@@ -30,9 +30,9 @@ const NotFound: Page = (props) => {
       <div className='px-5 min-h-screen flex justify-content-center align-items-center'>
         <div className='z-1 text-center'>
           <div className='text-900 font-bold text-8xl mb-4'>Oops!</div>
-          <p className='line-height-3 mt-0 mb-5 text-700 text-xl font-medium'>
+          <div className='line-height-3 mt-0 mb-5 text-700 text-xl font-medium'>
             There is nothing here
-          </p>
+          </div>
           <Link href={'/'}>
             <button
               type='button'

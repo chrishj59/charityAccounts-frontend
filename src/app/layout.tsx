@@ -13,6 +13,7 @@ import Footer from './components/footer';
 import { Suspense } from 'react';
 
 import '~/src/styles/globals.css';
+import { TanstackProvider } from '../components/client/providers/tanstack-provider';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -22,7 +23,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   const value = {
     ripple: true,
   };
-  console.log('/src/app/layout root layout has justify content center');
+
   return (
     <html lang='en' suppressHydrationWarning>
       <head>
@@ -36,7 +37,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <Suspense>
           <PrimeReactProvider>
             {/* <div className='flex  min-h-screen '> */}
-            <LayoutProvider>{children}</LayoutProvider>
+            <LayoutProvider>
+              <TanstackProvider>{children}</TanstackProvider>
+            </LayoutProvider>
             {/* </div> */}
             <div className='fixed bottom-0  right-0 left-0 '>
               <div className='flex align-self-center align-items-center justify-content-center '>

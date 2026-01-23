@@ -9,7 +9,6 @@ interface AuthLayoutProps {
 }
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
-  console.log(`/src/app/(auth)layout called`);
   // return (
   //   <html lang='en'>
   //     <body>

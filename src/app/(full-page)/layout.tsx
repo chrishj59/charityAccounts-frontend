@@ -13,11 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function FullPageLayout({ children }: FullPageLayoutProps) {
-  console.log('FullPageLayout app/(full-page)/layout');
   return (
     <React.Fragment>
       {children}
-      <AppConfig minimal />
+      {/* <AppConfig minimal /> */}
     </React.Fragment>
   );
 }

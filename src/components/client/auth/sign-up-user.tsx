@@ -7,7 +7,7 @@ import {
   userInputSchema,
   userInputValues,
 } from '~/src/zodSchema/signupUser-schema';
-import { signUp } from '~/src/lib/auth-client';
+import { client, signUp } from '~/src/lib/auth-client';
 import { Card } from 'primereact/card';
 import { classNames } from 'primereact/utils';
 import { InputText } from 'primereact/inputtext';
@@ -17,8 +17,15 @@ import { useRouter } from 'next/navigation';
 
 import { Password } from 'primereact/password';
 import { Dialog } from 'primereact/dialog';
+import { required } from 'zod/v4-mini';
+import { db } from '~/src/lib/db';
 
-export function SignUpUser() {
+type Props = {
+  setUserAction: React.Dispatch<React.SetStateAction<userInputValues>>;
+  setActiveTabAction: React.Dispatch<React.SetStateAction<number>>;
+};
+
+export function SignUpUser({ setUserAction, setActiveTabAction }: Props) {
   const defaultAddressValues = {
     street: '',
     postCode: '',
@@ -58,31 +65,33 @@ export function SignUpUser() {
 
   const onUserSubmit = async (formData: userInputValues) => {
     // var { firstName, familyName, email, password } = formData;
-    const { displayName, firstName, familyName, email, password } = formData;
 
-    const res = await signUp.email({
-      displayName,
-      firstName,
-      familyName,
-      email,
-      password,
-      name: `${firstName} ${familyName}`,
-      fetchOptions: {
-        onResponse: () => {
-          setLoading(false);
-        },
-        onRequest: () => {
-          setLoading(true);
-        },
-        onError: (ctx) => {
-          setErrMsg(ctx.error.message);
-          setShowErrDialog(true);
-        },
-        onSuccess: async () => {
-          // router.push('/secure');
-        },
-      },
-    });
+    (setUserAction(formData), setActiveTabAction(1));
+    // const { displayName, firstName, familyName, email, password } = formData;
+
+    // const res = await signUp.email({
+    //   displayName,
+    //   firstName,
+    //   familyName,
+    //   email,
+    //   password,
+    //   name: `${firstName} ${familyName}`,
+    //   fetchOptions: {
+    //     onResponse: () => {
+    //       setLoading(false);
+    //     },
+    //     onRequest: () => {
+    //       setLoading(true);
+    //     },
+    //     onError: (ctx) => {
+    //       setErrMsg(ctx.error.message);
+    //       setShowErrDialog(true);
+    //     },
+    //     onSuccess: async () => {
+    //       // router.push('/secure');
+    //     },
+    //   },
+    // });
   };
 
   const getFormErrorMessage = (name: string) => {
@@ -317,7 +326,7 @@ export function SignUpUser() {
             </div>
 
             <Button type='submit' disabled={loading} severity='success'>
-              save user
+              Next
             </Button>
           </div>
         </form>

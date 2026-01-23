@@ -194,6 +194,28 @@ export const auth = betterAuth({
         // });
         // console.log(res, data.email);
       },
+      teams: {
+        modelName: 'Fund',
+        enabled: true,
+        allowRemovingAllTeams: true,
+        additionalFields: {
+          isRestricted: {
+            type: 'boolean',
+            input: true,
+            required: true,
+          },
+          fundCategory: {
+            type: 'string',
+            input: true,
+            required: true,
+          },
+          fundSource: {
+            type: 'string',
+            input: true,
+            required: false,
+          },
+        },
+      },
       // organizationLimit: 1,
     }),
     lastLoginMethod({

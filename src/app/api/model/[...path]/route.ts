@@ -19,7 +19,7 @@
 import { auth } from '~/src/lib/auth';
 import { authDb } from '~/src/lib/db';
 import { schema } from '~/zenstack/schema';
-import { RPCApiHandler } from '@zenstackhq/server/api';
+import { RestApiHandler, RPCApiHandler } from '@zenstackhq/server/api';
 import { NextRequestHandler } from '@zenstackhq/server/next';
 import { headers } from 'next/headers';
 
@@ -58,7 +58,8 @@ async function getClient() {
 }
 
 const handler = NextRequestHandler({
-  apiHandler: new RPCApiHandler({ schema }),
+  //apiHandler: new RPCApiHandler({ schema }),
+  apiHandler: new RestApiHandler({ schema, endpoint: 'http://localhost/api' }),
   getClient,
   useAppDir: true,
 });

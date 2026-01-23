@@ -39,7 +39,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   );
   return (
     <main>
-      {/* <Toolbar
+      <Toolbar
         center={centerContent}
         className='bg-green-200 shadow-2 mr-3 ml-3'
         style={{
@@ -47,7 +47,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
           backgroundImage:
             'linear-gradient(to right, var(--teal-50), var(--teal-200))',
         }}
-      /> */}
+      />
       <Layout>{children}</Layout>)
     </main>
   );

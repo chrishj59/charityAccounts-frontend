@@ -17,6 +17,9 @@ export const client = createAuthClient({
   plugins: [
     organizationClient({
       schema: inferOrgAdditionalFields<typeof auth>(),
+      teams: {
+        enabled: true,
+      },
     }),
     adminClient(),
     inferAdditionalFields<typeof auth>(),

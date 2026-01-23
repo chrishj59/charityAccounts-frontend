@@ -210,7 +210,7 @@ const Layout = (props: ChildContainerProps) => {
         </div>
 
         {pathname.startsWith('/secure') && <AppProfileSidebar />}
-        {pathname.startsWith('/secure') && <AppConfig />}
+        {/* {pathname.startsWith('/secure') && <AppConfig />} */}
         <div className='layout-mask'></div>
       </div>
     </React.Fragment>

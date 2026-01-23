@@ -12,14 +12,43 @@ plugin policy {
     provider = '@zenstackhq/plugin-policy'
 }
 
+plugin hooks {
+  provider = "@zenstackhq/tanstack-query"
+  target = "react"
+  output = "./hooks/model"
+}
+
+
 /// Shape of the `auth()` function
 type Auth {
   userId           String  @id
   organizationId   String?
   organizationRole String?
-
+  role             String
   @@auth
 }
+
+enum OrgLegalForm{
+    SoleTrader
+    Company
+    Partnership
+    }
+enum OrgIdentificationType {
+  UTR_tax_ref
+  Company_Number
+  Charity_number
+}
+ enum OrgPlanType {
+  Trial
+  Free
+  Premium
+ }
+
+ enum PersonType {
+  Person
+  Organisation
+
+ }
 
 model TodoList {
   id             String        @id @default(cuid())
@@ -62,7 +91,7 @@ model Todo {
 }
 
 model User {
-  id            String        @id
+  id            String        @id @default(cuid())
   name          String        @default('')
   displayName   String        @length(1,40,'Display name is required up to 40 characters') @default('')
   firstName     String        @length(1,40,'First name is required up to 40 characters') @default('')
@@ -79,10 +108,13 @@ model User {
   sessions      Session[]
   accounts      Account[]
   members       Member[]
+  teamMembers   TeamMember[]
   invitations   Invitation[]
   todoLists     TodoList[]
   apiKey        Apikey?
-  lastLoginMethod String
+  glaccounts    GlAccount[]
+  partners      Partner[]
+  lastLoginMethod String?
 
   
   @@map("user")
@@ -118,21 +150,7 @@ model Verification {
   @@map("verification")
 }
 
-enum OrgLegalForm{
-    SoleTrader
-    Company
-    Partnership
-    }
-enum OrgIdentificationType {
-  UTR_tax_ref
-  Company_Number
-  Charity_number
-}
- enum OrgPlanType {
-  Trial
-  Free
-  Premium
- }
+
 
 model Organization {
     id             String       @id
@@ -152,10 +170,20 @@ model Organization {
     identification      String       @length(1,50, "Must be between 1 and 50 characters")
     accountType         OrgPlanType  @default(Trial)
     members             Member[]
+    
     invitations         Invitation[]
     todoLists           TodoList[]
 
     @@map('organization')
+}
+
+model Team {
+  id              String        @id
+  name            String
+  organizationId	String
+  teamMembers    TeamMember[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
 }
 
 model Member {
@@ -165,9 +193,21 @@ model Member {
   userId         String
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   role           String
-  createdAt      DateTime
+  
+  createdAt      DateTime     @default(now())
+  updatesAt      DateTime     @default(now()) @updatedAt
 
   @@map("member")
+}
+
+model TeamMember {
+  id            String @id
+  teamId        String
+  team          Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId        String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatesAt      DateTime     @default(now()) @updatedAt
 }
 
 model Invitation {
@@ -244,6 +284,9 @@ model Address {
   postCode String?      @length(1,10, 'Post code must be up 10 characters' )
   isoCountryId Int
   country ISOCountry    @relation(fields: [isoCountryId], references: [countryId])
+  partnerId    String
+  partners Partner[]
+  
 
 
 }
@@ -278,4 +321,73 @@ model Apikey {
 
   @@map("apikey")
 }
+ 
+ model GlAccount {
+  id              String @id @default(uuid())
+  name            String
+  balanceSheet    Boolean
+  reportCat       String
+  createdById     String
+  createdBy       User @relation(fields: [createdById], references: [id])
+  ArApRecAccount  ArAPPartner[]
+
+ }
+
+ model Partner {
+  id          String    @id @default(uuid())
+  name        String    @length(1,40, 'Partner name is requiredd')
+  personType  PersonType
+  familyName  String? 
+  addressId   Int
+  searchTerm  String    @length( 1,20, 'Search term to find partners')
+  stripeId    String
+  address     Address   @relation(fields: [addressId], references: [addressID])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  type        String    @length(1,20, 'Type of partner')
+
+
+  @@delegate(type)
+
+ }
+
+ model ArAPPartner extends Partner{
+   reconAccountId   String
+   reconAccount     GlAccount @relation(fields: [reconAccountId], references: [id])
+   companyId        String
+  //  company          Team      @relation(fields: [companyId], references: [id])
+ }
+
+ model FiscalYearVariant {
+  id            Int @id @default(autoincrement())
+  name          String
+  monthNum      Int
+  day           Int
+  fiscPeriod    Int
+  yearShift     Boolean
+  // company       Team[]
+  @@allow('create,read', true)
+
+ }
+
+ model PostingPeriod {
+  id      Int @id @default(autoincrement())
+  year    Int
+  period  Int
+  open    Boolean 
+  companyId String @unique
+  // company   Team  @relation('CompPeriods', fields: [companyId], references: [id])  
+ }
+
+ model Parameter {
+  id Int  @id @default(autoincrement())
+  name String
+  value String
+
+  @@allow('create,read', true)
+ }
+
+
 

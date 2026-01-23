@@ -16,6 +16,7 @@ export const orgInputSchema = z.object({
   taxRef: z.string().optional(),
   companyNumber: z.string().optional(),
   charityNumber: z.string().optional(),
+  companyName: z.string().optional(),
 });
 
 export type orgInputValues = z.infer<typeof orgInputSchema>;

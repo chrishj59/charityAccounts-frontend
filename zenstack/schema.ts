@@ -150,7 +150,8 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }]
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("cuid") }] }],
+                    default: ExpressionUtils.call("cuid")
                 },
                 name: {
                     name: "name",
@@ -244,6 +245,12 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "user" }
                 },
+                teamMembers: {
+                    name: "teamMembers",
+                    type: "TeamMember",
+                    array: true,
+                    relation: { opposite: "user" }
+                },
                 invitations: {
                     name: "invitations",
                     type: "Invitation",
@@ -262,9 +269,22 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     relation: { opposite: "user" }
                 },
+                glaccounts: {
+                    name: "glaccounts",
+                    type: "GlAccount",
+                    array: true,
+                    relation: { opposite: "createdBy" }
+                },
+                partners: {
+                    name: "partners",
+                    type: "Partner",
+                    array: true,
+                    relation: { opposite: "createdBy" }
+                },
                 lastLoginMethod: {
                     name: "lastLoginMethod",
-                    type: "String"
+                    type: "String",
+                    optional: true
                 }
             },
             attributes: [
@@ -521,6 +541,48 @@ export class SchemaType implements SchemaDef {
                 slug: { type: "String" }
             }
         },
+        Team: {
+            name: "Team",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }]
+                },
+                name: {
+                    name: "name",
+                    type: "String"
+                },
+                organizationId: {
+                    name: "organizationId",
+                    type: "String"
+                },
+                teamMembers: {
+                    name: "teamMembers",
+                    type: "TeamMember",
+                    array: true,
+                    relation: { opposite: "team" }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
+                    default: ExpressionUtils.call("now")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
+                    default: ExpressionUtils.call("now")
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
+        },
         Member: {
             name: "Member",
             fields: {
@@ -562,12 +624,75 @@ export class SchemaType implements SchemaDef {
                 },
                 createdAt: {
                     name: "createdAt",
-                    type: "DateTime"
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
+                    default: ExpressionUtils.call("now")
+                },
+                updatesAt: {
+                    name: "updatesAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
+                    default: ExpressionUtils.call("now")
                 }
             },
             attributes: [
                 { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("member") }] }
             ],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
+        },
+        TeamMember: {
+            name: "TeamMember",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }]
+                },
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "team"
+                    ]
+                },
+                team: {
+                    name: "team",
+                    type: "Team",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("teamId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    relation: { opposite: "teamMembers", fields: ["teamId"], references: ["id"], onDelete: "Cascade" }
+                },
+                userId: {
+                    name: "userId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "user"
+                    ]
+                },
+                user: {
+                    name: "user",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    relation: { opposite: "teamMembers", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
+                    default: ExpressionUtils.call("now")
+                },
+                updatesAt: {
+                    name: "updatesAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
+                    default: ExpressionUtils.call("now")
+                }
+            },
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -871,6 +996,16 @@ export class SchemaType implements SchemaDef {
                     type: "ISOCountry",
                     attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("isoCountryId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("countryId")]) }] }],
                     relation: { opposite: "addresses", fields: ["isoCountryId"], references: ["countryId"] }
+                },
+                partnerId: {
+                    name: "partnerId",
+                    type: "String"
+                },
+                partners: {
+                    name: "partners",
+                    type: "Partner",
+                    array: true,
+                    relation: { opposite: "address" }
                 }
             },
             idFields: ["addressID"],
@@ -1007,6 +1142,357 @@ export class SchemaType implements SchemaDef {
                 id: { type: "String" },
                 userId: { type: "String" }
             }
+        },
+        GlAccount: {
+            name: "GlAccount",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
+                    default: ExpressionUtils.call("uuid")
+                },
+                name: {
+                    name: "name",
+                    type: "String"
+                },
+                balanceSheet: {
+                    name: "balanceSheet",
+                    type: "Boolean"
+                },
+                reportCat: {
+                    name: "reportCat",
+                    type: "String"
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "glaccounts", fields: ["createdById"], references: ["id"] }
+                },
+                ArApRecAccount: {
+                    name: "ArApRecAccount",
+                    type: "ArAPPartner",
+                    array: true,
+                    relation: { opposite: "reconAccount" }
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
+        },
+        Partner: {
+            name: "Partner",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
+                    default: ExpressionUtils.call("uuid")
+                },
+                name: {
+                    name: "name",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Partner name is requiredd") }] }]
+                },
+                personType: {
+                    name: "personType",
+                    type: "PersonType"
+                },
+                familyName: {
+                    name: "familyName",
+                    type: "String",
+                    optional: true
+                },
+                addressId: {
+                    name: "addressId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "address"
+                    ]
+                },
+                searchTerm: {
+                    name: "searchTerm",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Search term to find partners") }] }]
+                },
+                stripeId: {
+                    name: "stripeId",
+                    type: "String"
+                },
+                address: {
+                    name: "address",
+                    type: "Address",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("addressId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("addressID")]) }] }],
+                    relation: { opposite: "partners", fields: ["addressId"], references: ["addressID"] }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
+                    default: ExpressionUtils.call("now")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
+                    default: ExpressionUtils.call("now")
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "partners", fields: ["createdById"], references: ["id"] }
+                },
+                type: {
+                    name: "type",
+                    type: "String",
+                    isDiscriminator: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Type of partner") }] }]
+                }
+            },
+            attributes: [
+                { name: "@@delegate", args: [{ name: "discriminator", value: ExpressionUtils.field("type") }] }
+            ],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            },
+            isDelegate: true,
+            subModels: ["ArAPPartner"]
+        },
+        ArAPPartner: {
+            name: "ArAPPartner",
+            baseModel: "Partner",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
+                    default: ExpressionUtils.call("uuid")
+                },
+                name: {
+                    name: "name",
+                    type: "String",
+                    originModel: "Partner",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Partner name is requiredd") }] }]
+                },
+                personType: {
+                    name: "personType",
+                    type: "PersonType",
+                    originModel: "Partner"
+                },
+                familyName: {
+                    name: "familyName",
+                    type: "String",
+                    optional: true,
+                    originModel: "Partner"
+                },
+                addressId: {
+                    name: "addressId",
+                    type: "Int",
+                    originModel: "Partner",
+                    foreignKeyFor: [
+                        "address"
+                    ]
+                },
+                searchTerm: {
+                    name: "searchTerm",
+                    type: "String",
+                    originModel: "Partner",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Search term to find partners") }] }]
+                },
+                stripeId: {
+                    name: "stripeId",
+                    type: "String",
+                    originModel: "Partner"
+                },
+                address: {
+                    name: "address",
+                    type: "Address",
+                    originModel: "Partner",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("addressId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("addressID")]) }] }],
+                    relation: { opposite: "partners", fields: ["addressId"], references: ["addressID"] }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    originModel: "Partner",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
+                    default: ExpressionUtils.call("now")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    originModel: "Partner",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
+                    default: ExpressionUtils.call("now")
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Partner",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    originModel: "Partner",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "partners", fields: ["createdById"], references: ["id"] }
+                },
+                type: {
+                    name: "type",
+                    type: "String",
+                    originModel: "Partner",
+                    isDiscriminator: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Type of partner") }] }]
+                },
+                reconAccountId: {
+                    name: "reconAccountId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "reconAccount"
+                    ]
+                },
+                reconAccount: {
+                    name: "reconAccount",
+                    type: "GlAccount",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("reconAccountId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "ArApRecAccount", fields: ["reconAccountId"], references: ["id"] }
+                },
+                companyId: {
+                    name: "companyId",
+                    type: "String"
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
+        },
+        FiscalYearVariant: {
+            name: "FiscalYearVariant",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
+                    default: ExpressionUtils.call("autoincrement")
+                },
+                name: {
+                    name: "name",
+                    type: "String"
+                },
+                monthNum: {
+                    name: "monthNum",
+                    type: "Int"
+                },
+                day: {
+                    name: "day",
+                    type: "Int"
+                },
+                fiscPeriod: {
+                    name: "fiscPeriod",
+                    type: "Int"
+                },
+                yearShift: {
+                    name: "yearShift",
+                    type: "Boolean"
+                }
+            },
+            attributes: [
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("create,read") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
+            ],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" }
+            }
+        },
+        PostingPeriod: {
+            name: "PostingPeriod",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
+                    default: ExpressionUtils.call("autoincrement")
+                },
+                year: {
+                    name: "year",
+                    type: "Int"
+                },
+                period: {
+                    name: "period",
+                    type: "Int"
+                },
+                open: {
+                    name: "open",
+                    type: "Boolean"
+                },
+                companyId: {
+                    name: "companyId",
+                    type: "String",
+                    unique: true,
+                    attributes: [{ name: "@unique" }]
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" },
+                companyId: { type: "String" }
+            }
+        },
+        Parameter: {
+            name: "Parameter",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
+                    default: ExpressionUtils.call("autoincrement")
+                },
+                name: {
+                    name: "name",
+                    type: "String"
+                },
+                value: {
+                    name: "value",
+                    type: "String"
+                }
+            },
+            attributes: [
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("create,read") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
+            ],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" }
+            }
         }
     } as const;
     typeDefs = {
@@ -1027,6 +1513,10 @@ export class SchemaType implements SchemaDef {
                     name: "organizationRole",
                     type: "String",
                     optional: true
+                },
+                role: {
+                    name: "role",
+                    type: "String"
                 }
             },
             attributes: [
@@ -1054,6 +1544,12 @@ export class SchemaType implements SchemaDef {
                 Trial: "Trial",
                 Free: "Free",
                 Premium: "Premium"
+            }
+        },
+        PersonType: {
+            values: {
+                Person: "Person",
+                Organisation: "Organisation"
             }
         }
     } as const;

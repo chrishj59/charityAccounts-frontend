@@ -25,3 +25,19 @@ export enum organisationIdTypeEnum {
   'TaxId',
   'TradingName',
 }
+
+enum OrgLegalForm {
+  'SoleTrader',
+  'Company',
+  'Partnership',
+}
+enum OrgIdentificationType {
+  'UTR_tax_ref',
+  'Company_Number',
+  'Charity_number',
+}
+enum OrgPlanType {
+  'Trial',
+  'Free',
+  'Premium',
+}

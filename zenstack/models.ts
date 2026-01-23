@@ -5,7 +5,7 @@
 
 /* eslint-disable */
 
-import { schema as $schema, type SchemaType as $Schema } from "./schema-lite";
+import { schema as $schema, type SchemaType as $Schema } from "./schema";
 import { type ModelResult as $ModelResult, type TypeDefResult as $TypeDefResult } from "@zenstackhq/orm";
 export type TodoList = $ModelResult<$Schema, "TodoList">;
 export type Todo = $ModelResult<$Schema, "Todo">;
@@ -13,13 +13,21 @@ export type User = $ModelResult<$Schema, "User">;
 export type Account = $ModelResult<$Schema, "Account">;
 export type Verification = $ModelResult<$Schema, "Verification">;
 export type Organization = $ModelResult<$Schema, "Organization">;
+export type Team = $ModelResult<$Schema, "Team">;
 export type Member = $ModelResult<$Schema, "Member">;
+export type TeamMember = $ModelResult<$Schema, "TeamMember">;
 export type Invitation = $ModelResult<$Schema, "Invitation">;
 export type Session = $ModelResult<$Schema, "Session">;
 export type ISOCountry = $ModelResult<$Schema, "ISOCountry">;
 export type AddressRegion = $ModelResult<$Schema, "AddressRegion">;
 export type Address = $ModelResult<$Schema, "Address">;
 export type Apikey = $ModelResult<$Schema, "Apikey">;
+export type GlAccount = $ModelResult<$Schema, "GlAccount">;
+export type Partner = $ModelResult<$Schema, "Partner">;
+export type ArAPPartner = $ModelResult<$Schema, "ArAPPartner">;
+export type FiscalYearVariant = $ModelResult<$Schema, "FiscalYearVariant">;
+export type PostingPeriod = $ModelResult<$Schema, "PostingPeriod">;
+export type Parameter = $ModelResult<$Schema, "Parameter">;
 /**
  * Shape of the `auth()` function
  */
@@ -30,3 +38,5 @@ export const OrgIdentificationType = $schema.enums.OrgIdentificationType.values;
 export type OrgIdentificationType = (typeof OrgIdentificationType)[keyof typeof OrgIdentificationType];
 export const OrgPlanType = $schema.enums.OrgPlanType.values;
 export type OrgPlanType = (typeof OrgPlanType)[keyof typeof OrgPlanType];
+export const PersonType = $schema.enums.PersonType.values;
+export type PersonType = (typeof PersonType)[keyof typeof PersonType];

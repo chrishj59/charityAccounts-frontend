@@ -1,5 +1,5 @@
 'use client';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Card } from 'primereact/card';
@@ -8,6 +8,7 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Toast, ToastMessage } from 'primereact/toast';
 
@@ -19,11 +20,30 @@ import {
 } from '~/src/zodSchema/signupOrg-schema';
 import { Dropdown } from 'primereact/dropdown';
 import { createAuthClient } from 'better-auth/client';
-import { organization, useSession } from '~/src/lib/auth-client';
+import {
+  client,
+  organization,
+  signUp,
+  useSession,
+} from '~/src/lib/auth-client';
+import type { userInputValues } from '~/src/zodSchema/signupUser-schema';
+import { signupPost } from '~/src/types/signup';
+import { signUpUserOrgAction } from '~/src/actions/auth/signup-organisation';
+import { statusEnum } from '~/src/types/helper';
 
-export function SignUpOrg() {
+type Props = {
+  user: userInputValues;
+  setActiveTabAction: React.Dispatch<React.SetStateAction<number>>;
+};
+
+export function SignUpOrg({ user, setActiveTabAction }: Props) {
   const [loading, setLoading] = useState<boolean>(false);
 
+  const [showErrDialog, setShowErrDialog] = useState<boolean>(false);
+  const [errMsgHeader, setErrMsgHeader] = useState<string>('');
+  const [errMsgBody, setErrMsgBody] = useState<string>('');
+  const [userCreated, setUserCreated] = useState<boolean>(false);
+  const [newOrgName, setNewOrgName] = useState<string>('');
   const [legalFormSelected, setLegalFormSelected] =
     useState<string>('SoleTrader');
   const [idTypeSelected, setIdTypeSelected] = useState<number>(1);
@@ -75,8 +95,9 @@ export function SignUpOrg() {
     severity: ToastMessage['severity'],
     summary: string,
     detail: string,
+    sticky: boolean,
   ) => {
-    toast.current?.show({ severity, summary, detail });
+    toast.current?.show({ severity, summary, detail, sticky });
   };
 
   const handleLegalFormChange = (e: { value: string }) => {
@@ -102,68 +123,160 @@ export function SignUpOrg() {
       )
     );
   };
+
+  async function fetchParameters() {
+    const res = await fetch(`/api/parameter/CHARITATIS_ADMIN_EMAIL`);
+    if (!res.ok) {
+      throw new Error('Failed to fetch posts');
+    }
+    return res.json();
+  }
+
+  const {
+    data: adminEmailParam,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['parameters'],
+    queryFn: fetchParameters,
+  });
+
   const onOrgSubmit = async (formData: orgInputValues) => {
     setLoading(true);
-    const generatedSlug = formData.tradingName
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, '-');
 
-    const idType = formData.idType;
-    let taxRef: string = '';
-    let companyNumber: string = '';
+    const result = await signUpUserOrgAction(
+      user,
+      formData,
 
-    let charityNumber: string = '';
+      adminEmailParam.value,
+    );
 
-    switch (idType) {
-      case 0:
-        taxRef = formData.identification;
-        break;
-      case 1:
-        companyNumber = formData.identification;
-        break;
-      case 2:
-        charityNumber = formData.identification;
-        break;
+    if (result.status === statusEnum.ERROR) {
+      setShowErrDialog(true);
+      setErrMsgHeader('Error Creating user / organisation');
+      setErrMsgBody(result.message);
+    } else {
+      showToast(
+        'success',
+        'Saved user and Organisation',
+        `User ${result?.data?.user?.name}`,
+        false,
+      );
     }
 
-    const { data, error } = await organization.create(
-      {
-        name: formData.tradingName,
-        slug: generatedSlug, // required
-        // logo: "https://example.com/logo.png",
-        tradingName: formData.tradingName,
-        legalForm: formData.legalForm,
-        idType: identificationTypes[formData.idType].name,
-        legalName: formData.legalName,
-        identification: formData.identification,
-        accountType: planTypes[formData.accountType].name,
-        charityNumber,
-        taxRef,
-        companyNumber,
-        userId,
-        keepCurrentActiveOrganization: false,
-      },
-      {
-        onResponse: () => {
-          setLoading(false);
-        },
-        onSuccess: () => {
-          showToast('success', 'Saved', 'Organization created successfully');
-          setLoading(false);
-          // toast.success(
-          //     'Organization created successfully'
-          // );
-        },
-        onError: (error) => {
-          showToast('error', 'Failed to save organsation', error.error.message);
-          // toast.error(error.error.message);
-          setLoading(false);
-        },
-      },
-    );
-  };
+    setLoading(false);
 
+    // const generatedSlug = formData.tradingName
+    //   .trim()
+    //   .toLowerCase()
+    //   .replace(/\s+/g, '-');
+
+    // const idType = formData.idType;
+    // let taxRef: string = '';
+    // let companyNumber: string = '';
+
+    // let charityNumber: string = '';
+
+    // switch (idType) {
+    //   case 0:
+    //     taxRef = formData.identification;
+    //     break;
+    //   case 1:
+    //     companyNumber = formData.identification;
+    //     break;
+    //   case 2:
+    //     charityNumber = formData.identification;
+    //     break;
+    // }
+
+    // const { data: newOrg, error: newOrgErr } = await organization.create(
+    //   {
+    //     name: formData.tradingName,
+    //     slug: generatedSlug, // required
+    //     // logo: "https://example.com/logo.png",
+    //     tradingName: formData.tradingName,
+    //     legalForm: formData.legalForm,
+    //     idType: identificationTypes[formData.idType].name,
+    //     legalName: formData.legalName,
+    //     identification: formData.identification,
+    //     accountType: planTypes[formData.accountType].name,
+    //     charityNumber,
+    //     taxRef,
+    //     companyNumber,
+    //     userId,
+    //     keepCurrentActiveOrganization: false,
+    //   },
+    //   {
+    //     onResponse: () => {
+    //       setNewOrgName(newOrg?.name ? newOrg?.name : '');
+    //       setLoading(false);
+    //     },
+    //     onSuccess: () => {
+    //       showToast(
+    //         'success',
+    //         'Saved',
+    //         `Created Organization ${newOrg?.name}`,
+    //         false,
+    //       );
+    //       setLoading(false);
+    //     },
+    //     onError: (error) => {
+    //       setErrMsgHeader(`Could not create User ${newOrgErr?.statusText}`);
+    //       setErrMsgBody(newOrgErr?.message ? newOrgErr.message : '');
+    //       setShowErrDialog(true);
+    //       return;
+    //       // toast.error(error.error.message);
+    //       setLoading(false);
+    //     },
+    //   },
+    // );
+    // if (!newOrgErr) {
+    //   return;
+    // }
+    // const { data: newTeam, error: newTeamErr } =
+    //   await client.organization.createTeam(
+    //     {
+    //       name: `${newOrg.name} default company`,
+    //       organizationId: newOrg.id,
+    //     },
+    //     {
+    //       onResponse: () => {
+    //         showToast('success', 'Saved', `Created Team ${newTeam?.name}`);
+    //         setLoading(false);
+    //       },
+    //       onSuccess: () => {
+    //         showToast('success', 'Saved', `Created team ${newTeam?.name}`);
+    //         setLoading(false);
+    //       },
+    //       onError: (error) => {
+    //         setErrMsgHeader(
+    //           `Could not create Team ${newTeamErr?.statusText}`,
+    //         );
+    //         setErrMsgBody(newTeamErr?.message ? newTeamErr.message : '');
+    //         setShowErrDialog(true);
+    //         return;
+    //         // toast.error(error.error.message);
+    //         setLoading(false);
+    //       },
+    //     },
+    //   );
+    // }
+  };
+  const errDialogHeader = (
+    <span className='font-bold white-space-nowrap'>{errMsgHeader}</span>
+  );
+
+  const errDialogFooter = (
+    <div className='flex justify-content-center'>
+      <Button
+        label='Close'
+        icon='pi pi-times'
+        outlined
+        onClick={() => setShowErrDialog(false)}
+      />
+    </div>
+  );
   return (
     <>
       <Toast ref={toast} position='center' />
@@ -372,6 +485,19 @@ export function SignUpOrg() {
           </div>
         </form>
       </Card>
+      <Dialog
+        visible={showErrDialog}
+        onHide={() => {
+          if (!showErrDialog) return;
+          setShowErrDialog(false);
+        }}
+        modal
+        header={errDialogHeader}
+        footer={errDialogFooter}
+        closable
+      >
+        <p className='m-0 font-bold text-primary'>{errMsgBody}</p>
+      </Dialog>
     </>
   );
 }

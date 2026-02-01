@@ -29,7 +29,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "/types/css.d.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "src/app/unauthorised.tsx"
   ],
   "exclude": ["node_modules"]
 }

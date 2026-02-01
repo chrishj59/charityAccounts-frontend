@@ -74,12 +74,14 @@ export default function SignIn() {
               <Password
                 id='password'
                 value={password}
+                feedback={false}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete='password'
                 placeholder='Password'
               />
             </td>
           </tr>
+
           <tr>
             <td>
               <label htmlFor='rememberMe'>Remember me</label>

@@ -71,7 +71,8 @@ export function SignUpOrg({ user, setActiveTabAction }: Props) {
   const planTypes = [
     { id: 0, name: 'Trial', description: 'Trial' },
     { id: 1, name: 'Free', description: 'Free' },
-    { id: 2, name: 'Premium', description: 'Premium' },
+    { id: 2, name: 'Standard', description: 'Standard' },
+    { id: 3, name: 'Premium', description: 'Premium' },
   ];
 
   const {

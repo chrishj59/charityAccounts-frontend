@@ -1,29 +1,27 @@
 import { String } from 'aws-sdk/clients/codebuild';
 import { headers } from 'next/headers';
+import { redirect, unauthorized } from 'next/navigation';
 import CompanyCreatePage from '~/src/components/client/company/create';
 import { auth } from '~/src/lib/auth';
-import { getLoggedInSession } from '~/src/utils/helper';
 
 export default async function CreateCompany() {
-  const session = getLoggedInSession();
-
-  const orgs = await auth.api.listOrganizations({
-    // This endpoint requires session cookies.
+  const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  const numUserOrganisations = orgs.length;
-  const topOrg = orgs[0];
-  const orgId: String = orgs[0].id;
+  console.log(`session ${JSON.stringify(session)}`);
+  if (!session) {
+    redirect('/unauthorised');
+  }
 
-  //  get teams for organisation
-  const data = await auth.api.listOrganizationTeams({
-    query: {
-      organizationId: orgId,
-    },
-    // This endpoint requires session cookies.
-    headers: await headers(),
-  });
+  const userId = session.user.id;
 
-  return <CompanyCreatePage orgId={orgId} />;
+  // const orgs = await auth.api.listOrganizations({
+  //   // This endpoint requires session cookies.
+  //   headers: await headers(),
+  // });
+
+  // const orgId: String = orgs[0].id;
+
+  return <CompanyCreatePage userId={userId} />;
 }

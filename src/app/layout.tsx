@@ -12,14 +12,16 @@ import '~/src/styles/globals.css';
 import Footer from './components/footer';
 import { Suspense } from 'react';
 
-import '~/src/styles/globals.css';
 import { TanstackProvider } from '../components/client/providers/tanstack-provider';
+import { auth } from '../lib/auth';
+import { headers } from 'next/headers';
+import { unauthorized } from 'next/navigation';
 
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({ children }: RootLayoutProps) {
   const value = {
     ripple: true,
   };

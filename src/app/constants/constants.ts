@@ -39,5 +39,6 @@ enum OrgIdentificationType {
 enum OrgPlanType {
   'Trial',
   'Free',
+  'Standard',
   'Premium',
 }

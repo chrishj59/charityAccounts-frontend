@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '~/src/lib/db';
-import { FiscYearVariantFormValues } from '~/src/zodSchema/fisYearVariant';
+import { FiscYearVariantFormValues } from '~/src/zodSchema/fisYearPeriod';
 
 export async function POST(req: NextRequest) {
   const body: FiscYearVariantFormValues = await req.json();
 
   try {
-    const resp = await db.fiscalYearVariant.create({
+    const resp = await db.fiscalYearPeriod.create({
       data: {
         id: 1,
 

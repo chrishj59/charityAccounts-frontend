@@ -252,7 +252,8 @@ export class SchemaType implements SchemaDef {
                 },
                 lastLoginMethod: {
                     name: "lastLoginMethod",
-                    type: "String"
+                    type: "String",
+                    optional: true
                 }
             },
             idFields: ["id"],
@@ -463,12 +464,6 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "organization" }
                 },
-                teams: {
-                    name: "teams",
-                    type: "Team",
-                    array: true,
-                    relation: { opposite: "Organisation" }
-                },
                 invitations: {
                     name: "invitations",
                     type: "Invitation",
@@ -502,43 +497,7 @@ export class SchemaType implements SchemaDef {
                 },
                 organizationId: {
                     name: "organizationId",
-                    type: "String",
-                    foreignKeyFor: [
-                        "Organisation"
-                    ]
-                },
-                Organisation: {
-                    name: "Organisation",
-                    type: "Organization",
-                    relation: { opposite: "teams", fields: ["organizationId"], references: ["id"] }
-                },
-                vatNumber: {
-                    name: "vatNumber",
                     type: "String"
-                },
-                ArAPPartner: {
-                    name: "ArAPPartner",
-                    type: "ArAPPartner",
-                    array: true,
-                    relation: { opposite: "company" }
-                },
-                periods: {
-                    name: "periods",
-                    type: "PostingPeriod",
-                    array: true,
-                    relation: { opposite: "company" }
-                },
-                fisYearVariantId: {
-                    name: "fisYearVariantId",
-                    type: "Int",
-                    foreignKeyFor: [
-                        "fisYearVariant"
-                    ]
-                },
-                fisYearVariant: {
-                    name: "fisYearVariant",
-                    type: "FiscalYearVariant",
-                    relation: { opposite: "company", fields: ["fisYearVariantId"], references: ["id"] }
                 },
                 teamMembers: {
                     name: "teamMembers",
@@ -944,6 +903,12 @@ export class SchemaType implements SchemaDef {
                     type: "Partner",
                     array: true,
                     relation: { opposite: "address" }
+                },
+                companys: {
+                    name: "companys",
+                    type: "Company",
+                    optional: true,
+                    relation: { opposite: "regsisteredAddress", name: "registereOfficeAddress" }
                 }
             },
             idFields: ["addressID"],
@@ -1293,15 +1258,7 @@ export class SchemaType implements SchemaDef {
                 },
                 companyId: {
                     name: "companyId",
-                    type: "String",
-                    foreignKeyFor: [
-                        "company"
-                    ]
-                },
-                company: {
-                    name: "company",
-                    type: "Team",
-                    relation: { opposite: "ArAPPartner", fields: ["companyId"], references: ["id"] }
+                    type: "String"
                 }
             },
             idFields: ["id"],
@@ -1309,13 +1266,14 @@ export class SchemaType implements SchemaDef {
                 id: { type: "String" }
             }
         },
-        FiscalYearVariant: {
-            name: "FiscalYearVariant",
+        FiscalYearPeriod: {
+            name: "FiscalYearPeriod",
             fields: {
                 id: {
                     name: "id",
                     type: "Int",
-                    id: true
+                    id: true,
+                    default: ExpressionUtils.call("autoincrement")
                 },
                 name: {
                     name: "name",
@@ -1335,17 +1293,13 @@ export class SchemaType implements SchemaDef {
                 },
                 yearShift: {
                     name: "yearShift",
-                    type: "Int"
+                    type: "Boolean"
                 },
-                companyId: {
-                    name: "companyId",
-                    type: "String"
-                },
-                company: {
-                    name: "company",
-                    type: "Team",
+                compFiscalPeriod: {
+                    name: "compFiscalPeriod",
+                    type: "CompanyFiscalPeriod",
                     array: true,
-                    relation: { opposite: "fisYearVariant" }
+                    relation: { opposite: "fiscalPeriod" }
                 }
             },
             idFields: ["id"],
@@ -1374,16 +1328,167 @@ export class SchemaType implements SchemaDef {
                     name: "open",
                     type: "Boolean"
                 },
-                company: {
-                    name: "company",
-                    type: "Team",
+                postPeriod: {
+                    name: "postPeriod",
+                    type: "CompanyPostingPeriod",
                     array: true,
-                    relation: { opposite: "periods" }
+                    relation: { opposite: "postPeriod" }
                 }
             },
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "Int" }
+            }
+        },
+        Parameter: {
+            name: "Parameter",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    default: ExpressionUtils.call("autoincrement")
+                },
+                name: {
+                    name: "name",
+                    type: "String"
+                },
+                value: {
+                    name: "value",
+                    type: "String"
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" }
+            }
+        },
+        Company: {
+            name: "Company",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    default: ExpressionUtils.call("autoincrement")
+                },
+                companyCode: {
+                    name: "companyCode",
+                    type: "String"
+                },
+                companyName: {
+                    name: "companyName",
+                    type: "String"
+                },
+                registeredOfficeAddressId: {
+                    name: "registeredOfficeAddressId",
+                    type: "Int",
+                    unique: true,
+                    foreignKeyFor: [
+                        "regsisteredAddress"
+                    ]
+                },
+                regsisteredAddress: {
+                    name: "regsisteredAddress",
+                    type: "Address",
+                    relation: { opposite: "companys", name: "registereOfficeAddress", fields: ["registeredOfficeAddressId"], references: ["addressID"] }
+                },
+                vatNumber: {
+                    name: "vatNumber",
+                    type: "String",
+                    optional: true
+                },
+                fiscalPeriodId: {
+                    name: "fiscalPeriodId",
+                    type: "Int"
+                },
+                fiscPeriod: {
+                    name: "fiscPeriod",
+                    type: "CompanyFiscalPeriod",
+                    array: true,
+                    relation: { opposite: "company" }
+                },
+                postPeriod: {
+                    name: "postPeriod",
+                    type: "CompanyPostingPeriod",
+                    array: true,
+                    relation: { opposite: "company" }
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" },
+                registeredOfficeAddressId: { type: "Int" }
+            }
+        },
+        CompanyFiscalPeriod: {
+            name: "CompanyFiscalPeriod",
+            fields: {
+                companyId: {
+                    name: "companyId",
+                    type: "Int",
+                    id: true,
+                    foreignKeyFor: [
+                        "company"
+                    ]
+                },
+                fiscalPeriodId: {
+                    name: "fiscalPeriodId",
+                    type: "Int",
+                    id: true,
+                    foreignKeyFor: [
+                        "fiscalPeriod"
+                    ]
+                },
+                company: {
+                    name: "company",
+                    type: "Company",
+                    relation: { opposite: "fiscPeriod", fields: ["companyId"], references: ["id"] }
+                },
+                fiscalPeriod: {
+                    name: "fiscalPeriod",
+                    type: "FiscalYearPeriod",
+                    relation: { opposite: "compFiscalPeriod", fields: ["fiscalPeriodId"], references: ["id"] }
+                }
+            },
+            idFields: ["companyId", "fiscalPeriodId"],
+            uniqueFields: {
+                companyId_fiscalPeriodId: { companyId: { type: "Int" }, fiscalPeriodId: { type: "Int" } }
+            }
+        },
+        CompanyPostingPeriod: {
+            name: "CompanyPostingPeriod",
+            fields: {
+                companyId: {
+                    name: "companyId",
+                    type: "Int",
+                    id: true,
+                    foreignKeyFor: [
+                        "company"
+                    ]
+                },
+                postingPeriodId: {
+                    name: "postingPeriodId",
+                    type: "Int",
+                    id: true,
+                    foreignKeyFor: [
+                        "postPeriod"
+                    ]
+                },
+                company: {
+                    name: "company",
+                    type: "Company",
+                    relation: { opposite: "postPeriod", fields: ["companyId"], references: ["id"] }
+                },
+                postPeriod: {
+                    name: "postPeriod",
+                    type: "PostingPeriod",
+                    relation: { opposite: "postPeriod", fields: ["postingPeriodId"], references: ["id"] }
+                }
+            },
+            idFields: ["companyId", "postingPeriodId"],
+            uniqueFields: {
+                companyId_postingPeriodId: { companyId: { type: "Int" }, postingPeriodId: { type: "Int" } }
             }
         }
     } as const;
@@ -1404,6 +1509,10 @@ export class SchemaType implements SchemaDef {
                     name: "organizationRole",
                     type: "String",
                     optional: true
+                },
+                role: {
+                    name: "role",
+                    type: "String"
                 }
             },
             attributes: [
@@ -1413,6 +1522,7 @@ export class SchemaType implements SchemaDef {
     } as const;
     enums = {
         OrgLegalForm: {
+            name: "OrgLegalForm",
             values: {
                 SoleTrader: "SoleTrader",
                 Company: "Company",
@@ -1420,6 +1530,7 @@ export class SchemaType implements SchemaDef {
             }
         },
         OrgIdentificationType: {
+            name: "OrgIdentificationType",
             values: {
                 UTR_tax_ref: "UTR_tax_ref",
                 Company_Number: "Company_Number",
@@ -1427,13 +1538,16 @@ export class SchemaType implements SchemaDef {
             }
         },
         OrgPlanType: {
+            name: "OrgPlanType",
             values: {
                 Trial: "Trial",
                 Free: "Free",
+                Standard: "Standard",
                 Premium: "Premium"
             }
         },
         PersonType: {
+            name: "PersonType",
             values: {
                 Person: "Person",
                 Organisation: "Organisation"

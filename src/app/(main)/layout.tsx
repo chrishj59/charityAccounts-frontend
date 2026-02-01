@@ -1,6 +1,9 @@
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
+import { unauthorized } from 'next/navigation';
 import { Toolbar } from 'primereact/toolbar';
 import Layout from '~/src/layout/layout';
+import { auth } from '~/src/lib/auth';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -28,8 +31,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function MainLayout({ children }: MainLayoutProps) {
+export default async function MainLayout({ children }: MainLayoutProps) {
   console.log('MainLayout (app/(main)/layout');
+
   const centerContent = (
     // <div className='flex flex-wrap align-items-center gap-3'>
     <span className=' font-bold text-primary-600 text-2xl'>

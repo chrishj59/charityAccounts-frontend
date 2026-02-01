@@ -4,6 +4,7 @@ import AppSubMenu from './AppSubMenu';
 const AppMenu = () => {
   const model: MenuModel[] = [
     {
+      icon: 'ArrowDropDownIcon',
       label: 'Accounting',
       items: [
         {
@@ -23,10 +24,19 @@ const AppMenu = () => {
         {
           label: 'Company',
           items: [
-            { label: 'Create', to: '/secure/set-up/basic/company-create' },
             {
-              label: 'Fiscal Year Var',
-              to: '/secure/set-up/basic/fiscal-year-variant',
+              icon: 'pi pi-file-plus',
+              label: 'Create',
+              to: '/secure/set-up/basic/company-create',
+            },
+            {
+              label: 'Update',
+              icon: 'pi-pencil',
+              to: '/secure/set-up/basic/company-update',
+            },
+            {
+              label: 'Fiscal Year Periods',
+              to: '/secure/set-up/basic/fiscal-year-period',
             },
           ],
         },

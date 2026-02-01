@@ -5,7 +5,7 @@
 
 /* eslint-disable */
 
-import { schema as $schema, type SchemaType as $Schema } from "./schema";
+import { schema as $schema, type SchemaType as $Schema } from "./schema-lite";
 import { type ModelResult as $ModelResult, type TypeDefResult as $TypeDefResult } from "@zenstackhq/orm";
 export type TodoList = $ModelResult<$Schema, "TodoList">;
 export type Todo = $ModelResult<$Schema, "Todo">;
@@ -25,9 +25,12 @@ export type Apikey = $ModelResult<$Schema, "Apikey">;
 export type GlAccount = $ModelResult<$Schema, "GlAccount">;
 export type Partner = $ModelResult<$Schema, "Partner">;
 export type ArAPPartner = $ModelResult<$Schema, "ArAPPartner">;
-export type FiscalYearVariant = $ModelResult<$Schema, "FiscalYearVariant">;
+export type FiscalYearPeriod = $ModelResult<$Schema, "FiscalYearPeriod">;
 export type PostingPeriod = $ModelResult<$Schema, "PostingPeriod">;
 export type Parameter = $ModelResult<$Schema, "Parameter">;
+export type Company = $ModelResult<$Schema, "Company">;
+export type CompanyFiscalPeriod = $ModelResult<$Schema, "CompanyFiscalPeriod">;
+export type CompanyPostingPeriod = $ModelResult<$Schema, "CompanyPostingPeriod">;
 /**
  * Shape of the `auth()` function
  */

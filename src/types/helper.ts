@@ -18,3 +18,7 @@ export interface responseType {
 export interface userCreateResponse extends responseType {
   data?: { user: UserWithRole; org?: Organization; errMessage?: string };
 }
+
+export interface orgCreateResponse extends responseType {
+  data?: { org: Organization; errMessage?: string };
+}

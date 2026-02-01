@@ -11,13 +11,20 @@ import {
   responseType,
   statusEnum,
   userCreateResponse,
+  orgCreateResponse,
 } from '~/src/types/helper';
-import { db } from '~/src/lib/db';
+import { authDb } from '~/src/lib/db';
+import { email } from 'zod';
 
 export async function userEmailExist(email: string): Promise<boolean> {
-  const userExists = await db.user.findFirst({ where: { email } });
+  try {
+    const userExists = await authDb.user.findFirstOrThrow({ where: { email } });
 
-  return !userExists ? true : false;
+    return !userExists ? true : false;
+  } catch (error) {
+    console.log(`error: ${JSON.stringify(error)}`);
+    return true;
+  }
 }
 
 export async function signUpUserOrgAction(
@@ -76,31 +83,47 @@ export async function signUpUserOrgAction(
       };
     }
 
-    const newOrg: Organization | null = await auth.api.createOrganization({
-      body: {
-        name: org.tradingName,
-        tradingName: org.tradingName,
-        slug: generatedSlug,
-        legalForm: org.legalForm,
-        legalName: org.legalName,
-        idType: idType,
-        identification: org.identification,
-        accountType: orgPlan,
-        taxRef: org.taxRef,
-        companyNumber: org.companyNumber,
-        companyName: org.companyName,
-        userId: userId,
-      },
-    });
+    switch (idType) {
+      case 'UTR_tax_ref':
+        org.taxRef = org.identification;
+        break;
+      case 'Company_Number':
+        org.companyNumber = org.identification;
 
-    const user = newUser.user;
-    if (newOrg) {
+        break;
+      case 'Charity_number':
+        org.charityNumber = org.identification;
+    }
+
+    if (org.legalForm === 'Company') {
+      org.companyName = org.legalName;
+    }
+    try {
+      const newOrg: Organization | null = await auth.api.createOrganization({
+        body: {
+          name: org.tradingName,
+          tradingName: org.tradingName,
+          slug: generatedSlug,
+          legalForm: org.legalForm,
+          legalName: org.legalName,
+          idType: idType,
+          identification: org.identification,
+          accountType: orgPlan,
+          taxRef: org.taxRef,
+          companyNumber: org.companyNumber,
+          companyName: org.companyName,
+          userId: userId,
+        },
+      });
+
+      const user = newUser.user;
+
       return {
         status: statusEnum.SUCCESS,
         message: 'Created user and organisation',
-        data: { user, org: newOrg },
+        data: { user },
       };
-    } else {
+    } catch (error) {
       return {
         status: statusEnum.ERROR,
         message: 'Could not create the organisation',
@@ -112,6 +135,61 @@ export async function signUpUserOrgAction(
       status: statusEnum.SUCCESS,
       message: 'Created admin user',
       data: { user },
+    };
+  }
+}
+
+export async function orgCreateAction(
+  org: orgInputValues,
+  userId: string,
+): Promise<orgCreateResponse> {
+  const idType = Object.keys(OrgIdentificationType)[org.idType];
+  const orgPlan = Object.keys(OrgPlanType)[org.accountType];
+  const generatedSlug = org.tradingName
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-');
+  switch (idType) {
+    case 'UTR_tax_ref':
+      org.taxRef = org.identification;
+      break;
+    case 'Company_Number':
+      org.companyNumber = org.identification;
+
+      break;
+    case 'Charity_number':
+      org.charityNumber = org.identification;
+  }
+
+  if (org.legalForm === 'Company') {
+    org.companyName = org.legalName;
+  }
+
+  const newOrg: Organization | null = await auth.api.createOrganization({
+    body: {
+      name: org.tradingName,
+      tradingName: org.tradingName,
+      slug: generatedSlug,
+      legalForm: org.legalForm,
+      legalName: org.legalName,
+      idType: idType,
+      identification: org.identification,
+      accountType: orgPlan,
+      taxRef: org.taxRef,
+      companyNumber: org.companyNumber,
+      companyName: org.companyName,
+      userId: userId,
+    },
+  });
+  if (newOrg) {
+    return {
+      status: statusEnum.SUCCESS,
+      message: 'Created the organisation',
+    };
+  } else {
+    return {
+      status: statusEnum.ERROR,
+      message: 'Could not create the organisation',
     };
   }
 }

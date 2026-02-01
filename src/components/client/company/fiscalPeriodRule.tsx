@@ -1,5 +1,4 @@
 'use client';
-import { FiscalYearVariant } from '~/zenstack/models';
 
 import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
@@ -9,27 +8,28 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { Controller, useForm } from 'react-hook-form';
 import { useClientQueries } from '@zenstackhq/tanstack-query/react';
-import { schema } from '~/zenstack/schema-lite';
+
 import { Dialog } from 'primereact/dialog';
 import { classNames } from 'primereact/utils';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputSwitch } from 'primereact/inputswitch';
 import {
-  fiscalYearVariantSchema,
+  fiscalYearPeriodSchema,
   FiscYearVariantFormValues,
-} from '~/src/zodSchema/fisYearVariant';
+} from '~/src/zodSchema/fisYearPeriod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 interface FiscalYearVarProps {
-  fiscVar: FiscalYearVariant[];
+  fiscVar: FiscalYearPeriod[];
 }
 import { Stepper } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
+import { FiscalYearPeriod } from '~/zenstack/models';
 
-export default function FiscalYearVariantPage({ fiscVar }: FiscalYearVarProps) {
+export default function FiscalPeriodRule({ fiscVar }: FiscalYearVarProps) {
   const toast = useRef<Toast | null>(null);
-  const emptyFiscYrVar: FiscalYearVariant = {
+  const emptyFiscYrVar: FiscalYearPeriod = {
     id: 0,
     name: '',
     monthNum: 0,
@@ -39,8 +39,8 @@ export default function FiscalYearVariantPage({ fiscVar }: FiscalYearVarProps) {
   };
 
   const [fiscYrVarList, setFiscYrVarList] =
-    useState<FiscalYearVariant[]>(fiscVar);
-  const [fiscYrVar, setFiscYrVar] = useState<FiscalYearVariant>(emptyFiscYrVar);
+    useState<FiscalYearPeriod[]>(fiscVar);
+  const [fiscYrVar, setFiscYrVar] = useState<FiscalYearPeriod>(emptyFiscYrVar);
   const [fiscYrDialog, setFiscYrDialog] = useState<boolean>(false);
   const [fiscYrAddDialog, setFiscYrAddDialog] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -52,22 +52,22 @@ export default function FiscalYearVariantPage({ fiscVar }: FiscalYearVarProps) {
     handleSubmit,
     reset,
   } = useForm<FiscYearVariantFormValues>({
-    resolver: zodResolver(fiscalYearVariantSchema),
+    resolver: zodResolver(fiscalYearPeriodSchema),
     defaultValues: emptyFiscYrVar,
   });
 
-  const dt = useRef<DataTable<FiscalYearVariant[]>>(null);
+  const dt = useRef<DataTable<FiscalYearPeriod[]>>(null);
   console.log(`fiscVar in client ${JSON.stringify(fiscYrVarList)}`);
 
-  const addFiscYrVar = (fiscYrVar: FiscalYearVariant) => {
-    const _fiscYrVar: FiscalYearVariant = emptyFiscYrVar;
+  const addFiscYrVar = (fiscYrVar: FiscalYearPeriod) => {
+    const _fiscYrVar: FiscalYearPeriod = emptyFiscYrVar;
 
     setFiscYrVar(_fiscYrVar);
     setFiscYrAddDialog(true);
     reset(fiscYrVar);
   };
-  const editFiscYrVar = (fiscYrVar: FiscalYearVariant) => {
-    const _fiscYrVar: FiscalYearVariant = {
+  const editFiscYrVar = (fiscYrVar: FiscalYearPeriod) => {
+    const _fiscYrVar: FiscalYearPeriod = {
       id: fiscYrVar.id,
       name: fiscYrVar.name,
       monthNum: fiscYrVar.monthNum,
@@ -91,7 +91,7 @@ export default function FiscalYearVariantPage({ fiscVar }: FiscalYearVarProps) {
     alert(`hideFiscYrVarAddDialog called`);
   };
 
-  const actionBodyTemplate = (rowData: FiscalYearVariant) => {
+  const actionBodyTemplate = (rowData: FiscalYearPeriod) => {
     return (
       <>
         <Button
@@ -141,16 +141,16 @@ export default function FiscalYearVariantPage({ fiscVar }: FiscalYearVarProps) {
       />
     </div>
   );
-  const onSubmitAdd = async (updated: FiscalYearVariant) => {
+  const onSubmitAdd = async (updated: FiscalYearPeriod) => {
     // const client = useClientQueries(schema);
     // const { mutateAsync: create, isPending } =
-    //   client.fiscalYearVariant.useCreate(); //client.todoList.useCreate();
+    //   client.FiscalYearPeriod.useCreate(); //client.todoList.useCreate();
 
     // const resp = await create({ data: updated });
 
     const payload = {
       data: {
-        type: 'FiscalYearVariant',
+        type: 'FiscalYearPeriod',
         attributes: {
           name: updated.name,
           monthNum: updated.monthNum,
@@ -160,14 +160,14 @@ export default function FiscalYearVariantPage({ fiscVar }: FiscalYearVarProps) {
         },
       },
     };
-    const res = await fetch('/api/model/FiscalYearVariant', {
+    const res = await fetch('/api/model/FiscalYearPeriod', {
       method: 'POST',
       // headers: await headers(),
       cache: 'no-store',
       body: JSON.stringify(payload),
     });
     if (res.ok) {
-      const dbVar = (await res.json()) as FiscalYearVariant;
+      const dbVar = (await res.json()) as FiscalYearPeriod;
       console.log(`res.status ${res.status} text: ${res.statusText}`);
       console.log(`updated ${JSON.stringify(dbVar)}`);
       updated.id = dbVar.id;
@@ -182,9 +182,9 @@ export default function FiscalYearVariantPage({ fiscVar }: FiscalYearVarProps) {
 
   const getFormErrorMessage = (name: string) => {
     return (
-      errors[name as keyof FiscalYearVariant] && (
+      errors[name as keyof FiscalYearPeriod] && (
         <small className='p-error'>
-          {errors[name as keyof FiscalYearVariant]?.message}
+          {errors[name as keyof FiscalYearPeriod]?.message}
         </small>
       )
     );

@@ -41,6 +41,7 @@ enum OrgIdentificationType {
  enum OrgPlanType {
   Trial
   Free
+  Standard
   Premium
  }
 
@@ -286,6 +287,9 @@ model Address {
   country ISOCountry    @relation(fields: [isoCountryId], references: [countryId])
   partnerId    String
   partners Partner[]
+  // companyId String
+  companys Company?   @relation('registereOfficeAddress')
+  
   
 
 
@@ -360,14 +364,14 @@ model Apikey {
   //  company          Team      @relation(fields: [companyId], references: [id])
  }
 
- model FiscalYearVariant {
+ model FiscalPeriodRule {
   id            Int @id @default(autoincrement())
   name          String
   monthNum      Int
   day           Int
   fiscPeriod    Int
   yearShift     Boolean
-  // company       Team[]
+  companies     Company[]
   @@allow('create,read', true)
 
  }
@@ -377,8 +381,8 @@ model Apikey {
   year    Int
   period  Int
   open    Boolean 
-  companyId String @unique
-  // company   Team  @relation('CompPeriods', fields: [companyId], references: [id])  
+  postPeriod CompanyPostingPeriod []
+  
  }
 
  model Parameter {
@@ -387,6 +391,34 @@ model Apikey {
   value String
 
   @@allow('create,read', true)
+ }
+
+ model Company {
+  id Int @id @default(autoincrement())
+  companyCode String
+  companyName String
+  registeredOfficeAddressId Int @unique
+  regsisteredAddress Address @relation('registereOfficeAddress',fields: [registeredOfficeAddressId], references: [addressID])
+  vatNumber String?
+  fiscalPeriodRuleId Int
+  fiscPeriodRule FiscalPeriodRule @relation( fields: [fiscalPeriodRuleId], references: [id])
+  postPeriod CompanyPostingPeriod []
+ }
+
+//  model CompanyFiscalPeriod {
+//   companyId Int
+//   fiscalPeriodId Int
+//   company Company @relation(fields: [companyId], references: [id])
+//   fiscalPeriod FiscalYearPeriod @relation(fields: [fiscalPeriodId], references: [id])
+//   @@id([companyId, fiscalPeriodId])
+//  }
+
+ model CompanyPostingPeriod {
+  companyId Int
+  postingPeriodId Int
+  company Company @relation(fields: [companyId], references: [id])
+  postPeriod PostingPeriod @relation(fields: [postingPeriodId], references: [id])
+  @@id([companyId,postingPeriodId ])
  }
 
 

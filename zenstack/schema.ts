@@ -41,7 +41,7 @@ export class SchemaType implements SchemaDef {
                 owner: {
                     name: "owner",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("ownerId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("ownerId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "todoLists", fields: ["ownerId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 ownerId: {
@@ -57,7 +57,7 @@ export class SchemaType implements SchemaDef {
                     name: "organization",
                     type: "Organization",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "todoLists", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 organizationId: {
@@ -131,7 +131,7 @@ export class SchemaType implements SchemaDef {
                 list: {
                     name: "list",
                     type: "TodoList",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("listId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("listId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "todos", fields: ["listId"], references: ["id"], onDelete: "Cascade" }
                 }
             },
@@ -323,7 +323,7 @@ export class SchemaType implements SchemaDef {
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "accounts", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
                 },
                 accessToken: {
@@ -602,7 +602,7 @@ export class SchemaType implements SchemaDef {
                 organization: {
                     name: "organization",
                     type: "Organization",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "members", fields: ["organizationId"], references: ["id"], onDelete: "Cascade" }
                 },
                 userId: {
@@ -615,7 +615,7 @@ export class SchemaType implements SchemaDef {
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "members", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
                 },
                 role: {
@@ -663,7 +663,7 @@ export class SchemaType implements SchemaDef {
                 team: {
                     name: "team",
                     type: "Team",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("teamId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("teamId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "teamMembers", fields: ["teamId"], references: ["id"], onDelete: "Cascade" }
                 },
                 userId: {
@@ -676,7 +676,7 @@ export class SchemaType implements SchemaDef {
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "teamMembers", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
                 },
                 createdAt: {
@@ -717,7 +717,7 @@ export class SchemaType implements SchemaDef {
                 organization: {
                     name: "organization",
                     type: "Organization",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "invitations", fields: ["organizationId"], references: ["id"], onDelete: "Cascade" }
                 },
                 email: {
@@ -748,7 +748,7 @@ export class SchemaType implements SchemaDef {
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("inviterId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("inviterId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "invitations", fields: ["inviterId"], references: ["id"], onDelete: "Cascade" }
                 }
             },
@@ -805,7 +805,7 @@ export class SchemaType implements SchemaDef {
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "sessions", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
                 },
                 activeOrganizationId: {
@@ -820,7 +820,7 @@ export class SchemaType implements SchemaDef {
                 }
             },
             attributes: [
-                { name: "@@unique", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("token")]) }] },
+                { name: "@@unique", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("token")]) }] },
                 { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("session") }] }
             ],
             idFields: ["id"],
@@ -903,7 +903,7 @@ export class SchemaType implements SchemaDef {
                 country: {
                     name: "country",
                     type: "ISOCountry",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("isoCountryId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("countryId")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("isoCountryId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("countryId")]) }] }],
                     relation: { opposite: "regions", fields: ["isoCountryId"], references: ["countryId"] }
                 },
                 name: {
@@ -994,7 +994,7 @@ export class SchemaType implements SchemaDef {
                 country: {
                     name: "country",
                     type: "ISOCountry",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("isoCountryId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("countryId")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("isoCountryId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("countryId")]) }] }],
                     relation: { opposite: "addresses", fields: ["isoCountryId"], references: ["countryId"] }
                 },
                 partnerId: {
@@ -1006,6 +1006,13 @@ export class SchemaType implements SchemaDef {
                     type: "Partner",
                     array: true,
                     relation: { opposite: "address" }
+                },
+                companys: {
+                    name: "companys",
+                    type: "Company",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("registereOfficeAddress") }] }],
+                    relation: { opposite: "regsisteredAddress", name: "registereOfficeAddress" }
                 }
             },
             idFields: ["addressID"],
@@ -1053,7 +1060,7 @@ export class SchemaType implements SchemaDef {
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
                     relation: { opposite: "apiKey", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
                 },
                 refillInterval: {
@@ -1175,7 +1182,7 @@ export class SchemaType implements SchemaDef {
                 createdBy: {
                     name: "createdBy",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
                     relation: { opposite: "glaccounts", fields: ["createdById"], references: ["id"] }
                 },
                 ArApRecAccount: {
@@ -1233,7 +1240,7 @@ export class SchemaType implements SchemaDef {
                 address: {
                     name: "address",
                     type: "Address",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("addressId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("addressID")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressID")]) }] }],
                     relation: { opposite: "partners", fields: ["addressId"], references: ["addressID"] }
                 },
                 createdAt: {
@@ -1259,7 +1266,7 @@ export class SchemaType implements SchemaDef {
                 createdBy: {
                     name: "createdBy",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
                     relation: { opposite: "partners", fields: ["createdById"], references: ["id"] }
                 },
                 type: {
@@ -1330,7 +1337,7 @@ export class SchemaType implements SchemaDef {
                     name: "address",
                     type: "Address",
                     originModel: "Partner",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("addressId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("addressID")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressID")]) }] }],
                     relation: { opposite: "partners", fields: ["addressId"], references: ["addressID"] }
                 },
                 createdAt: {
@@ -1360,7 +1367,7 @@ export class SchemaType implements SchemaDef {
                     name: "createdBy",
                     type: "User",
                     originModel: "Partner",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
                     relation: { opposite: "partners", fields: ["createdById"], references: ["id"] }
                 },
                 type: {
@@ -1380,7 +1387,7 @@ export class SchemaType implements SchemaDef {
                 reconAccount: {
                     name: "reconAccount",
                     type: "GlAccount",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array([ExpressionUtils.field("reconAccountId")]) }, { name: "references", value: ExpressionUtils.array([ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("reconAccountId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
                     relation: { opposite: "ArApRecAccount", fields: ["reconAccountId"], references: ["id"] }
                 },
                 companyId: {
@@ -1393,8 +1400,8 @@ export class SchemaType implements SchemaDef {
                 id: { type: "String" }
             }
         },
-        FiscalYearVariant: {
-            name: "FiscalYearVariant",
+        FiscalYearPeriod: {
+            name: "FiscalYearPeriod",
             fields: {
                 id: {
                     name: "id",
@@ -1422,6 +1429,12 @@ export class SchemaType implements SchemaDef {
                 yearShift: {
                     name: "yearShift",
                     type: "Boolean"
+                },
+                compFiscalPeriod: {
+                    name: "compFiscalPeriod",
+                    type: "CompanyFiscalPeriod",
+                    array: true,
+                    relation: { opposite: "fiscalPeriod" }
                 }
             },
             attributes: [
@@ -1454,17 +1467,16 @@ export class SchemaType implements SchemaDef {
                     name: "open",
                     type: "Boolean"
                 },
-                companyId: {
-                    name: "companyId",
-                    type: "String",
-                    unique: true,
-                    attributes: [{ name: "@unique" }]
+                postPeriod: {
+                    name: "postPeriod",
+                    type: "CompanyPostingPeriod",
+                    array: true,
+                    relation: { opposite: "postPeriod" }
                 }
             },
             idFields: ["id"],
             uniqueFields: {
-                id: { type: "Int" },
-                companyId: { type: "String" }
+                id: { type: "Int" }
             }
         },
         Parameter: {
@@ -1492,6 +1504,147 @@ export class SchemaType implements SchemaDef {
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "Int" }
+            }
+        },
+        Company: {
+            name: "Company",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
+                    default: ExpressionUtils.call("autoincrement")
+                },
+                companyCode: {
+                    name: "companyCode",
+                    type: "String"
+                },
+                companyName: {
+                    name: "companyName",
+                    type: "String"
+                },
+                registeredOfficeAddressId: {
+                    name: "registeredOfficeAddressId",
+                    type: "Int",
+                    unique: true,
+                    attributes: [{ name: "@unique" }],
+                    foreignKeyFor: [
+                        "regsisteredAddress"
+                    ]
+                },
+                regsisteredAddress: {
+                    name: "regsisteredAddress",
+                    type: "Address",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("registereOfficeAddress") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("registeredOfficeAddressId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressID")]) }] }],
+                    relation: { opposite: "companys", name: "registereOfficeAddress", fields: ["registeredOfficeAddressId"], references: ["addressID"] }
+                },
+                vatNumber: {
+                    name: "vatNumber",
+                    type: "String",
+                    optional: true
+                },
+                fiscalPeriodId: {
+                    name: "fiscalPeriodId",
+                    type: "Int"
+                },
+                fiscPeriod: {
+                    name: "fiscPeriod",
+                    type: "CompanyFiscalPeriod",
+                    array: true,
+                    relation: { opposite: "company" }
+                },
+                postPeriod: {
+                    name: "postPeriod",
+                    type: "CompanyPostingPeriod",
+                    array: true,
+                    relation: { opposite: "company" }
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" },
+                registeredOfficeAddressId: { type: "Int" }
+            }
+        },
+        CompanyFiscalPeriod: {
+            name: "CompanyFiscalPeriod",
+            fields: {
+                companyId: {
+                    name: "companyId",
+                    type: "Int",
+                    id: true,
+                    foreignKeyFor: [
+                        "company"
+                    ]
+                },
+                fiscalPeriodId: {
+                    name: "fiscalPeriodId",
+                    type: "Int",
+                    id: true,
+                    foreignKeyFor: [
+                        "fiscalPeriod"
+                    ]
+                },
+                company: {
+                    name: "company",
+                    type: "Company",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("companyId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "fiscPeriod", fields: ["companyId"], references: ["id"] }
+                },
+                fiscalPeriod: {
+                    name: "fiscalPeriod",
+                    type: "FiscalYearPeriod",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("fiscalPeriodId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "compFiscalPeriod", fields: ["fiscalPeriodId"], references: ["id"] }
+                }
+            },
+            attributes: [
+                { name: "@@id", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("companyId"), ExpressionUtils.field("fiscalPeriodId")]) }] }
+            ],
+            idFields: ["companyId", "fiscalPeriodId"],
+            uniqueFields: {
+                companyId_fiscalPeriodId: { companyId: { type: "Int" }, fiscalPeriodId: { type: "Int" } }
+            }
+        },
+        CompanyPostingPeriod: {
+            name: "CompanyPostingPeriod",
+            fields: {
+                companyId: {
+                    name: "companyId",
+                    type: "Int",
+                    id: true,
+                    foreignKeyFor: [
+                        "company"
+                    ]
+                },
+                postingPeriodId: {
+                    name: "postingPeriodId",
+                    type: "Int",
+                    id: true,
+                    foreignKeyFor: [
+                        "postPeriod"
+                    ]
+                },
+                company: {
+                    name: "company",
+                    type: "Company",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("companyId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "postPeriod", fields: ["companyId"], references: ["id"] }
+                },
+                postPeriod: {
+                    name: "postPeriod",
+                    type: "PostingPeriod",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("postingPeriodId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "postPeriod", fields: ["postingPeriodId"], references: ["id"] }
+                }
+            },
+            attributes: [
+                { name: "@@id", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("companyId"), ExpressionUtils.field("postingPeriodId")]) }] }
+            ],
+            idFields: ["companyId", "postingPeriodId"],
+            uniqueFields: {
+                companyId_postingPeriodId: { companyId: { type: "Int" }, postingPeriodId: { type: "Int" } }
             }
         }
     } as const;
@@ -1526,6 +1679,7 @@ export class SchemaType implements SchemaDef {
     } as const;
     enums = {
         OrgLegalForm: {
+            name: "OrgLegalForm",
             values: {
                 SoleTrader: "SoleTrader",
                 Company: "Company",
@@ -1533,6 +1687,7 @@ export class SchemaType implements SchemaDef {
             }
         },
         OrgIdentificationType: {
+            name: "OrgIdentificationType",
             values: {
                 UTR_tax_ref: "UTR_tax_ref",
                 Company_Number: "Company_Number",
@@ -1540,13 +1695,16 @@ export class SchemaType implements SchemaDef {
             }
         },
         OrgPlanType: {
+            name: "OrgPlanType",
             values: {
                 Trial: "Trial",
                 Free: "Free",
+                Standard: "Standard",
                 Premium: "Premium"
             }
         },
         PersonType: {
+            name: "PersonType",
             values: {
                 Person: "Person",
                 Organisation: "Organisation"

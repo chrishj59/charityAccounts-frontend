@@ -22,6 +22,7 @@ import {
 import { awsVerificationEmail } from '../actions/send-email/send-verification';
 import { resend } from './email/resend';
 import { TruckElectric } from 'lucide-react';
+import { label } from 'framer-motion/client';
 
 const from = process.env.BETTER_AUTH_EMAIL || 'delivered@resend.dev';
 const to = process.env.TEST_EMAIL || '';
@@ -108,7 +109,15 @@ export const auth = betterAuth({
     organization({
       schema: {
         organization: {
-          name: 'Trading name',
+          // name: 'Trading name',
+          customRoles: [
+            { role: 'orgAdmin', label: 'Organisation Admin' },
+            { role: 'fundAdmin', label: 'Fund Administrator' },
+            { role: 'auditor', label: 'Auditor' },
+            { role: 'salesSuper', label: 'Sales Supervisor' },
+            { role: 'salesInvoice', label: 'Sales invoice' },
+            { role: 'salesCash', label: 'Sales cash' },
+          ],
           additionalFields: {
             tradingName: {
               type: 'string',

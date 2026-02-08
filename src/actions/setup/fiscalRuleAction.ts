@@ -50,8 +50,6 @@ export async function fiscalRuleUpdateAction(
     yearShift: rule.yearShift,
     calendarBased: rule.calendarBased,
   };
-  console.log(`payload ${JSON.stringify(payload)}`);
-  console.log(`data ${JSON.stringify(data)}`);
 
   try {
     const updated = await authDb.fiscalPeriodRule.update({

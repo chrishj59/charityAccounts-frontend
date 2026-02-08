@@ -1400,8 +1400,8 @@ export class SchemaType implements SchemaDef {
                 id: { type: "String" }
             }
         },
-        FiscalYearPeriod: {
-            name: "FiscalYearPeriod",
+        FiscalPeriodRule: {
+            name: "FiscalPeriodRule",
             fields: {
                 id: {
                     name: "id",
@@ -1430,11 +1430,16 @@ export class SchemaType implements SchemaDef {
                     name: "yearShift",
                     type: "Boolean"
                 },
-                compFiscalPeriod: {
-                    name: "compFiscalPeriod",
-                    type: "CompanyFiscalPeriod",
+                calendarBased: {
+                    name: "calendarBased",
+                    type: "Boolean"
+                },
+                companies: {
+                    name: "companies",
+                    type: "Company",
                     array: true,
-                    relation: { opposite: "fiscalPeriod" }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }] }],
+                    relation: { opposite: "fiscPeriodRule", name: "fiscPeriodRule" }
                 }
             },
             attributes: [
@@ -1544,15 +1549,18 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     optional: true
                 },
-                fiscalPeriodId: {
-                    name: "fiscalPeriodId",
-                    type: "Int"
+                fiscalPeriodRuleId: {
+                    name: "fiscalPeriodRuleId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "fiscPeriodRule"
+                    ]
                 },
-                fiscPeriod: {
-                    name: "fiscPeriod",
-                    type: "CompanyFiscalPeriod",
-                    array: true,
-                    relation: { opposite: "company" }
+                fiscPeriodRule: {
+                    name: "fiscPeriodRule",
+                    type: "FiscalPeriodRule",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("fiscalPeriodRuleId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "companies", name: "fiscPeriodRule", fields: ["fiscalPeriodRuleId"], references: ["id"] }
                 },
                 postPeriod: {
                     name: "postPeriod",
@@ -1565,46 +1573,6 @@ export class SchemaType implements SchemaDef {
             uniqueFields: {
                 id: { type: "Int" },
                 registeredOfficeAddressId: { type: "Int" }
-            }
-        },
-        CompanyFiscalPeriod: {
-            name: "CompanyFiscalPeriod",
-            fields: {
-                companyId: {
-                    name: "companyId",
-                    type: "Int",
-                    id: true,
-                    foreignKeyFor: [
-                        "company"
-                    ]
-                },
-                fiscalPeriodId: {
-                    name: "fiscalPeriodId",
-                    type: "Int",
-                    id: true,
-                    foreignKeyFor: [
-                        "fiscalPeriod"
-                    ]
-                },
-                company: {
-                    name: "company",
-                    type: "Company",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("companyId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }],
-                    relation: { opposite: "fiscPeriod", fields: ["companyId"], references: ["id"] }
-                },
-                fiscalPeriod: {
-                    name: "fiscalPeriod",
-                    type: "FiscalYearPeriod",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("fiscalPeriodId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }],
-                    relation: { opposite: "compFiscalPeriod", fields: ["fiscalPeriodId"], references: ["id"] }
-                }
-            },
-            attributes: [
-                { name: "@@id", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("companyId"), ExpressionUtils.field("fiscalPeriodId")]) }] }
-            ],
-            idFields: ["companyId", "fiscalPeriodId"],
-            uniqueFields: {
-                companyId_fiscalPeriodId: { companyId: { type: "Int" }, fiscalPeriodId: { type: "Int" } }
             }
         },
         CompanyPostingPeriod: {

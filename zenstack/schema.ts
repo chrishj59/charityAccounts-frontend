@@ -89,6 +89,62 @@ export class SchemaType implements SchemaDef {
                 id: { type: "String" }
             }
         },
+        PostingPeriod: {
+            name: "PostingPeriod",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
+                    default: ExpressionUtils.call("autoincrement")
+                },
+                year: {
+                    name: "year",
+                    type: "Int"
+                },
+                period: {
+                    name: "period",
+                    type: "Int"
+                },
+                open: {
+                    name: "open",
+                    type: "Boolean"
+                },
+                postPeriod: {
+                    name: "postPeriod",
+                    type: "CompanyPostingPeriod",
+                    array: true,
+                    relation: { opposite: "postPeriod" }
+                },
+                organization: {
+                    name: "organization",
+                    type: "Organization",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    relation: { opposite: "postingPeriods", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
+                },
+                organizationId: {
+                    name: "organizationId",
+                    type: "String",
+                    optional: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]) }] }],
+                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]),
+                    foreignKeyFor: [
+                        "organization"
+                    ]
+                }
+            },
+            attributes: [
+                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.call("auth"), "==", ExpressionUtils._null()) }] },
+                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organizationId")) }] },
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("read") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.field("organizationId"), "!=", ExpressionUtils._null()) }] }
+            ],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" }
+            }
+        },
         Todo: {
             name: "Todo",
             fields: {
@@ -278,6 +334,12 @@ export class SchemaType implements SchemaDef {
                 partners: {
                     name: "partners",
                     type: "Partner",
+                    array: true,
+                    relation: { opposite: "createdBy" }
+                },
+                funds: {
+                    name: "funds",
+                    type: "Fund",
                     array: true,
                     relation: { opposite: "createdBy" }
                 },
@@ -516,6 +578,12 @@ export class SchemaType implements SchemaDef {
                 members: {
                     name: "members",
                     type: "Member",
+                    array: true,
+                    relation: { opposite: "organization" }
+                },
+                postingPeriods: {
+                    name: "postingPeriods",
+                    type: "PostingPeriod",
                     array: true,
                     relation: { opposite: "organization" }
                 },
@@ -1443,42 +1511,9 @@ export class SchemaType implements SchemaDef {
                 }
             },
             attributes: [
-                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("create,read") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] },
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationRole"]), "==", ExpressionUtils.literal("admin")) }] }
             ],
-            idFields: ["id"],
-            uniqueFields: {
-                id: { type: "Int" }
-            }
-        },
-        PostingPeriod: {
-            name: "PostingPeriod",
-            fields: {
-                id: {
-                    name: "id",
-                    type: "Int",
-                    id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
-                    default: ExpressionUtils.call("autoincrement")
-                },
-                year: {
-                    name: "year",
-                    type: "Int"
-                },
-                period: {
-                    name: "period",
-                    type: "Int"
-                },
-                open: {
-                    name: "open",
-                    type: "Boolean"
-                },
-                postPeriod: {
-                    name: "postPeriod",
-                    type: "CompanyPostingPeriod",
-                    array: true,
-                    relation: { opposite: "postPeriod" }
-                }
-            },
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "Int" }
@@ -1613,6 +1648,147 @@ export class SchemaType implements SchemaDef {
             idFields: ["companyId", "postingPeriodId"],
             uniqueFields: {
                 companyId_postingPeriodId: { companyId: { type: "Int" }, postingPeriodId: { type: "Int" } }
+            }
+        },
+        Fund: {
+            name: "Fund",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
+                    default: ExpressionUtils.call("uuid")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
+                    default: ExpressionUtils.call("now")
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
+                    default: ExpressionUtils.call("now")
+                },
+                fundName: {
+                    name: "fundName",
+                    type: "String"
+                },
+                donarName: {
+                    name: "donarName",
+                    type: "String",
+                    optional: true
+                },
+                objective: {
+                    name: "objective",
+                    type: "String",
+                    optional: true
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                },
+                type: {
+                    name: "type",
+                    type: "String",
+                    isDiscriminator: true
+                }
+            },
+            attributes: [
+                { name: "@@delegate", args: [{ name: "discriminator", value: ExpressionUtils.field("type") }] }
+            ],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            },
+            isDelegate: true,
+            subModels: ["UnrestrictedFund"]
+        },
+        UnrestrictedFund: {
+            name: "UnrestrictedFund",
+            baseModel: "Fund",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
+                    default: ExpressionUtils.call("uuid")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
+                    default: ExpressionUtils.call("now")
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
+                    default: ExpressionUtils.call("now")
+                },
+                fundName: {
+                    name: "fundName",
+                    type: "String",
+                    originModel: "Fund"
+                },
+                donarName: {
+                    name: "donarName",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                objective: {
+                    name: "objective",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    originModel: "Fund",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                },
+                type: {
+                    name: "type",
+                    type: "String",
+                    originModel: "Fund",
+                    isDiscriminator: true
+                },
+                reviewDate: {
+                    name: "reviewDate",
+                    type: "DateTime",
+                    optional: true
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
             }
         }
     } as const;

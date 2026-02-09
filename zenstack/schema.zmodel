@@ -78,6 +78,28 @@ model TodoList {
   @@allow('read', organizationId != null)
 }
 
+model PostingPeriod {
+  id      Int @id @default(autoincrement())
+  year    Int
+  period  Int
+  open    Boolean 
+  postPeriod CompanyPostingPeriod []
+  
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String?       @default(auth().organizationId) //@allow('update', false)
+  
+  // deny anonymous users
+  @@deny('all', auth() == null)
+
+  // deny access to lists that don't belong to the user's active organization
+  @@deny('all', auth().organizationId != organizationId)
+
+  
+
+  // if the list belongs to an org, it's readable to all members
+  @@allow('read', organizationId != null)
+ }
+
 model Todo {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -115,6 +137,7 @@ model User {
   apiKey        Apikey?
   glaccounts    GlAccount[]
   partners      Partner[]
+  funds         Fund[]
   lastLoginMethod String?
 
   
@@ -171,6 +194,7 @@ model Organization {
     identification      String       @length(1,50, "Must be between 1 and 50 characters")
     accountType         OrgPlanType  @default(Trial)
     members             Member[]
+    postingPeriods      PostingPeriod[]
     
     invitations         Invitation[]
     todoLists           TodoList[]
@@ -373,18 +397,14 @@ model Apikey {
   yearShift     Boolean
   calendarBased Boolean
   companies     Company[] @relation('fiscPeriodRule')
-  @@allow('create,read', true)
+  @@allow('all', true)
+  @@allow('all', auth().organizationRole == 'admin')
+  // deny anonymous users
+  // @@deny('all', auth() == null)
 
  }
 
- model PostingPeriod {
-  id      Int @id @default(autoincrement())
-  year    Int
-  period  Int
-  open    Boolean 
-  postPeriod CompanyPostingPeriod []
-  
- }
+ 
 
  model Parameter {
   id Int  @id @default(autoincrement())
@@ -406,13 +426,7 @@ model Apikey {
   postPeriod CompanyPostingPeriod []
  }
 
-//  model CompanyFiscalPeriod {
-//   companyId Int
-//   fiscalPeriodId Int
-//   company Company @relation(fields: [companyId], references: [id])
-//   fiscalPeriod FiscalYearPeriod @relation(fields: [fiscalPeriodId], references: [id])
-//   @@id([companyId, fiscalPeriodId])
-//  }
+
 
  model CompanyPostingPeriod {
   companyId Int
@@ -420,6 +434,27 @@ model Apikey {
   company Company @relation(fields: [companyId], references: [id])
   postPeriod PostingPeriod @relation(fields: [postingPeriodId], references: [id])
   @@id([companyId,postingPeriodId ])
+ }
+
+ model Fund {
+  id String @id @default(uuid())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  createdAt   DateTime  @default(now())
+  fundName String
+  donarName String?
+  objective String?
+  managedById String
+  createdBy   User      @relation(fields: [managedById], references: [id])
+  type      String
+
+  @@delegate(type)
+
+ }
+
+ model UnrestrictedFund extends Fund {
+  reviewDate DateTime?
+
+
  }
 
 

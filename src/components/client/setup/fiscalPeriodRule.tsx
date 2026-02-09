@@ -5,7 +5,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from 'primereact/button';
-import { Toast } from 'primereact/toast';
+import { Toast, ToastMessage } from 'primereact/toast';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useClientQueries } from '@zenstackhq/tanstack-query/react';
 
@@ -26,6 +26,11 @@ interface FiscalYearVarProps {
 
 import { FiscalPeriodRule } from '~/zenstack/models';
 import { truncate } from 'node:fs/promises';
+import {
+  DB_ERROR,
+  fiscPeriodRuleResponse,
+  statusEnum,
+} from '../../../types/helper';
 import {
   fiscalRuleAddAction,
   fiscalRuleUpdateAction,
@@ -65,7 +70,14 @@ export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
 
   const dt = useRef<DataTable<FiscalPeriodRule[]>>(null);
   console.log(`fiscVar in client ${JSON.stringify(fiscRulesList)}`);
-
+  const showToast = (
+    severity: ToastMessage['severity'],
+    summary: string,
+    detail: string,
+    sticky: boolean,
+  ) => {
+    toast.current?.show({ severity, summary, detail, sticky });
+  };
   const addFiscYrVar = (fiscYrVar: FiscalPeriodRule) => {
     const _fiscYrVar: FiscalPeriodRule = emptyFiscRule;
 
@@ -137,7 +149,28 @@ export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
   const saveFiscPeriodUpdate = async () => {
     const _editFiscRule = editFiscRule;
 
-    const result = await fiscalRuleUpdateAction(_editFiscRule);
+    const result: fiscPeriodRuleResponse =
+      await fiscalRuleUpdateAction(_editFiscRule);
+
+    if (result.status === statusEnum.SUCCESS) {
+      showToast('success', 'Update success', 'Updated period rule', false);
+
+      const updated = result.data?.fiscalPeriodRule;
+      const _fiscalRules = fiscRulesList;
+      const updatedIdx = _fiscalRules.findIndex((f) => f.id === updated?.id);
+      if (updatedIdx && updated) {
+        _fiscalRules[updatedIdx] = updated;
+        setFiscRulesList(_fiscalRules);
+      }
+    } else {
+      toast.current?.show({
+        severity: 'warn',
+        summary: 'Update failed',
+        detail: ` Update failed ${result.data?.error?.reason}`,
+        life: 400,
+      });
+    }
+    setEditFiscRuleDialog(false);
   };
   const updateDialogFooter = (
     <div className='flex flex-row'>
@@ -276,6 +309,7 @@ export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
           emptyMessage='No Fiscal Year periods'
         >
           <Column field='id' header='id' />
+          <Column field='calendarBased' header='Cal based' />
           <Column field='name' header='Name' />
           <Column field='monthNum' header='Month ' />
           <Column field='day' header='Day of Month' />
@@ -532,7 +566,6 @@ export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
           },
         }}
       >
-        <div>{JSON.stringify(editFiscRule)}</div>
         {/* Calendar Year */}
         <div className='field'>
           <label htmlFor='calendarBased' className='font-bold'>
@@ -566,7 +599,7 @@ export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
             onChange={(e) => onInputChange(e, 'name')}
             size={20}
             required
-            disabled={editFiscRule.calendarBased}
+            // disabled={editFiscRule.calendarBased}
             autoFocus
             className={classNames({
               'p-invalid': submitted && !editFiscRule?.name,

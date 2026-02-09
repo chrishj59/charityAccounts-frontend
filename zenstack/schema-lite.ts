@@ -75,6 +75,54 @@ export class SchemaType implements SchemaDef {
                 id: { type: "String" }
             }
         },
+        PostingPeriod: {
+            name: "PostingPeriod",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    default: ExpressionUtils.call("autoincrement")
+                },
+                year: {
+                    name: "year",
+                    type: "Int"
+                },
+                period: {
+                    name: "period",
+                    type: "Int"
+                },
+                open: {
+                    name: "open",
+                    type: "Boolean"
+                },
+                postPeriod: {
+                    name: "postPeriod",
+                    type: "CompanyPostingPeriod",
+                    array: true,
+                    relation: { opposite: "postPeriod" }
+                },
+                organization: {
+                    name: "organization",
+                    type: "Organization",
+                    optional: true,
+                    relation: { opposite: "postingPeriods", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
+                },
+                organizationId: {
+                    name: "organizationId",
+                    type: "String",
+                    optional: true,
+                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]),
+                    foreignKeyFor: [
+                        "organization"
+                    ]
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" }
+            }
+        },
         Todo: {
             name: "Todo",
             fields: {
@@ -247,6 +295,12 @@ export class SchemaType implements SchemaDef {
                 partners: {
                     name: "partners",
                     type: "Partner",
+                    array: true,
+                    relation: { opposite: "createdBy" }
+                },
+                funds: {
+                    name: "funds",
+                    type: "Fund",
                     array: true,
                     relation: { opposite: "createdBy" }
                 },
@@ -461,6 +515,12 @@ export class SchemaType implements SchemaDef {
                 members: {
                     name: "members",
                     type: "Member",
+                    array: true,
+                    relation: { opposite: "organization" }
+                },
+                postingPeriods: {
+                    name: "postingPeriods",
+                    type: "PostingPeriod",
                     array: true,
                     relation: { opposite: "organization" }
                 },
@@ -1266,8 +1326,8 @@ export class SchemaType implements SchemaDef {
                 id: { type: "String" }
             }
         },
-        FiscalYearPeriod: {
-            name: "FiscalYearPeriod",
+        FiscalPeriodRule: {
+            name: "FiscalPeriodRule",
             fields: {
                 id: {
                     name: "id",
@@ -1295,44 +1355,15 @@ export class SchemaType implements SchemaDef {
                     name: "yearShift",
                     type: "Boolean"
                 },
-                compFiscalPeriod: {
-                    name: "compFiscalPeriod",
-                    type: "CompanyFiscalPeriod",
-                    array: true,
-                    relation: { opposite: "fiscalPeriod" }
-                }
-            },
-            idFields: ["id"],
-            uniqueFields: {
-                id: { type: "Int" }
-            }
-        },
-        PostingPeriod: {
-            name: "PostingPeriod",
-            fields: {
-                id: {
-                    name: "id",
-                    type: "Int",
-                    id: true,
-                    default: ExpressionUtils.call("autoincrement")
-                },
-                year: {
-                    name: "year",
-                    type: "Int"
-                },
-                period: {
-                    name: "period",
-                    type: "Int"
-                },
-                open: {
-                    name: "open",
+                calendarBased: {
+                    name: "calendarBased",
                     type: "Boolean"
                 },
-                postPeriod: {
-                    name: "postPeriod",
-                    type: "CompanyPostingPeriod",
+                companies: {
+                    name: "companies",
+                    type: "Company",
                     array: true,
-                    relation: { opposite: "postPeriod" }
+                    relation: { opposite: "fiscPeriodRule", name: "fiscPeriodRule" }
                 }
             },
             idFields: ["id"],
@@ -1398,15 +1429,17 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     optional: true
                 },
-                fiscalPeriodId: {
-                    name: "fiscalPeriodId",
-                    type: "Int"
+                fiscalPeriodRuleId: {
+                    name: "fiscalPeriodRuleId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "fiscPeriodRule"
+                    ]
                 },
-                fiscPeriod: {
-                    name: "fiscPeriod",
-                    type: "CompanyFiscalPeriod",
-                    array: true,
-                    relation: { opposite: "company" }
+                fiscPeriodRule: {
+                    name: "fiscPeriodRule",
+                    type: "FiscalPeriodRule",
+                    relation: { opposite: "companies", name: "fiscPeriodRule", fields: ["fiscalPeriodRuleId"], references: ["id"] }
                 },
                 postPeriod: {
                     name: "postPeriod",
@@ -1419,41 +1452,6 @@ export class SchemaType implements SchemaDef {
             uniqueFields: {
                 id: { type: "Int" },
                 registeredOfficeAddressId: { type: "Int" }
-            }
-        },
-        CompanyFiscalPeriod: {
-            name: "CompanyFiscalPeriod",
-            fields: {
-                companyId: {
-                    name: "companyId",
-                    type: "Int",
-                    id: true,
-                    foreignKeyFor: [
-                        "company"
-                    ]
-                },
-                fiscalPeriodId: {
-                    name: "fiscalPeriodId",
-                    type: "Int",
-                    id: true,
-                    foreignKeyFor: [
-                        "fiscalPeriod"
-                    ]
-                },
-                company: {
-                    name: "company",
-                    type: "Company",
-                    relation: { opposite: "fiscPeriod", fields: ["companyId"], references: ["id"] }
-                },
-                fiscalPeriod: {
-                    name: "fiscalPeriod",
-                    type: "FiscalYearPeriod",
-                    relation: { opposite: "compFiscalPeriod", fields: ["fiscalPeriodId"], references: ["id"] }
-                }
-            },
-            idFields: ["companyId", "fiscalPeriodId"],
-            uniqueFields: {
-                companyId_fiscalPeriodId: { companyId: { type: "Int" }, fiscalPeriodId: { type: "Int" } }
             }
         },
         CompanyPostingPeriod: {
@@ -1489,6 +1487,136 @@ export class SchemaType implements SchemaDef {
             idFields: ["companyId", "postingPeriodId"],
             uniqueFields: {
                 companyId_postingPeriodId: { companyId: { type: "Int" }, postingPeriodId: { type: "Int" } }
+            }
+        },
+        Fund: {
+            name: "Fund",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    default: ExpressionUtils.call("uuid")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    default: ExpressionUtils.call("now")
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    default: ExpressionUtils.call("now")
+                },
+                fundName: {
+                    name: "fundName",
+                    type: "String"
+                },
+                donarName: {
+                    name: "donarName",
+                    type: "String",
+                    optional: true
+                },
+                objective: {
+                    name: "objective",
+                    type: "String",
+                    optional: true
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                },
+                type: {
+                    name: "type",
+                    type: "String",
+                    isDiscriminator: true
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            },
+            isDelegate: true,
+            subModels: ["UnrestrictedFund"]
+        },
+        UnrestrictedFund: {
+            name: "UnrestrictedFund",
+            baseModel: "Fund",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    default: ExpressionUtils.call("uuid")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    originModel: "Fund",
+                    default: ExpressionUtils.call("now")
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    originModel: "Fund",
+                    default: ExpressionUtils.call("now")
+                },
+                fundName: {
+                    name: "fundName",
+                    type: "String",
+                    originModel: "Fund"
+                },
+                donarName: {
+                    name: "donarName",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                objective: {
+                    name: "objective",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    originModel: "Fund",
+                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                },
+                type: {
+                    name: "type",
+                    type: "String",
+                    originModel: "Fund",
+                    isDiscriminator: true
+                },
+                reviewDate: {
+                    name: "reviewDate",
+                    type: "DateTime",
+                    optional: true
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
             }
         }
     } as const;

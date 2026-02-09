@@ -1,9 +1,12 @@
 'use server';
 
 import { ORMError } from '@zenstackhq/orm';
-import { authDb } from '~/src/lib/db';
-import { DB_ERROR } from '~/src/types/helper';
+import { json } from 'zod';
+import { authDb, db } from '~/src/lib/db';
+import { DB_ERROR, statusEnum } from '~/src/types/helper';
 import { FiscalPeriodRule } from '~/zenstack/models';
+import { fiscPeriodRuleResponse } from '../../types/helper';
+import { RationesOrganisation } from '~/src/types';
 export async function fiscalRuleAddAction(
   rule: FiscalPeriodRule,
 ): Promise<FiscalPeriodRule> {
@@ -27,7 +30,7 @@ export async function fiscalRuleAddAction(
 
 export async function fiscalRuleUpdateAction(
   rule: FiscalPeriodRule,
-): Promise<FiscalPeriodRule | unknown> {
+): Promise<fiscPeriodRuleResponse> {
   console.log(`called fiscalRuleAdd with ${JSON.stringify(rule)}`);
 
   const payload = {
@@ -52,15 +55,30 @@ export async function fiscalRuleUpdateAction(
   };
 
   try {
-    const updated = await authDb.fiscalPeriodRule.update({
+    const found = await authDb.fiscalPeriodRule.findFirst({
       where: { id: rule.id },
+    });
+
+    const updated = await authDb.fiscalPeriodRule.update({
+      where: { id: 1 },
       data: data,
     });
-    console.log(`updates ${JSON.stringify(updated)}`);
-    return updated;
+    console.log(`updated rule ${JSON.stringify(updated)}`);
+    const resp: fiscPeriodRuleResponse = {
+      status: statusEnum.SUCCESS,
+      message: `Updated rule`,
+      data: { fiscalPeriodRule: updated },
+    };
+    return resp;
   } catch (error) {
     console.log(`error ${JSON.stringify(error)}`);
+    const _error = error as DB_ERROR;
+    const errResp: fiscPeriodRuleResponse = {
+      status: statusEnum.ERROR,
+      message: `Could not update period rule`,
+      data: { error: { reason: _error.reason, model: _error.model } },
+    };
 
-    return error;
+    return errResp;
   }
 }

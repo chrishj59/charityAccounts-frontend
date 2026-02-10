@@ -1,4 +1,10 @@
- 
+ enum Role {
+  MANAGER
+  RECEIVABLE_POSTER
+  PAYABLE_POSTER
+  GL_POSTER
+  RECEIVABLE_DISPLAY
+ }
 
 datasource db {
   provider = "postgresql"
@@ -124,7 +130,8 @@ model User {
   image         String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @default(now()) @updatedAt
-  role          String?
+  // role          String?
+  role          Role
   banned        Boolean?
   banReason     String?
   banExpires    DateTime?
@@ -139,6 +146,7 @@ model User {
   partners      Partner[]
   funds         Fund[]
   lastLoginMethod String?
+  
 
   
   @@map("user")
@@ -453,6 +461,20 @@ model Apikey {
 
  model UnrestrictedFund extends Fund {
   reviewDate DateTime?
+
+
+ }
+
+ model JournalDoc {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ref String
+  year Int
+  fiscalPeriod Int
+  headerText String
+
+  @@allow('create', auth().role in [RECEIVABLE_POSTER, PAYABLE_POSTER, GL_POSTER])
 
 
  }

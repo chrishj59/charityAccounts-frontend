@@ -4,6 +4,8 @@
   PAYABLE_POSTER
   GL_POSTER
   RECEIVABLE_DISPLAY
+  CLERK
+  user
  }
 
 datasource db {
@@ -131,7 +133,7 @@ model User {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @default(now()) @updatedAt
   // role          String?
-  role          Role
+  role          Role          @default(user)
   banned        Boolean?
   banReason     String?
   banExpires    DateTime?
@@ -145,6 +147,8 @@ model User {
   glaccounts    GlAccount[]
   partners      Partner[]
   funds         Fund[]
+  createdDesignatedFund DesignatedFund[] @relation(name:"designationCreate")
+  releasedDesignatedFund DesignatedFund[] @relation(name:'designationRelease')
   lastLoginMethod String?
   
 
@@ -206,6 +210,7 @@ model Organization {
     
     invitations         Invitation[]
     todoLists           TodoList[]
+    funds               Fund[] @relation(name:'fund')
 
     @@map('organization')
 }
@@ -445,24 +450,76 @@ model Apikey {
  }
 
  model Fund {
-  id String @id @default(uuid())
+  id              String @id @default(uuid())
   updatedAt       DateTime      @default(now()) @updatedAt
-  createdAt   DateTime  @default(now())
-  fundName String
-  donarName String?
-  objective String?
-  managedById String
-  createdBy   User      @relation(fields: [managedById], references: [id])
-  type      String
+  createdAt       DateTime  @default(now())
+  fundName        String
+  donarName       String?
+  objective       String?
+  managedById     String
+  organisationId  String
+  organisation    Organization @relation(name:'fund',fields: [organisationId], references: [id], onDelete: Cascade)
+  createdBy       User      @relation(fields: [managedById], references: [id])
+  fundType        String
+  balances        FundBalance[] @relation(name:'fundBalance')
 
-  @@delegate(type)
+  @@delegate(fundType)
+  //restricted by organisation
+  @@deny('all', auth() == null)
+  @@deny('all', auth().organizationId != organisationId)
+
+  // add role that can create/ update/ view
 
  }
 
- model UnrestrictedFund extends Fund {
+ model GeneralFund extends Fund {
   reviewDate DateTime?
+  balance Decimal @db.Decimal(16,2)
 
 
+ }
+ model RestrictedFund extends Fund {
+  projectEndDate      DateTime
+  restrictedType      String
+  nextDonarReviewDate DateTime
+  returnSurplus       Boolean
+
+  @@delegate(restrictedType)
+ }
+ model DesignatedFund extends RestrictedFund {
+  
+  designatedDate          DateTime
+  releasedDate            DateTime
+  designatedById          String
+  designateMeeting        String
+  undesignateMeeting      String
+  designationReleasedById String
+  designationCreatedBy    User @relation(name:'designationCreate', fields: [designatedById], references: [id])
+  designationReleasedBy   User @relation(name:'designationRelease', fields: [designationReleasedById], references: [id])
+ }
+
+ model EndownmentPermanent extends RestrictedFund {
+  capitalAmount Decimal @db.Decimal(16,2)
+  incomeAmount Decimal @db.Decimal(16,2)
+
+  
+ }
+
+ model EndownmentIncome extends RestrictedFund {
+  capitalAmount Decimal @db.Decimal(16,2)
+  incomeAmount  Decimal @db.Decimal(16,2)
+  generalUsage  Decimal @db.Decimal(16,2)
+  
+  
+ }
+
+ model FundBalance {
+  id            String    @id @default(uuid())
+  fiscalPeriod  Int  
+  fiscalYear    Int
+  balance       Decimal   @db.Decimal(16,2)
+  fundId        String
+  fund          Fund      @relation(name:'fundBalance',fields: [fundId], references: [id])
  }
 
  model JournalDoc {

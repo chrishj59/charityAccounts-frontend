@@ -31,11 +31,19 @@ export type Parameter = $ModelResult<$Schema, "Parameter">;
 export type Company = $ModelResult<$Schema, "Company">;
 export type CompanyPostingPeriod = $ModelResult<$Schema, "CompanyPostingPeriod">;
 export type Fund = $ModelResult<$Schema, "Fund">;
-export type UnrestrictedFund = $ModelResult<$Schema, "UnrestrictedFund">;
+export type GeneralFund = $ModelResult<$Schema, "GeneralFund">;
+export type RestrictedFund = $ModelResult<$Schema, "RestrictedFund">;
+export type DesignatedFund = $ModelResult<$Schema, "DesignatedFund">;
+export type EndownmentPermanent = $ModelResult<$Schema, "EndownmentPermanent">;
+export type EndownmentIncome = $ModelResult<$Schema, "EndownmentIncome">;
+export type FundBalance = $ModelResult<$Schema, "FundBalance">;
+export type JournalDoc = $ModelResult<$Schema, "JournalDoc">;
 /**
  * Shape of the `auth()` function
  */
 export type Auth = $TypeDefResult<$Schema, "Auth">;
+export const Role = $schema.enums.Role.values;
+export type Role = (typeof Role)[keyof typeof Role];
 export const OrgLegalForm = $schema.enums.OrgLegalForm.values;
 export type OrgLegalForm = (typeof OrgLegalForm)[keyof typeof OrgLegalForm];
 export const OrgIdentificationType = $schema.enums.OrgIdentificationType.values;

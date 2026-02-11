@@ -226,8 +226,8 @@ export class SchemaType implements SchemaDef {
                 },
                 role: {
                     name: "role",
-                    type: "String",
-                    optional: true
+                    type: "Role",
+                    default: "user"
                 },
                 banned: {
                     name: "banned",
@@ -303,6 +303,18 @@ export class SchemaType implements SchemaDef {
                     type: "Fund",
                     array: true,
                     relation: { opposite: "createdBy" }
+                },
+                createdDesignatedFund: {
+                    name: "createdDesignatedFund",
+                    type: "DesignatedFund",
+                    array: true,
+                    relation: { opposite: "designationCreatedBy", name: "designationCreate" }
+                },
+                releasedDesignatedFund: {
+                    name: "releasedDesignatedFund",
+                    type: "DesignatedFund",
+                    array: true,
+                    relation: { opposite: "designationReleasedBy", name: "designationRelease" }
                 },
                 lastLoginMethod: {
                     name: "lastLoginMethod",
@@ -535,6 +547,12 @@ export class SchemaType implements SchemaDef {
                     type: "TodoList",
                     array: true,
                     relation: { opposite: "organization" }
+                },
+                funds: {
+                    name: "funds",
+                    type: "Fund",
+                    array: true,
+                    relation: { opposite: "organisation", name: "fund" }
                 }
             },
             idFields: ["id"],
@@ -1530,15 +1548,33 @@ export class SchemaType implements SchemaDef {
                         "createdBy"
                     ]
                 },
+                organisationId: {
+                    name: "organisationId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "organisation"
+                    ]
+                },
+                organisation: {
+                    name: "organisation",
+                    type: "Organization",
+                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
                 },
-                type: {
-                    name: "type",
+                fundType: {
+                    name: "fundType",
                     type: "String",
                     isDiscriminator: true
+                },
+                balances: {
+                    name: "balances",
+                    type: "FundBalance",
+                    array: true,
+                    relation: { opposite: "fund", name: "fundBalance" }
                 }
             },
             idFields: ["id"],
@@ -1546,10 +1582,10 @@ export class SchemaType implements SchemaDef {
                 id: { type: "String" }
             },
             isDelegate: true,
-            subModels: ["UnrestrictedFund"]
+            subModels: ["GeneralFund", "RestrictedFund"]
         },
-        UnrestrictedFund: {
-            name: "UnrestrictedFund",
+        GeneralFund: {
+            name: "GeneralFund",
             baseModel: "Fund",
             fields: {
                 id: {
@@ -1596,22 +1632,617 @@ export class SchemaType implements SchemaDef {
                         "createdBy"
                     ]
                 },
+                organisationId: {
+                    name: "organisationId",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "organisation"
+                    ]
+                },
+                organisation: {
+                    name: "organisation",
+                    type: "Organization",
+                    originModel: "Fund",
+                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
                     relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
                 },
-                type: {
-                    name: "type",
+                fundType: {
+                    name: "fundType",
                     type: "String",
                     originModel: "Fund",
                     isDiscriminator: true
+                },
+                balances: {
+                    name: "balances",
+                    type: "FundBalance",
+                    array: true,
+                    originModel: "Fund",
+                    relation: { opposite: "fund", name: "fundBalance" }
                 },
                 reviewDate: {
                     name: "reviewDate",
                     type: "DateTime",
                     optional: true
+                },
+                balance: {
+                    name: "balance",
+                    type: "Decimal"
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
+        },
+        RestrictedFund: {
+            name: "RestrictedFund",
+            baseModel: "Fund",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    default: ExpressionUtils.call("uuid")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    originModel: "Fund",
+                    default: ExpressionUtils.call("now")
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    originModel: "Fund",
+                    default: ExpressionUtils.call("now")
+                },
+                fundName: {
+                    name: "fundName",
+                    type: "String",
+                    originModel: "Fund"
+                },
+                donarName: {
+                    name: "donarName",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                objective: {
+                    name: "objective",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                organisationId: {
+                    name: "organisationId",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "organisation"
+                    ]
+                },
+                organisation: {
+                    name: "organisation",
+                    type: "Organization",
+                    originModel: "Fund",
+                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    originModel: "Fund",
+                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                },
+                fundType: {
+                    name: "fundType",
+                    type: "String",
+                    originModel: "Fund",
+                    isDiscriminator: true
+                },
+                balances: {
+                    name: "balances",
+                    type: "FundBalance",
+                    array: true,
+                    originModel: "Fund",
+                    relation: { opposite: "fund", name: "fundBalance" }
+                },
+                projectEndDate: {
+                    name: "projectEndDate",
+                    type: "DateTime"
+                },
+                restrictedType: {
+                    name: "restrictedType",
+                    type: "String",
+                    isDiscriminator: true
+                },
+                nextDonarReviewDate: {
+                    name: "nextDonarReviewDate",
+                    type: "DateTime"
+                },
+                returnSurplus: {
+                    name: "returnSurplus",
+                    type: "Boolean"
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            },
+            isDelegate: true,
+            subModels: ["DesignatedFund", "EndownmentPermanent", "EndownmentIncome"]
+        },
+        DesignatedFund: {
+            name: "DesignatedFund",
+            baseModel: "RestrictedFund",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    default: ExpressionUtils.call("uuid")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    originModel: "Fund",
+                    default: ExpressionUtils.call("now")
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    originModel: "Fund",
+                    default: ExpressionUtils.call("now")
+                },
+                fundName: {
+                    name: "fundName",
+                    type: "String",
+                    originModel: "Fund"
+                },
+                donarName: {
+                    name: "donarName",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                objective: {
+                    name: "objective",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                organisationId: {
+                    name: "organisationId",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "organisation"
+                    ]
+                },
+                organisation: {
+                    name: "organisation",
+                    type: "Organization",
+                    originModel: "Fund",
+                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    originModel: "Fund",
+                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                },
+                fundType: {
+                    name: "fundType",
+                    type: "String",
+                    originModel: "Fund",
+                    isDiscriminator: true
+                },
+                balances: {
+                    name: "balances",
+                    type: "FundBalance",
+                    array: true,
+                    originModel: "Fund",
+                    relation: { opposite: "fund", name: "fundBalance" }
+                },
+                projectEndDate: {
+                    name: "projectEndDate",
+                    type: "DateTime",
+                    originModel: "RestrictedFund"
+                },
+                restrictedType: {
+                    name: "restrictedType",
+                    type: "String",
+                    originModel: "RestrictedFund",
+                    isDiscriminator: true
+                },
+                nextDonarReviewDate: {
+                    name: "nextDonarReviewDate",
+                    type: "DateTime",
+                    originModel: "RestrictedFund"
+                },
+                returnSurplus: {
+                    name: "returnSurplus",
+                    type: "Boolean",
+                    originModel: "RestrictedFund"
+                },
+                designatedDate: {
+                    name: "designatedDate",
+                    type: "DateTime"
+                },
+                releasedDate: {
+                    name: "releasedDate",
+                    type: "DateTime"
+                },
+                designatedById: {
+                    name: "designatedById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "designationCreatedBy"
+                    ]
+                },
+                designateMeeting: {
+                    name: "designateMeeting",
+                    type: "String"
+                },
+                undesignateMeeting: {
+                    name: "undesignateMeeting",
+                    type: "String"
+                },
+                designationReleasedById: {
+                    name: "designationReleasedById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "designationReleasedBy"
+                    ]
+                },
+                designationCreatedBy: {
+                    name: "designationCreatedBy",
+                    type: "User",
+                    relation: { opposite: "createdDesignatedFund", name: "designationCreate", fields: ["designatedById"], references: ["id"] }
+                },
+                designationReleasedBy: {
+                    name: "designationReleasedBy",
+                    type: "User",
+                    relation: { opposite: "releasedDesignatedFund", name: "designationRelease", fields: ["designationReleasedById"], references: ["id"] }
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
+        },
+        EndownmentPermanent: {
+            name: "EndownmentPermanent",
+            baseModel: "RestrictedFund",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    default: ExpressionUtils.call("uuid")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    originModel: "Fund",
+                    default: ExpressionUtils.call("now")
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    originModel: "Fund",
+                    default: ExpressionUtils.call("now")
+                },
+                fundName: {
+                    name: "fundName",
+                    type: "String",
+                    originModel: "Fund"
+                },
+                donarName: {
+                    name: "donarName",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                objective: {
+                    name: "objective",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                organisationId: {
+                    name: "organisationId",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "organisation"
+                    ]
+                },
+                organisation: {
+                    name: "organisation",
+                    type: "Organization",
+                    originModel: "Fund",
+                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    originModel: "Fund",
+                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                },
+                fundType: {
+                    name: "fundType",
+                    type: "String",
+                    originModel: "Fund",
+                    isDiscriminator: true
+                },
+                balances: {
+                    name: "balances",
+                    type: "FundBalance",
+                    array: true,
+                    originModel: "Fund",
+                    relation: { opposite: "fund", name: "fundBalance" }
+                },
+                projectEndDate: {
+                    name: "projectEndDate",
+                    type: "DateTime",
+                    originModel: "RestrictedFund"
+                },
+                restrictedType: {
+                    name: "restrictedType",
+                    type: "String",
+                    originModel: "RestrictedFund",
+                    isDiscriminator: true
+                },
+                nextDonarReviewDate: {
+                    name: "nextDonarReviewDate",
+                    type: "DateTime",
+                    originModel: "RestrictedFund"
+                },
+                returnSurplus: {
+                    name: "returnSurplus",
+                    type: "Boolean",
+                    originModel: "RestrictedFund"
+                },
+                capitalAmount: {
+                    name: "capitalAmount",
+                    type: "Decimal"
+                },
+                incomeAmount: {
+                    name: "incomeAmount",
+                    type: "Decimal"
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
+        },
+        EndownmentIncome: {
+            name: "EndownmentIncome",
+            baseModel: "RestrictedFund",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    default: ExpressionUtils.call("uuid")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    originModel: "Fund",
+                    default: ExpressionUtils.call("now")
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    originModel: "Fund",
+                    default: ExpressionUtils.call("now")
+                },
+                fundName: {
+                    name: "fundName",
+                    type: "String",
+                    originModel: "Fund"
+                },
+                donarName: {
+                    name: "donarName",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                objective: {
+                    name: "objective",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                organisationId: {
+                    name: "organisationId",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "organisation"
+                    ]
+                },
+                organisation: {
+                    name: "organisation",
+                    type: "Organization",
+                    originModel: "Fund",
+                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    originModel: "Fund",
+                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                },
+                fundType: {
+                    name: "fundType",
+                    type: "String",
+                    originModel: "Fund",
+                    isDiscriminator: true
+                },
+                balances: {
+                    name: "balances",
+                    type: "FundBalance",
+                    array: true,
+                    originModel: "Fund",
+                    relation: { opposite: "fund", name: "fundBalance" }
+                },
+                projectEndDate: {
+                    name: "projectEndDate",
+                    type: "DateTime",
+                    originModel: "RestrictedFund"
+                },
+                restrictedType: {
+                    name: "restrictedType",
+                    type: "String",
+                    originModel: "RestrictedFund",
+                    isDiscriminator: true
+                },
+                nextDonarReviewDate: {
+                    name: "nextDonarReviewDate",
+                    type: "DateTime",
+                    originModel: "RestrictedFund"
+                },
+                returnSurplus: {
+                    name: "returnSurplus",
+                    type: "Boolean",
+                    originModel: "RestrictedFund"
+                },
+                capitalAmount: {
+                    name: "capitalAmount",
+                    type: "Decimal"
+                },
+                incomeAmount: {
+                    name: "incomeAmount",
+                    type: "Decimal"
+                },
+                generalUsage: {
+                    name: "generalUsage",
+                    type: "Decimal"
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
+        },
+        FundBalance: {
+            name: "FundBalance",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    default: ExpressionUtils.call("uuid")
+                },
+                fiscalPeriod: {
+                    name: "fiscalPeriod",
+                    type: "Int"
+                },
+                fiscalYear: {
+                    name: "fiscalYear",
+                    type: "Int"
+                },
+                balance: {
+                    name: "balance",
+                    type: "Decimal"
+                },
+                fundId: {
+                    name: "fundId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "fund"
+                    ]
+                },
+                fund: {
+                    name: "fund",
+                    type: "Fund",
+                    relation: { opposite: "balances", name: "fundBalance", fields: ["fundId"], references: ["id"] }
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
+        },
+        JournalDoc: {
+            name: "JournalDoc",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    default: ExpressionUtils.call("uuid")
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    default: ExpressionUtils.call("now")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true
+                },
+                ref: {
+                    name: "ref",
+                    type: "String"
+                },
+                year: {
+                    name: "year",
+                    type: "Int"
+                },
+                fiscalPeriod: {
+                    name: "fiscalPeriod",
+                    type: "Int"
+                },
+                headerText: {
+                    name: "headerText",
+                    type: "String"
                 }
             },
             idFields: ["id"],
@@ -1649,6 +2280,18 @@ export class SchemaType implements SchemaDef {
         }
     } as const;
     enums = {
+        Role: {
+            name: "Role",
+            values: {
+                MANAGER: "MANAGER",
+                RECEIVABLE_POSTER: "RECEIVABLE_POSTER",
+                PAYABLE_POSTER: "PAYABLE_POSTER",
+                GL_POSTER: "GL_POSTER",
+                RECEIVABLE_DISPLAY: "RECEIVABLE_DISPLAY",
+                CLERK: "CLERK",
+                user: "user"
+            }
+        },
         OrgLegalForm: {
             name: "OrgLegalForm",
             values: {

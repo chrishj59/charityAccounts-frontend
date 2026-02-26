@@ -34,8 +34,9 @@ export type Fund = $ModelResult<$Schema, "Fund">;
 export type GeneralFund = $ModelResult<$Schema, "GeneralFund">;
 export type RestrictedFund = $ModelResult<$Schema, "RestrictedFund">;
 export type DesignatedFund = $ModelResult<$Schema, "DesignatedFund">;
+export type IncomeFund = $ModelResult<$Schema, "IncomeFund">;
 export type EndownmentPermanent = $ModelResult<$Schema, "EndownmentPermanent">;
-export type EndownmentIncome = $ModelResult<$Schema, "EndownmentIncome">;
+export type EndownmentExpendable = $ModelResult<$Schema, "EndownmentExpendable">;
 export type FundBalance = $ModelResult<$Schema, "FundBalance">;
 export type JournalDoc = $ModelResult<$Schema, "JournalDoc">;
 /**
@@ -52,3 +53,5 @@ export const OrgPlanType = $schema.enums.OrgPlanType.values;
 export type OrgPlanType = (typeof OrgPlanType)[keyof typeof OrgPlanType];
 export const PersonType = $schema.enums.PersonType.values;
 export type PersonType = (typeof PersonType)[keyof typeof PersonType];
+export const FundType = $schema.enums.FundType.values;
+export type FundType = (typeof FundType)[keyof typeof FundType];

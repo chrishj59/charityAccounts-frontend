@@ -6,6 +6,7 @@
   RECEIVABLE_DISPLAY
   CLERK
   user
+  member
  }
 
 datasource db {
@@ -14,7 +15,13 @@ datasource db {
   defaultSchema = 'charitatis'
 }
 
-
+// plugin openapi {
+//     provider = "@zenstackhq/openapi"
+//     output = "rationes-charitatis.json"
+//     title = "Charity Accounting  API"
+//     version = "1.0.0"
+//     flavor = "rpc"
+// }
 
 plugin policy {
     provider = '@zenstackhq/plugin-policy'
@@ -58,6 +65,16 @@ enum OrgIdentificationType {
   Organisation
 
  }
+
+ enum FundType {
+  General 
+  Designated 
+  Income
+  Expendable
+  Permanent 
+ }
+
+ 
 
 model TodoList {
   id             String        @id @default(cuid())
@@ -147,6 +164,8 @@ model User {
   glaccounts    GlAccount[]
   partners      Partner[]
   funds         Fund[]
+
+  designatedFund  DesignatedFund[]  @relation(name:'designatedBy')
   createdDesignatedFund DesignatedFund[] @relation(name:"designationCreate")
   releasedDesignatedFund DesignatedFund[] @relation(name:'designationRelease')
   lastLoginMethod String?
@@ -202,7 +221,7 @@ model Organization {
     taxRef              String?
     companyNumber       String?
     companyName         String?
-    idType OrgIdentificationType     @default(UTR_tax_ref)
+    idType              OrgIdentificationType     @default(UTR_tax_ref)
     identification      String       @length(1,50, "Must be between 1 and 50 characters")
     accountType         OrgPlanType  @default(Trial)
     members             Member[]
@@ -450,7 +469,7 @@ model Apikey {
  }
 
  model Fund {
-  id              String @id @default(uuid())
+  id              String     @id @default(uuid())
   updatedAt       DateTime      @default(now()) @updatedAt
   createdAt       DateTime  @default(now())
   fundName        String
@@ -459,56 +478,79 @@ model Apikey {
   managedById     String
   organisationId  String
   organisation    Organization @relation(name:'fund',fields: [organisationId], references: [id], onDelete: Cascade)
-  createdBy       User      @relation(fields: [managedById], references: [id])
-  fundType        String
-  balances        FundBalance[] @relation(name:'fundBalance')
+  createdBy       User         @relation(fields: [managedById], references: [id])
+  fundType        String     @default('General')
+  reviewDate      DateTime?
+  type            String
+        
+  
 
-  @@delegate(fundType)
+  @@delegate(type)
   //restricted by organisation
-  @@deny('all', auth() == null)
-  @@deny('all', auth().organizationId != organisationId)
+  // @@deny('all', auth() == null)
+  // @@deny('all', auth().organizationId != organisationId)
+
+  @@allow('all', true)
+  //@@allow('all', auth().organizationRole == 'admin')
+  
 
   // add role that can create/ update/ view
 
  }
 
  model GeneralFund extends Fund {
-  reviewDate DateTime?
-  balance Decimal @db.Decimal(16,2)
+  
+  balance  Decimal? @db.Decimal(16,2)
+  balances FundBalance[] @relation(name:'genFundBal')
 
 
  }
  model RestrictedFund extends Fund {
   projectEndDate      DateTime
   restrictedType      String
-  nextDonarReviewDate DateTime
-  returnSurplus       Boolean
+  nextDonarReviewDate DateTime?
+  returnSurplus       Boolean?
 
   @@delegate(restrictedType)
  }
  model DesignatedFund extends RestrictedFund {
-  
+  designatedBal           Decimal? @db.Decimal(16,2)
+  currentBal              Decimal? @db.Decimal(16,2)
   designatedDate          DateTime
-  releasedDate            DateTime
+  releasedDate            DateTime?
   designatedById          String
   designateMeeting        String
-  undesignateMeeting      String
-  designationReleasedById String
-  designationCreatedBy    User @relation(name:'designationCreate', fields: [designatedById], references: [id])
-  designationReleasedBy   User @relation(name:'designationRelease', fields: [designationReleasedById], references: [id])
+  undesignateMeeting      String?
+  designationReleasedById String?
+  designationCreatedById  String
+  designatedBy            User? @relation(name:'designatedBy', fields: [designatedById], references: [id])
+  designationCreatedBy    User @relation(name:'designationCreate', fields: [designationCreatedById], references: [id])
+  designationReleasedBy   User? @relation(name:'designationRelease', fields: [designationReleasedById], references: [id])
+  balances                FundBalance [] @relation('designatedBal')
+ }
+
+ model IncomeFund extends RestrictedFund {
+  balance               Decimal? @db.Decimal(16,2)
+  balances              FundBalance[] @relation('incomeFundBal')
  }
 
  model EndownmentPermanent extends RestrictedFund {
-  capitalAmount Decimal @db.Decimal(16,2)
-  incomeAmount Decimal @db.Decimal(16,2)
+  initalCapitalAmount Decimal? @db.Decimal(16,2)
+  incomeBalance Decimal? @db.Decimal(16,2)
+  capitalBalance Decimal? @db.Decimal(16,2)
+  permanentIncomeBalances  FundBalance[] @relation('permanentIncomeFundBal')
+  permanentCapitalBalances  FundBalance[] @relation('permanentCapitalFundBal')
 
   
  }
 
- model EndownmentIncome extends RestrictedFund {
-  capitalAmount Decimal @db.Decimal(16,2)
-  incomeAmount  Decimal @db.Decimal(16,2)
-  generalUsage  Decimal @db.Decimal(16,2)
+ model EndownmentExpendable extends RestrictedFund {
+  initalCapitalAmount Decimal? @db.Decimal(16,2)
+  incomeAmount  Decimal? @db.Decimal(16,2)
+  incomeBalance Decimal? @db.Decimal(16,2)
+  capitalBalance Decimal? @db.Decimal(16,2)
+  expendableIncomeBalances  FundBalance[] @relation('expendableIncomeFundBal')
+  expendableCapitalBalances  FundBalance[] @relation('expendableCapitalFundBal')
   
   
  }
@@ -518,8 +560,21 @@ model Apikey {
   fiscalPeriod  Int  
   fiscalYear    Int
   balance       Decimal   @db.Decimal(16,2)
-  fundId        String
-  fund          Fund      @relation(name:'fundBalance',fields: [fundId], references: [id])
+  generalFundId        String?
+  generalFund   GeneralFund?  @relation(name:'genFundBal',fields: [generalFundId], references: [id])
+  
+  incomeFundId   String?
+  incomeFund    IncomeFund?  @relation(name:'incomeFundBal',fields: [incomeFundId], references: [id])
+  designiatedFundId String?
+  designatedfund DesignatedFund? @relation( name:'designatedBal',fields: [designiatedFundId], references: [id])
+  expendableIncomeFundId String?
+  expendableIncomefund EndownmentExpendable? @relation( name:'expendableIncomeFundBal',fields: [expendableIncomeFundId], references: [id])
+  expendableCapitalFundId String?
+  expendableCapitalfund EndownmentExpendable? @relation( name:'expendableCapitalFundBal',fields: [expendableCapitalFundId], references: [id])
+  permanentIncomeFundId String?
+  permanentIncomefund EndownmentPermanent? @relation( name:'permanentIncomeFundBal',fields: [permanentIncomeFundId], references: [id])
+  permanentCapitalFundId String?
+  permanentCapitalfund EndownmentPermanent? @relation( name:'permanentCapitalFundBal',fields: [permanentCapitalFundId], references: [id])
  }
 
  model JournalDoc {

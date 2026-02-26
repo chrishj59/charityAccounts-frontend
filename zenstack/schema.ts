@@ -344,6 +344,13 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "createdBy" }
                 },
+                designatedFund: {
+                    name: "designatedFund",
+                    type: "DesignatedFund",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBy") }] }],
+                    relation: { opposite: "designatedBy", name: "designatedBy" }
+                },
                 createdDesignatedFund: {
                     name: "createdDesignatedFund",
                     type: "DesignatedFund",
@@ -1738,20 +1745,23 @@ export class SchemaType implements SchemaDef {
                 fundType: {
                     name: "fundType",
                     type: "String",
-                    isDiscriminator: true
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
+                    default: "General"
                 },
-                balances: {
-                    name: "balances",
-                    type: "FundBalance",
-                    array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundBalance") }] }],
-                    relation: { opposite: "fund", name: "fundBalance" }
+                reviewDate: {
+                    name: "reviewDate",
+                    type: "DateTime",
+                    optional: true
+                },
+                type: {
+                    name: "type",
+                    type: "String",
+                    isDiscriminator: true
                 }
             },
             attributes: [
-                { name: "@@delegate", args: [{ name: "discriminator", value: ExpressionUtils.field("fundType") }] },
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.call("auth"), "==", ExpressionUtils._null()) }] },
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organisationId")) }] }
+                { name: "@@delegate", args: [{ name: "discriminator", value: ExpressionUtils.field("type") }] },
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
             ],
             idFields: ["id"],
             uniqueFields: {
@@ -1837,30 +1847,37 @@ export class SchemaType implements SchemaDef {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
+                    default: "General"
+                },
+                reviewDate: {
+                    name: "reviewDate",
+                    type: "DateTime",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                type: {
+                    name: "type",
+                    type: "String",
+                    originModel: "Fund",
                     isDiscriminator: true
+                },
+                balance: {
+                    name: "balance",
+                    type: "Decimal",
+                    optional: true,
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
                 },
                 balances: {
                     name: "balances",
                     type: "FundBalance",
                     array: true,
-                    originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundBalance") }] }],
-                    relation: { opposite: "fund", name: "fundBalance" }
-                },
-                reviewDate: {
-                    name: "reviewDate",
-                    type: "DateTime",
-                    optional: true
-                },
-                balance: {
-                    name: "balance",
-                    type: "Decimal",
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("genFundBal") }] }],
+                    relation: { opposite: "generalFund", name: "genFundBal" }
                 }
             },
             attributes: [
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.call("auth"), "==", ExpressionUtils._null()) }] },
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organisationId")) }] }
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
             ],
             idFields: ["id"],
             uniqueFields: {
@@ -1944,15 +1961,20 @@ export class SchemaType implements SchemaDef {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    isDiscriminator: true
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
+                    default: "General"
                 },
-                balances: {
-                    name: "balances",
-                    type: "FundBalance",
-                    array: true,
+                reviewDate: {
+                    name: "reviewDate",
+                    type: "DateTime",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                type: {
+                    name: "type",
+                    type: "String",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundBalance") }] }],
-                    relation: { opposite: "fund", name: "fundBalance" }
+                    isDiscriminator: true
                 },
                 projectEndDate: {
                     name: "projectEndDate",
@@ -1965,16 +1987,17 @@ export class SchemaType implements SchemaDef {
                 },
                 nextDonarReviewDate: {
                     name: "nextDonarReviewDate",
-                    type: "DateTime"
+                    type: "DateTime",
+                    optional: true
                 },
                 returnSurplus: {
                     name: "returnSurplus",
-                    type: "Boolean"
+                    type: "Boolean",
+                    optional: true
                 }
             },
             attributes: [
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.call("auth"), "==", ExpressionUtils._null()) }] },
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organisationId")) }] },
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] },
                 { name: "@@delegate", args: [{ name: "discriminator", value: ExpressionUtils.field("restrictedType") }] }
             ],
             idFields: ["id"],
@@ -1982,7 +2005,7 @@ export class SchemaType implements SchemaDef {
                 id: { type: "String" }
             },
             isDelegate: true,
-            subModels: ["DesignatedFund", "EndownmentPermanent", "EndownmentIncome"]
+            subModels: ["DesignatedFund", "IncomeFund", "EndownmentPermanent", "EndownmentExpendable"]
         },
         DesignatedFund: {
             name: "DesignatedFund",
@@ -2061,15 +2084,20 @@ export class SchemaType implements SchemaDef {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    isDiscriminator: true
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
+                    default: "General"
                 },
-                balances: {
-                    name: "balances",
-                    type: "FundBalance",
-                    array: true,
+                reviewDate: {
+                    name: "reviewDate",
+                    type: "DateTime",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                type: {
+                    name: "type",
+                    type: "String",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundBalance") }] }],
-                    relation: { opposite: "fund", name: "fundBalance" }
+                    isDiscriminator: true
                 },
                 projectEndDate: {
                     name: "projectEndDate",
@@ -2085,12 +2113,26 @@ export class SchemaType implements SchemaDef {
                 nextDonarReviewDate: {
                     name: "nextDonarReviewDate",
                     type: "DateTime",
+                    optional: true,
                     originModel: "RestrictedFund"
                 },
                 returnSurplus: {
                     name: "returnSurplus",
                     type: "Boolean",
+                    optional: true,
                     originModel: "RestrictedFund"
+                },
+                designatedBal: {
+                    name: "designatedBal",
+                    type: "Decimal",
+                    optional: true,
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                },
+                currentBal: {
+                    name: "currentBal",
+                    type: "Decimal",
+                    optional: true,
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
                 },
                 designatedDate: {
                     name: "designatedDate",
@@ -2098,13 +2140,14 @@ export class SchemaType implements SchemaDef {
                 },
                 releasedDate: {
                     name: "releasedDate",
-                    type: "DateTime"
+                    type: "DateTime",
+                    optional: true
                 },
                 designatedById: {
                     name: "designatedById",
                     type: "String",
                     foreignKeyFor: [
-                        "designationCreatedBy"
+                        "designatedBy"
                     ]
                 },
                 designateMeeting: {
@@ -2113,31 +2156,191 @@ export class SchemaType implements SchemaDef {
                 },
                 undesignateMeeting: {
                     name: "undesignateMeeting",
-                    type: "String"
+                    type: "String",
+                    optional: true
                 },
                 designationReleasedById: {
                     name: "designationReleasedById",
                     type: "String",
+                    optional: true,
                     foreignKeyFor: [
                         "designationReleasedBy"
                     ]
                 },
+                designationCreatedById: {
+                    name: "designationCreatedById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "designationCreatedBy"
+                    ]
+                },
+                designatedBy: {
+                    name: "designatedBy",
+                    type: "User",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designatedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "designatedFund", name: "designatedBy", fields: ["designatedById"], references: ["id"] }
+                },
                 designationCreatedBy: {
                     name: "designationCreatedBy",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationCreate") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designatedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
-                    relation: { opposite: "createdDesignatedFund", name: "designationCreate", fields: ["designatedById"], references: ["id"] }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationCreate") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designationCreatedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "createdDesignatedFund", name: "designationCreate", fields: ["designationCreatedById"], references: ["id"] }
                 },
                 designationReleasedBy: {
                     name: "designationReleasedBy",
                     type: "User",
+                    optional: true,
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationRelease") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designationReleasedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
                     relation: { opposite: "releasedDesignatedFund", name: "designationRelease", fields: ["designationReleasedById"], references: ["id"] }
+                },
+                balances: {
+                    name: "balances",
+                    type: "FundBalance",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBal") }] }],
+                    relation: { opposite: "designatedfund", name: "designatedBal" }
                 }
             },
             attributes: [
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.call("auth"), "==", ExpressionUtils._null()) }] },
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organisationId")) }] }
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
+            ],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
+        },
+        IncomeFund: {
+            name: "IncomeFund",
+            baseModel: "RestrictedFund",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
+                    default: ExpressionUtils.call("uuid")
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
+                    default: ExpressionUtils.call("now")
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
+                    default: ExpressionUtils.call("now")
+                },
+                fundName: {
+                    name: "fundName",
+                    type: "String",
+                    originModel: "Fund"
+                },
+                donarName: {
+                    name: "donarName",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                objective: {
+                    name: "objective",
+                    type: "String",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ]
+                },
+                organisationId: {
+                    name: "organisationId",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "organisation"
+                    ]
+                },
+                organisation: {
+                    name: "organisation",
+                    type: "Organization",
+                    originModel: "Fund",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organisationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    originModel: "Fund",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                },
+                fundType: {
+                    name: "fundType",
+                    type: "String",
+                    originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
+                    default: "General"
+                },
+                reviewDate: {
+                    name: "reviewDate",
+                    type: "DateTime",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                type: {
+                    name: "type",
+                    type: "String",
+                    originModel: "Fund",
+                    isDiscriminator: true
+                },
+                projectEndDate: {
+                    name: "projectEndDate",
+                    type: "DateTime",
+                    originModel: "RestrictedFund"
+                },
+                restrictedType: {
+                    name: "restrictedType",
+                    type: "String",
+                    originModel: "RestrictedFund",
+                    isDiscriminator: true
+                },
+                nextDonarReviewDate: {
+                    name: "nextDonarReviewDate",
+                    type: "DateTime",
+                    optional: true,
+                    originModel: "RestrictedFund"
+                },
+                returnSurplus: {
+                    name: "returnSurplus",
+                    type: "Boolean",
+                    optional: true,
+                    originModel: "RestrictedFund"
+                },
+                balance: {
+                    name: "balance",
+                    type: "Decimal",
+                    optional: true,
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                },
+                balances: {
+                    name: "balances",
+                    type: "FundBalance",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("incomeFundBal") }] }],
+                    relation: { opposite: "incomeFund", name: "incomeFundBal" }
+                }
+            },
+            attributes: [
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
             ],
             idFields: ["id"],
             uniqueFields: {
@@ -2221,15 +2424,20 @@ export class SchemaType implements SchemaDef {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    isDiscriminator: true
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
+                    default: "General"
                 },
-                balances: {
-                    name: "balances",
-                    type: "FundBalance",
-                    array: true,
+                reviewDate: {
+                    name: "reviewDate",
+                    type: "DateTime",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                type: {
+                    name: "type",
+                    type: "String",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundBalance") }] }],
-                    relation: { opposite: "fund", name: "fundBalance" }
+                    isDiscriminator: true
                 },
                 projectEndDate: {
                     name: "projectEndDate",
@@ -2245,35 +2453,58 @@ export class SchemaType implements SchemaDef {
                 nextDonarReviewDate: {
                     name: "nextDonarReviewDate",
                     type: "DateTime",
+                    optional: true,
                     originModel: "RestrictedFund"
                 },
                 returnSurplus: {
                     name: "returnSurplus",
                     type: "Boolean",
+                    optional: true,
                     originModel: "RestrictedFund"
                 },
-                capitalAmount: {
-                    name: "capitalAmount",
+                initalCapitalAmount: {
+                    name: "initalCapitalAmount",
                     type: "Decimal",
+                    optional: true,
                     attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
                 },
-                incomeAmount: {
-                    name: "incomeAmount",
+                incomeBalance: {
+                    name: "incomeBalance",
                     type: "Decimal",
+                    optional: true,
                     attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                },
+                capitalBalance: {
+                    name: "capitalBalance",
+                    type: "Decimal",
+                    optional: true,
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                },
+                permanentIncomeBalances: {
+                    name: "permanentIncomeBalances",
+                    type: "FundBalance",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentIncomeFundBal") }] }],
+                    relation: { opposite: "permanentIncomefund", name: "permanentIncomeFundBal" }
+                },
+                permanentCapitalBalances: {
+                    name: "permanentCapitalBalances",
+                    type: "FundBalance",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentCapitalFundBal") }] }],
+                    relation: { opposite: "permanentCapitalfund", name: "permanentCapitalFundBal" }
                 }
             },
             attributes: [
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.call("auth"), "==", ExpressionUtils._null()) }] },
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organisationId")) }] }
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
             ],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
             }
         },
-        EndownmentIncome: {
-            name: "EndownmentIncome",
+        EndownmentExpendable: {
+            name: "EndownmentExpendable",
             baseModel: "RestrictedFund",
             fields: {
                 id: {
@@ -2349,15 +2580,20 @@ export class SchemaType implements SchemaDef {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    isDiscriminator: true
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
+                    default: "General"
                 },
-                balances: {
-                    name: "balances",
-                    type: "FundBalance",
-                    array: true,
+                reviewDate: {
+                    name: "reviewDate",
+                    type: "DateTime",
+                    optional: true,
+                    originModel: "Fund"
+                },
+                type: {
+                    name: "type",
+                    type: "String",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundBalance") }] }],
-                    relation: { opposite: "fund", name: "fundBalance" }
+                    isDiscriminator: true
                 },
                 projectEndDate: {
                     name: "projectEndDate",
@@ -2373,32 +2609,56 @@ export class SchemaType implements SchemaDef {
                 nextDonarReviewDate: {
                     name: "nextDonarReviewDate",
                     type: "DateTime",
+                    optional: true,
                     originModel: "RestrictedFund"
                 },
                 returnSurplus: {
                     name: "returnSurplus",
                     type: "Boolean",
+                    optional: true,
                     originModel: "RestrictedFund"
                 },
-                capitalAmount: {
-                    name: "capitalAmount",
+                initalCapitalAmount: {
+                    name: "initalCapitalAmount",
                     type: "Decimal",
+                    optional: true,
                     attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
                 },
                 incomeAmount: {
                     name: "incomeAmount",
                     type: "Decimal",
+                    optional: true,
                     attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
                 },
-                generalUsage: {
-                    name: "generalUsage",
+                incomeBalance: {
+                    name: "incomeBalance",
                     type: "Decimal",
+                    optional: true,
                     attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                },
+                capitalBalance: {
+                    name: "capitalBalance",
+                    type: "Decimal",
+                    optional: true,
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                },
+                expendableIncomeBalances: {
+                    name: "expendableIncomeBalances",
+                    type: "FundBalance",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableIncomeFundBal") }] }],
+                    relation: { opposite: "expendableIncomefund", name: "expendableIncomeFundBal" }
+                },
+                expendableCapitalBalances: {
+                    name: "expendableCapitalBalances",
+                    type: "FundBalance",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableCapitalFundBal") }] }],
+                    relation: { opposite: "expendableCapitalfund", name: "expendableCapitalFundBal" }
                 }
             },
             attributes: [
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.call("auth"), "==", ExpressionUtils._null()) }] },
-                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organisationId")) }] }
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
             ],
             idFields: ["id"],
             uniqueFields: {
@@ -2428,18 +2688,110 @@ export class SchemaType implements SchemaDef {
                     type: "Decimal",
                     attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
                 },
-                fundId: {
-                    name: "fundId",
+                generalFundId: {
+                    name: "generalFundId",
                     type: "String",
+                    optional: true,
                     foreignKeyFor: [
-                        "fund"
+                        "generalFund"
                     ]
                 },
-                fund: {
-                    name: "fund",
-                    type: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundBalance") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("fundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
-                    relation: { opposite: "balances", name: "fundBalance", fields: ["fundId"], references: ["id"] }
+                generalFund: {
+                    name: "generalFund",
+                    type: "GeneralFund",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("genFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("generalFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "balances", name: "genFundBal", fields: ["generalFundId"], references: ["id"] }
+                },
+                incomeFundId: {
+                    name: "incomeFundId",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "incomeFund"
+                    ]
+                },
+                incomeFund: {
+                    name: "incomeFund",
+                    type: "IncomeFund",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("incomeFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("incomeFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "balances", name: "incomeFundBal", fields: ["incomeFundId"], references: ["id"] }
+                },
+                designiatedFundId: {
+                    name: "designiatedFundId",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "designatedfund"
+                    ]
+                },
+                designatedfund: {
+                    name: "designatedfund",
+                    type: "DesignatedFund",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designiatedFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "balances", name: "designatedBal", fields: ["designiatedFundId"], references: ["id"] }
+                },
+                expendableIncomeFundId: {
+                    name: "expendableIncomeFundId",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "expendableIncomefund"
+                    ]
+                },
+                expendableIncomefund: {
+                    name: "expendableIncomefund",
+                    type: "EndownmentExpendable",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableIncomeFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("expendableIncomeFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "expendableIncomeBalances", name: "expendableIncomeFundBal", fields: ["expendableIncomeFundId"], references: ["id"] }
+                },
+                expendableCapitalFundId: {
+                    name: "expendableCapitalFundId",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "expendableCapitalfund"
+                    ]
+                },
+                expendableCapitalfund: {
+                    name: "expendableCapitalfund",
+                    type: "EndownmentExpendable",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableCapitalFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("expendableCapitalFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "expendableCapitalBalances", name: "expendableCapitalFundBal", fields: ["expendableCapitalFundId"], references: ["id"] }
+                },
+                permanentIncomeFundId: {
+                    name: "permanentIncomeFundId",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "permanentIncomefund"
+                    ]
+                },
+                permanentIncomefund: {
+                    name: "permanentIncomefund",
+                    type: "EndownmentPermanent",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentIncomeFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("permanentIncomeFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "permanentIncomeBalances", name: "permanentIncomeFundBal", fields: ["permanentIncomeFundId"], references: ["id"] }
+                },
+                permanentCapitalFundId: {
+                    name: "permanentCapitalFundId",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "permanentCapitalfund"
+                    ]
+                },
+                permanentCapitalfund: {
+                    name: "permanentCapitalfund",
+                    type: "EndownmentPermanent",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentCapitalFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("permanentCapitalFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    relation: { opposite: "permanentCapitalBalances", name: "permanentCapitalFundBal", fields: ["permanentCapitalFundId"], references: ["id"] }
                 }
             },
             idFields: ["id"],
@@ -2534,7 +2886,8 @@ export class SchemaType implements SchemaDef {
                 GL_POSTER: "GL_POSTER",
                 RECEIVABLE_DISPLAY: "RECEIVABLE_DISPLAY",
                 CLERK: "CLERK",
-                user: "user"
+                user: "user",
+                member: "member"
             }
         },
         OrgLegalForm: {
@@ -2567,6 +2920,16 @@ export class SchemaType implements SchemaDef {
             values: {
                 Person: "Person",
                 Organisation: "Organisation"
+            }
+        },
+        FundType: {
+            name: "FundType",
+            values: {
+                General: "General",
+                Designated: "Designated",
+                Income: "Income",
+                Expendable: "Expendable",
+                Permanent: "Permanent"
             }
         }
     } as const;

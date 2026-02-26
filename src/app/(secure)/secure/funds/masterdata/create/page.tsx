@@ -1,4 +1,5 @@
 import { User } from 'better-auth';
+import { Organization } from 'better-auth/plugins';
 import { headers } from 'next/headers';
 import { RedirectType } from 'next/navigation';
 import { redirect } from 'next/navigation';
@@ -15,6 +16,14 @@ export default async function CreateFundPage() {
     redirect('/sign-in', RedirectType.replace);
   }
 
+  const data = await auth.api.listOrganizations({
+    // This endpoint requires session cookies.
+    headers: await headers(),
+  });
+
+  console.log(`user organisations ${JSON.stringify(data)}`);
   const usr: User = session.user;
-  return <CreateFund userId={usr.id} />;
+  const userOrgId = data[0].id;
+
+  return <CreateFund userId={usr.id} orgId={userOrgId} />;
 }

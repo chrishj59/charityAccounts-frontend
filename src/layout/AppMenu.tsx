@@ -8,6 +8,20 @@ const AppMenu = () => {
       label: 'Accounting',
       items: [
         {
+          label: 'Fund',
+          items: [
+            {
+              label: 'Master Data',
+              items: [
+                {
+                  label: 'Create Fund',
+                  to: '/secure/funds/masterdata/create',
+                },
+              ],
+            },
+          ],
+        },
+        {
           label: 'Receivable',
           items: [
             {

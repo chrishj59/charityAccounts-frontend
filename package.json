@@ -21,40 +21,11 @@
     "up": "pnpm add @zenstackhq/cli@latest @zenstackhq/orm@latest @zenstackhq/server@latest @zenstackhq/tanstack-query@latest @zenstackhq/plugin-policy@latest"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "@aws-sdk/client-s3": "^3.1000.0",
-    "@aws-sdk/client-ses": "^3.1000.0",
-    "@aws-sdk/client-sesv2": "^3.1000.0",
-    "@aws-sdk/credential-provider-node": "^3.972.14",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@hookform/resolvers": "^5.2.2",
-    "@react-email/components": "^1.0.8",
-=======
-    "@aws-sdk/client-s3": "^3.985.0",
-    "@aws-sdk/client-ses": "^3.985.0",
-    "@aws-sdk/client-sesv2": "^3.985.0",
-    "@aws-sdk/credential-provider-node": "^3.972.6",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@hookform/resolvers": "^5.2.2",
-    "@react-email/components": "^1.0.7",
->>>>>>> baac8c0b6b4d1f839453055d65850ad9c098eea3
     "@react-email/heading": "^0.0.15",
     "@react-email/html": "^0.0.11",
     "@react-email/text": "^0.1.6",
     "@react-three/fiber": "^9.5.0",
-<<<<<<< HEAD
     "@tanstack/react-query": "^5.90.21",
-    "@zenstackhq/better-auth": "3.3.1",
-    "@zenstackhq/orm": "3.3.1",
-    "@zenstackhq/plugin-policy": "3.3.1",
-    "@zenstackhq/server": "3.3.1",
-    "@zenstackhq/tanstack-query": "3.3.1",
-    "aws-sdk": "^2.1693.0",
-    "better-auth": "^1.4.20",
-=======
-    "@tanstack/react-query": "^5.90.20",
     "@tanstack/react-query-devtools": "^5.91.3",
     "@visualbravo/zenstack-cache": "^1.0.6",
     "@zenstackhq/better-auth": "3.3.3",
@@ -66,7 +37,6 @@
     "babel-plugin-superjson-next": "^0.4.5",
     "bcryptjs": "^3.0.3",
     "better-auth": "^1.4.18",
->>>>>>> baac8c0b6b4d1f839453055d65850ad9c098eea3
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -74,11 +44,7 @@
     "date-fns": "^4.1.0",
     "decimal.js": "^10.6.0",
     "embla-carousel-react": "^8.6.0",
-<<<<<<< HEAD
     "framer-motion": "^12.34.3",
-=======
-    "framer-motion": "^12.33.0",
->>>>>>> baac8c0b6b4d1f839453055d65850ad9c098eea3
     "geist": "^1.7.0",
     "input-otp": "1.4.2",
     "kysely": "0.28.8",
@@ -88,16 +54,11 @@
     "nanoid": "^5.1.6",
     "next": "16.1.6",
     "next-themes": "^0.4.6",
-<<<<<<< HEAD
     "pg": "^8.19.0",
-=======
-    "pg": "^8.18.0",
->>>>>>> baac8c0b6b4d1f839453055d65850ad9c098eea3
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
     "primereact": "10.9.7",
     "react": "19.2.0",
-<<<<<<< HEAD
     "react-day-picker": "^9.14.0",
     "react-dom": "19.2.0",
     "react-hook-form": "^7.71.2",
@@ -108,20 +69,8 @@
     "server-only": "^0.0.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
-=======
-    "react-day-picker": "^9.13.1",
-    "react-dom": "19.2.0",
-    "react-hook-form": "^7.71.1",
-    "react-qr-code": "^2.0.18",
-    "react-resizable-panels": "^3.0.6",
-    "recharts": "^3.7.0",
-    "resend": "^6.9.1",
-    "server-only": "^0.0.1",
-    "sonner": "^2.0.7",
     "superjson": "^2.2.6",
     "swagger-ui-express": "^5.0.1",
-    "tailwind-merge": "^3.4.0",
->>>>>>> baac8c0b6b4d1f839453055d65850ad9c098eea3
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.181.2",
     "ua-parser-js": "^2.0.9",
@@ -129,36 +78,18 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "@better-auth/cli": "^1.4.20",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/node": "24.10.1",
-=======
-    "@better-auth/cli": "^1.4.18",
-    "@tailwindcss/line-clamp": "^0.4.4",
-    "@tailwindcss/postcss": "^4.1.18",
-    "@types/bcryptjs": "^3.0.0",
-    "@types/node": "25.2.2",
->>>>>>> baac8c0b6b4d1f839453055d65850ad9c098eea3
     "@types/pg": "^8.16.0",
     "@types/react": "19.2.6",
     "@types/react-dom": "19.2.3",
     "@types/swagger-ui-express": "^4.1.8",
     "@types/three": "^0.181.0",
     "@types/ua-parser-js": "^0.7.39",
-<<<<<<< HEAD
     "@zenstackhq/cli": "3.3.1",
     "baseline-browser-mapping": "^2.10.0",
     "dotenv": "^17.3.1",
-=======
-    "@typescript-eslint/eslint-plugin": "^8.54.0",
-    "@typescript-eslint/parser": "^8.54.0",
-    "@zenstackhq/cli": "3.3.3",
-    "@zenstackhq/openapi": "^2.22.1",
-    "autoprefixer": "^10.4.24",
-    "baseline-browser-mapping": "^2.9.19",
-    "dotenv": "^17.2.4",
->>>>>>> baac8c0b6b4d1f839453055d65850ad9c098eea3
     "dotenv-cli": "^11.0.0",
     "eslint": "9.37.0",
     "eslint-config-next": "15.5.6",
@@ -167,11 +98,7 @@
     "prettier": "^3.8.1",
     "prisma": "^6.19.2",
     "sass": "^1.97.3",
-<<<<<<< HEAD
     "tailwindcss": "^4.2.1",
-=======
-    "tailwindcss": "^4.1.18",
->>>>>>> baac8c0b6b4d1f839453055d65850ad9c098eea3
     "tsx": "^4.21.0",
     "typescript": "5.9.3"
   },

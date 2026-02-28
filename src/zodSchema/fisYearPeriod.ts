@@ -1,12 +1,37 @@
 import z from 'zod';
 
-export const fiscalYearPeriodSchema = z.object({
-  id: z.int(),
-  name: z.string().min(1, 'Month name is required').max(20),
-  monthNum: z.int().min(1, 'month number is required'),
-  day: z.int().min(1, 'Day of month required'),
-  fiscPeriod: z.int().min(1, 'Fiscal period is required'),
-  yearShift: z.boolean(),
-});
+export const fiscalPeriodRuleSchema = z
+  .object({
+    id: z.int(),
+    name: z.string(),
+    monthNum: z.int(),
+    day: z.int(),
+    fiscPeriod: z.int(),
+    yearShift: z.boolean(),
+    calendarBased: z.boolean(),
+  })
+  .superRefine((values, context) => {
+    if (!values.calendarBased && !values.monthNum) {
+      context.addIssue({
+        code: 'custom', //z.ZodIssueCode.custom,
+        message: 'Please add Month number',
+        path: ['monthNum'],
+      });
+    }
+    if (!values.calendarBased && !values.day) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Please add day of the month',
+        path: ['monthNum'],
+      });
+    }
+    if (!values.calendarBased && !values.fiscPeriod) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Please add Fiscal Period number',
+        path: ['monthNum'],
+      });
+    }
+  });
 
-export type FiscYearVariantFormValues = z.infer<typeof fiscalYearPeriodSchema>;
+export type FiscPeriodRuleFormValues = z.infer<typeof fiscalPeriodRuleSchema>;

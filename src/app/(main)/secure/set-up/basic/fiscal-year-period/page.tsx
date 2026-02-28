@@ -1,13 +1,14 @@
-import { FiscalYearPeriod } from '~/zenstack/models';
+import { FiscalPeriodRule } from '~/zenstack/models';
 
 import { getLoggedInSession } from '~/src/utils/helper';
 import { authDb } from '~/src/lib/db';
-import FiscalPeriod from '~/src/components/client/company/fiscalPeriodRule';
+import FiscPeriodRule from '~/src/components/client/company/fiscalPeriodRule';
 
 export default async function FisPeriod() {
   const session = getLoggedInSession();
-  const db = authDb;
-  const variants: FiscalYearPeriod[] = await authDb.fiscalYearPeriod.findMany();
 
-  return <FiscalPeriod fiscVar={variants} />;
+  const rules: FiscalPeriodRule[] = await authDb.fiscalPeriodRule.findMany();
+  console.log(`rules returned 2 ${JSON.stringify(rules)}`);
+
+  return <FiscPeriodRule fiscRules={rules} />;
 }

@@ -1,21 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '~/src/lib/db';
-import { FiscYearVariantFormValues } from '~/src/zodSchema/fisYearPeriod';
+import { FiscPeriodRuleFormValues } from '~/src/zodSchema/fisYearPeriod';
 
 export async function POST(req: NextRequest) {
-  const body: FiscYearVariantFormValues = await req.json();
+  const body: FiscPeriodRuleFormValues = await req.json();
 
   try {
-    const resp = await db.fiscalYearPeriod.create({
-      data: {
-        id: 1,
+    const resp = await db.fiscalPeriodRule.create({
+      data: body,
+      // {
+      //   id: 1,
 
-        name: 'fred',
-        monthNum: 1,
-        day: 1,
-        fiscPeriod: 1,
-        yearShift: false,
-      },
+      //   name: 'fred',
+      //   monthNum: 1,
+      //   day: 1,
+      //   fiscPeriod: 1,
+      //   yearShift: false,
+      // },
     });
     return NextResponse.json(resp);
   } catch (err) {

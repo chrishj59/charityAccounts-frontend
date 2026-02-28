@@ -8,6 +8,7 @@
 import { schema as $schema, type SchemaType as $Schema } from "./schema-lite";
 import { type ModelResult as $ModelResult, type TypeDefResult as $TypeDefResult } from "@zenstackhq/orm";
 export type TodoList = $ModelResult<$Schema, "TodoList">;
+export type PostingPeriod = $ModelResult<$Schema, "PostingPeriod">;
 export type Todo = $ModelResult<$Schema, "Todo">;
 export type User = $ModelResult<$Schema, "User">;
 export type Account = $ModelResult<$Schema, "Account">;
@@ -25,16 +26,25 @@ export type Apikey = $ModelResult<$Schema, "Apikey">;
 export type GlAccount = $ModelResult<$Schema, "GlAccount">;
 export type Partner = $ModelResult<$Schema, "Partner">;
 export type ArAPPartner = $ModelResult<$Schema, "ArAPPartner">;
-export type FiscalYearPeriod = $ModelResult<$Schema, "FiscalYearPeriod">;
-export type PostingPeriod = $ModelResult<$Schema, "PostingPeriod">;
+export type FiscalPeriodRule = $ModelResult<$Schema, "FiscalPeriodRule">;
 export type Parameter = $ModelResult<$Schema, "Parameter">;
 export type Company = $ModelResult<$Schema, "Company">;
-export type CompanyFiscalPeriod = $ModelResult<$Schema, "CompanyFiscalPeriod">;
 export type CompanyPostingPeriod = $ModelResult<$Schema, "CompanyPostingPeriod">;
+export type Fund = $ModelResult<$Schema, "Fund">;
+export type GeneralFund = $ModelResult<$Schema, "GeneralFund">;
+export type RestrictedFund = $ModelResult<$Schema, "RestrictedFund">;
+export type DesignatedFund = $ModelResult<$Schema, "DesignatedFund">;
+export type IncomeFund = $ModelResult<$Schema, "IncomeFund">;
+export type EndownmentPermanent = $ModelResult<$Schema, "EndownmentPermanent">;
+export type EndownmentExpendable = $ModelResult<$Schema, "EndownmentExpendable">;
+export type FundBalance = $ModelResult<$Schema, "FundBalance">;
+export type JournalDoc = $ModelResult<$Schema, "JournalDoc">;
 /**
  * Shape of the `auth()` function
  */
 export type Auth = $TypeDefResult<$Schema, "Auth">;
+export const Role = $schema.enums.Role.values;
+export type Role = (typeof Role)[keyof typeof Role];
 export const OrgLegalForm = $schema.enums.OrgLegalForm.values;
 export type OrgLegalForm = (typeof OrgLegalForm)[keyof typeof OrgLegalForm];
 export const OrgIdentificationType = $schema.enums.OrgIdentificationType.values;
@@ -43,3 +53,5 @@ export const OrgPlanType = $schema.enums.OrgPlanType.values;
 export type OrgPlanType = (typeof OrgPlanType)[keyof typeof OrgPlanType];
 export const PersonType = $schema.enums.PersonType.values;
 export type PersonType = (typeof PersonType)[keyof typeof PersonType];
+export const FundType = $schema.enums.FundType.values;
+export type FundType = (typeof FundType)[keyof typeof FundType];

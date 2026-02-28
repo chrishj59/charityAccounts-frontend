@@ -1,4 +1,13 @@
- 
+ enum Role {
+  MANAGER
+  RECEIVABLE_POSTER
+  PAYABLE_POSTER
+  GL_POSTER
+  RECEIVABLE_DISPLAY
+  CLERK
+  user
+  member
+ }
 
 datasource db {
   provider = "postgresql"
@@ -15,7 +24,7 @@ plugin policy {
 plugin hooks {
   provider = "@zenstackhq/tanstack-query"
   target = "react"
-  output = "./hooks/model"
+  output = "./src/lib/hooks/model"
 }
 
 
@@ -51,6 +60,16 @@ enum OrgIdentificationType {
 
  }
 
+ enum FundType {
+  General 
+  Designated 
+  Income
+  Expendable
+  Permanent 
+ }
+
+ 
+
 model TodoList {
   id             String        @id @default(cuid())
   createdAt      DateTime      @default(now())
@@ -78,6 +97,28 @@ model TodoList {
   @@allow('read', organizationId != null)
 }
 
+model PostingPeriod {
+  id      Int @id @default(autoincrement())
+  year    Int
+  period  Int
+  open    Boolean 
+  postPeriod CompanyPostingPeriod []
+  
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String?       @default(auth().organizationId) //@allow('update', false)
+  
+  // deny anonymous users
+  @@deny('all', auth() == null)
+
+  // deny access to lists that don't belong to the user's active organization
+  @@deny('all', auth().organizationId != organizationId)
+
+  
+
+  // if the list belongs to an org, it's readable to all members
+  @@allow('read', organizationId != null)
+ }
+
 model Todo {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -102,7 +143,8 @@ model User {
   image         String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @default(now()) @updatedAt
-  role          String?
+  // role          String?
+  role          Role          @default(user)
   banned        Boolean?
   banReason     String?
   banExpires    DateTime?
@@ -115,7 +157,13 @@ model User {
   apiKey        Apikey?
   glaccounts    GlAccount[]
   partners      Partner[]
+  funds         Fund[]
+
+  designatedFund  DesignatedFund[]  @relation(name:'designatedBy')
+  createdDesignatedFund DesignatedFund[] @relation(name:"designationCreate")
+  releasedDesignatedFund DesignatedFund[] @relation(name:'designationRelease')
   lastLoginMethod String?
+  
 
   
   @@map("user")
@@ -167,13 +215,15 @@ model Organization {
     taxRef              String?
     companyNumber       String?
     companyName         String?
-    idType OrgIdentificationType     @default(UTR_tax_ref)
+    idType              OrgIdentificationType     @default(UTR_tax_ref)
     identification      String       @length(1,50, "Must be between 1 and 50 characters")
     accountType         OrgPlanType  @default(Trial)
     members             Member[]
+    postingPeriods      PostingPeriod[]
     
     invitations         Invitation[]
     todoLists           TodoList[]
+    funds               Fund[] @relation(name:'fund')
 
     @@map('organization')
 }
@@ -371,19 +421,16 @@ model Apikey {
   day           Int
   fiscPeriod    Int
   yearShift     Boolean
-  companies     Company[]
-  @@allow('create,read', true)
+  calendarBased Boolean
+  companies     Company[] @relation('fiscPeriodRule')
+  @@allow('all', true)
+  @@allow('all', auth().organizationRole == 'admin')
+  // deny anonymous users
+  // @@deny('all', auth() == null)
 
  }
 
- model PostingPeriod {
-  id      Int @id @default(autoincrement())
-  year    Int
-  period  Int
-  open    Boolean 
-  postPeriod CompanyPostingPeriod []
-  
- }
+ 
 
  model Parameter {
   id Int  @id @default(autoincrement())
@@ -401,17 +448,11 @@ model Apikey {
   regsisteredAddress Address @relation('registereOfficeAddress',fields: [registeredOfficeAddressId], references: [addressID])
   vatNumber String?
   fiscalPeriodRuleId Int
-  fiscPeriodRule FiscalPeriodRule @relation( fields: [fiscalPeriodRuleId], references: [id])
+  fiscPeriodRule FiscalPeriodRule @relation('fiscPeriodRule', fields: [fiscalPeriodRuleId], references: [id])
   postPeriod CompanyPostingPeriod []
  }
 
-//  model CompanyFiscalPeriod {
-//   companyId Int
-//   fiscalPeriodId Int
-//   company Company @relation(fields: [companyId], references: [id])
-//   fiscalPeriod FiscalYearPeriod @relation(fields: [fiscalPeriodId], references: [id])
-//   @@id([companyId, fiscalPeriodId])
-//  }
+
 
  model CompanyPostingPeriod {
   companyId Int
@@ -419,6 +460,129 @@ model Apikey {
   company Company @relation(fields: [companyId], references: [id])
   postPeriod PostingPeriod @relation(fields: [postingPeriodId], references: [id])
   @@id([companyId,postingPeriodId ])
+ }
+
+ model Fund {
+  id              String     @id @default(uuid())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  createdAt       DateTime  @default(now())
+  fundName        String
+  donarName       String?
+  objective       String?
+  managedById     String
+  organisationId  String
+  organisation    Organization @relation(name:'fund',fields: [organisationId], references: [id], onDelete: Cascade)
+  createdBy       User         @relation(fields: [managedById], references: [id])
+  fundType        String     @default('General')
+  reviewDate      DateTime?
+  type            String
+        
+  
+
+  @@delegate(type)
+  //restricted by organisation
+  // @@deny('all', auth() == null)
+  // @@deny('all', auth().organizationId != organisationId)
+
+  @@allow('all', true)
+  //@@allow('all', auth().organizationRole == 'admin')
+  
+
+  // add role that can create/ update/ view
+
+ }
+
+ model GeneralFund extends Fund {
+  
+  balance  Decimal? @db.Decimal(16,2)
+  balances FundBalance[] @relation(name:'genFundBal')
+
+
+ }
+ model RestrictedFund extends Fund {
+  projectEndDate      DateTime
+  restrictedType      String
+  nextDonarReviewDate DateTime?
+  returnSurplus       Boolean?
+
+  @@delegate(restrictedType)
+ }
+ model DesignatedFund extends RestrictedFund {
+  designatedBal           Decimal? @db.Decimal(16,2)
+  currentBal              Decimal? @db.Decimal(16,2)
+  designatedDate          DateTime
+  releasedDate            DateTime?
+  designatedById          String
+  designateMeeting        String
+  undesignateMeeting      String?
+  designationReleasedById String?
+  designationCreatedById  String
+  designatedBy            User? @relation(name:'designatedBy', fields: [designatedById], references: [id])
+  designationCreatedBy    User @relation(name:'designationCreate', fields: [designationCreatedById], references: [id])
+  designationReleasedBy   User? @relation(name:'designationRelease', fields: [designationReleasedById], references: [id])
+  balances                FundBalance [] @relation('designatedBal')
+ }
+
+ model IncomeFund extends RestrictedFund {
+  balance               Decimal? @db.Decimal(16,2)
+  balances              FundBalance[] @relation('incomeFundBal')
+ }
+
+ model EndownmentPermanent extends RestrictedFund {
+  initalCapitalAmount Decimal? @db.Decimal(16,2)
+  incomeBalance Decimal? @db.Decimal(16,2)
+  capitalBalance Decimal? @db.Decimal(16,2)
+  permanentIncomeBalances  FundBalance[] @relation('permanentIncomeFundBal')
+  permanentCapitalBalances  FundBalance[] @relation('permanentCapitalFundBal')
+
+  
+ }
+
+ model EndownmentExpendable extends RestrictedFund {
+  initalCapitalAmount Decimal? @db.Decimal(16,2)
+  incomeAmount  Decimal? @db.Decimal(16,2)
+  incomeBalance Decimal? @db.Decimal(16,2)
+  capitalBalance Decimal? @db.Decimal(16,2)
+  expendableIncomeBalances  FundBalance[] @relation('expendableIncomeFundBal')
+  expendableCapitalBalances  FundBalance[] @relation('expendableCapitalFundBal')
+  
+  
+ }
+
+ model FundBalance {
+  id            String    @id @default(uuid())
+  fiscalPeriod  Int  
+  fiscalYear    Int
+  balance       Decimal   @db.Decimal(16,2)
+  generalFundId        String?
+  generalFund   GeneralFund?  @relation(name:'genFundBal',fields: [generalFundId], references: [id])
+  
+  incomeFundId   String?
+  incomeFund    IncomeFund?  @relation(name:'incomeFundBal',fields: [incomeFundId], references: [id])
+  designiatedFundId String?
+  designatedfund DesignatedFund? @relation( name:'designatedBal',fields: [designiatedFundId], references: [id])
+  expendableIncomeFundId String?
+  expendableIncomefund EndownmentExpendable? @relation( name:'expendableIncomeFundBal',fields: [expendableIncomeFundId], references: [id])
+  expendableCapitalFundId String?
+  expendableCapitalfund EndownmentExpendable? @relation( name:'expendableCapitalFundBal',fields: [expendableCapitalFundId], references: [id])
+  permanentIncomeFundId String?
+  permanentIncomefund EndownmentPermanent? @relation( name:'permanentIncomeFundBal',fields: [permanentIncomeFundId], references: [id])
+  permanentCapitalFundId String?
+  permanentCapitalfund EndownmentPermanent? @relation( name:'permanentCapitalFundBal',fields: [permanentCapitalFundId], references: [id])
+ }
+
+ model JournalDoc {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ref String
+  year Int
+  fiscalPeriod Int
+  headerText String
+
+  @@allow('create', auth().role in [RECEIVABLE_POSTER, PAYABLE_POSTER, GL_POSTER])
+
+
  }
 
 

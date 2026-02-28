@@ -15,7 +15,13 @@ datasource db {
   defaultSchema = 'charitatis'
 }
 
-
+// plugin openapi {
+//     provider = "@zenstackhq/openapi"
+//     output = "rationes-charitatis.json"
+//     title = "Charity Accounting  API"
+//     version = "1.0.0"
+//     flavor = "rpc"
+// }
 
 plugin policy {
     provider = '@zenstackhq/plugin-policy'

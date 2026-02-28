@@ -3,6 +3,8 @@ import { schema } from '~/zenstack/schema';
 import { PostgresDialect } from 'kysely';
 import { PolicyPlugin } from '@zenstackhq/plugin-policy';
 import { Pool } from 'pg';
+import { MemoryCacheProvider } from '@visualbravo/zenstack-cache/providers/memory';
+import { defineCachePlugin } from '@visualbravo/zenstack-cache';
 
 export const db = new ZenStackClient(schema, {
   dialect: new PostgresDialect({
@@ -11,6 +13,6 @@ export const db = new ZenStackClient(schema, {
     }),
   }),
   log: ['query', 'error'],
-});
+}).$use(defineCachePlugin({ provider: new MemoryCacheProvider() }));
 
 export const authDb = db.$use(new PolicyPlugin());

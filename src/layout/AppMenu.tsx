@@ -8,6 +8,20 @@ const AppMenu = () => {
       label: 'Accounting',
       items: [
         {
+          label: 'Fund',
+          items: [
+            {
+              label: 'Master Data',
+              items: [
+                {
+                  label: 'Create Fund',
+                  to: '/secure/funds/masterdata/create',
+                },
+              ],
+            },
+          ],
+        },
+        {
           label: 'Receivable',
           items: [
             {
@@ -22,6 +36,16 @@ const AppMenu = () => {
       label: 'Set up',
       items: [
         {
+          label: 'Global',
+          items: [
+            {
+              icon: 'pi-pencil',
+              label: 'Fisc Period Rule',
+              to: '/secure/set-up/basic/fiscalPeriodRule',
+            },
+          ],
+        },
+        {
           label: 'Company',
           items: [
             {
@@ -33,10 +57,6 @@ const AppMenu = () => {
               label: 'Update',
               icon: 'pi-pencil',
               to: '/secure/set-up/basic/company-update',
-            },
-            {
-              label: 'Fiscal Year Periods',
-              to: '/secure/set-up/basic/fiscal-year-period',
             },
           ],
         },

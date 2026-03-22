@@ -1,6 +1,8 @@
 import { Organization, UserWithRole } from 'better-auth/plugins';
+import { ToastMessage } from 'primereact/toast';
 
 import { Dispatch, SetStateAction } from 'react';
+import { FiscalPeriodRule } from '~/zenstack/models';
 
 export type Dispatcher<S> = Dispatch<SetStateAction<S>>;
 
@@ -13,6 +15,7 @@ export enum statusEnum {
 export interface responseType {
   status: statusEnum;
   message: string;
+  errMessage?: string;
 }
 
 export interface userCreateResponse extends responseType {
@@ -21,6 +24,10 @@ export interface userCreateResponse extends responseType {
 
 export interface orgCreateResponse extends responseType {
   data?: { org: Organization; errMessage?: string };
+}
+
+export interface fiscPeriodRuleResponse extends responseType {
+  data?: { fiscalPeriodRule?: FiscalPeriodRule; error?: DB_ERROR };
 }
 
 export type DB_ERROR = {

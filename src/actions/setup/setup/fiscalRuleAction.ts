@@ -5,7 +5,7 @@ import { json } from 'zod';
 import { authDb, db } from '~/src/lib/db';
 import { DB_ERROR, statusEnum } from '~/src/types/helper';
 import { FiscalPeriodRule } from '~/zenstack/models';
-import { fiscPeriodRuleResponse } from '../../types/helper';
+import { fiscPeriodRuleResponse } from '~/src/types/helper';
 import { RationesOrganisation } from '~/src/types';
 export async function fiscalRuleAddAction(
   rule: FiscalPeriodRule,

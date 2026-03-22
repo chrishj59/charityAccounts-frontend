@@ -17,7 +17,7 @@ import { InputSwitch, InputSwitchChangeEvent } from 'primereact/inputswitch';
 import {
   fiscalPeriodRuleSchema,
   FiscPeriodRuleFormValues,
-} from '~/src/zodSchema/fisPeriodRule';
+} from '~/src/zodSchema/fisYearPeriod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 interface FiscalYearVarProps {
@@ -30,7 +30,7 @@ import {
   DB_ERROR,
   fiscPeriodRuleResponse,
   statusEnum,
-} from '../../../types/helper';
+} from '~/src/types/helper';
 import {
   fiscalRuleAddAction,
   fiscalRuleUpdateAction,

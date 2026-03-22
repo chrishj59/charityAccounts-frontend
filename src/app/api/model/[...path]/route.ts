@@ -58,8 +58,8 @@ async function getClient() {
 }
 
 const handler = NextRequestHandler({
-  //apiHandler: new RPCApiHandler({ schema }),
-  apiHandler: new RestApiHandler({ schema, endpoint: 'http://localhost/api' }),
+  apiHandler: new RPCApiHandler({ schema }),
+  // apiHandler: new RestApiHandler({ schema, endpoint: 'http://localhost/api' }),
   getClient,
   useAppDir: true,
 });

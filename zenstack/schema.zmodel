@@ -371,7 +371,8 @@ model Apikey {
   day           Int
   fiscPeriod    Int
   yearShift     Boolean
-  companies     Company[]
+  calendarBased Boolean
+  companies     Company[] @relation('fiscPeriodRule')
   @@allow('create,read', true)
 
  }
@@ -401,7 +402,7 @@ model Apikey {
   regsisteredAddress Address @relation('registereOfficeAddress',fields: [registeredOfficeAddressId], references: [addressID])
   vatNumber String?
   fiscalPeriodRuleId Int
-  fiscPeriodRule FiscalPeriodRule @relation( fields: [fiscalPeriodRuleId], references: [id])
+  fiscPeriodRule FiscalPeriodRule @relation('fiscPeriodRule', fields: [fiscalPeriodRuleId], references: [id])
   postPeriod CompanyPostingPeriod []
  }
 

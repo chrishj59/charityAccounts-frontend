@@ -22,3 +22,8 @@ export interface userCreateResponse extends responseType {
 export interface orgCreateResponse extends responseType {
   data?: { org: Organization; errMessage?: string };
 }
+
+export type DB_ERROR = {
+  reason: string;
+  model: string;
+};

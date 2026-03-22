@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '~/src/lib/db';
-import { FiscYearVariantFormValues } from '~/src/zodSchema/fisYearPeriod';
+import { FiscYearVariantFormValues } from '~/src/zodSchema/fisPeriodRule';
 
 export async function POST(req: NextRequest) {
   const body: FiscYearVariantFormValues = await req.json();

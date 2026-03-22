@@ -13,21 +13,21 @@ export const fiscalPeriodRuleSchema = z
   .superRefine((values, context) => {
     if (!values.calendarBased && !values.monthNum) {
       context.addIssue({
-        code: 'custom', //z.ZodIssueCode.custom,
+        code: z.ZodIssueCode.custom,
         message: 'Please add Month number',
         path: ['monthNum'],
       });
     }
     if (!values.calendarBased && !values.day) {
       context.addIssue({
-        code: 'custom',
+        code: z.ZodIssueCode.custom,
         message: 'Please add day of the month',
         path: ['monthNum'],
       });
     }
     if (!values.calendarBased && !values.fiscPeriod) {
       context.addIssue({
-        code: 'custom',
+        code: z.ZodIssueCode.custom,
         message: 'Please add Fiscal Period number',
         path: ['monthNum'],
       });

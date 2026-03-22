@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '~/src/lib/db';
-<<<<<<< HEAD
-import { FiscPeriodRuleFormValues } from '~/src/zodSchema/fisYearPeriod';
-=======
-import { FiscYearVariantFormValues } from '~/src/zodSchema/fisPeriodRule';
->>>>>>> baac8c0b6b4d1f839453055d65850ad9c098eea3
+import { FiscPeriodRuleFormValues } from '~/src/zodSchema/fisPeriodRule';
 
 export async function POST(req: NextRequest) {
   const body: FiscPeriodRuleFormValues = await req.json();

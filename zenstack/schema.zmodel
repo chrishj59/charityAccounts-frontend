@@ -1,4 +1,4 @@
- enum Role {
+enum Role {
   MANAGER
   RECEIVABLE_POSTER
   PAYABLE_POSTER
@@ -7,7 +7,9 @@
   CLERK
   user
   member
- }
+  admin
+  ORG_ADMIN
+}
 
 datasource db {
   provider = "postgresql"
@@ -24,7 +26,7 @@ datasource db {
 // }
 
 plugin policy {
-    provider = '@zenstackhq/plugin-policy'
+  provider = '@zenstackhq/plugin-policy'
 }
 
 plugin hooks {
@@ -43,38 +45,37 @@ type Auth {
   @@auth
 }
 
-enum OrgLegalForm{
-    SoleTrader
-    Company
-    Partnership
-    }
+enum OrgLegalForm {
+  SoleTrader
+  Company
+  Partnership
+}
 enum OrgIdentificationType {
   UTR_tax_ref
   Company_Number
   Charity_number
 }
- enum OrgPlanType {
+enum OrgPlanType {
   Trial
   Free
   Standard
   Premium
- }
+}
 
- enum PersonType {
+enum PersonType {
   Person
   Organisation
+}
 
- }
-
- enum FundType {
-  General 
-  Designated 
+enum FundType {
+  General
+  Designated
   Income
   Expendable
-  Permanent 
- }
+  Permanent
+}
 
- 
+
 
 model TodoList {
   id             String        @id @default(cuid())
@@ -104,14 +105,14 @@ model TodoList {
 }
 
 model PostingPeriod {
-  id      Int @id @default(autoincrement())
-  year    Int
-  period  Int
-  open    Boolean 
-  postPeriod CompanyPostingPeriod []
-  
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String?       @default(auth().organizationId) //@allow('update', false)
+  id             Int                    @id @default(autoincrement())
+  year           Int
+  period         Int
+  open           Boolean
+  postPeriod     CompanyPostingPeriod []
+
+  organization   Organization?          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String?                @default(auth().organizationId) //@allow('update', false)
   
   // deny anonymous users
   @@deny('all', auth() == null)
@@ -123,7 +124,7 @@ model PostingPeriod {
 
   // if the list belongs to an org, it's readable to all members
   @@allow('read', organizationId != null)
- }
+}
 
 model Todo {
   id        String   @id @default(cuid())
@@ -139,39 +140,39 @@ model Todo {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  name          String        @default('')
-  displayName   String        @length(1,40,'Display name is required up to 40 characters') @default('')
-  firstName     String        @length(1,40,'First name is required up to 40 characters') @default('')
-  familyName    String        @length(1,40,'Family name is required up to 40 characters') @default('')
-  email         String        @unique    
-  emailVerified Boolean       @default(false)
-  image         String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @default(now()) @updatedAt
+  id                     String           @id @default(cuid())
+  name                   String           @default('')
+  displayName            String           @length(1,  40, 'Display name is required up to 40 characters') @default('')
+  firstName              String           @length(1,  40, 'First name is required up to 40 characters') @default('')
+  familyName             String           @length(1,  40, 'Family name is required up to 40 characters') @default('')
+  email                  String           @unique
+  emailVerified          Boolean          @default(false)
+  image                  String?
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @default(now()) @updatedAt
   // role          String?
-  role          Role          @default(user)
-  banned        Boolean?
-  banReason     String?
-  banExpires    DateTime?
-  sessions      Session[]
-  accounts      Account[]
-  members       Member[]
-  teamMembers   TeamMember[]
-  invitations   Invitation[]
-  todoLists     TodoList[]
-  apiKey        Apikey?
-  glaccounts    GlAccount[]
-  partners      Partner[]
-  funds         Fund[]
+  role                   Role             @default(user)
+  banned                 Boolean?
+  banReason              String?
+  banExpires             DateTime?
+  sessions               Session[]
+  accounts               Account[]
+  members                Member[]
+  teamMembers            TeamMember[]
+  invitations            Invitation[]
+  todoLists              TodoList[]
+  apiKey                 Apikey?
+  glaccounts             GlAccount[]
+  partners               Partner[]
+  funds                  Fund[]
 
-  designatedFund  DesignatedFund[]  @relation(name:'designatedBy')
-  createdDesignatedFund DesignatedFund[] @relation(name:"designationCreate")
-  releasedDesignatedFund DesignatedFund[] @relation(name:'designationRelease')
-  lastLoginMethod String?
-  
+  designatedFund         DesignatedFund[] @relation(name: 'designatedBy')
+  createdDesignatedFund  DesignatedFund[] @relation(name: "designationCreate")
+  releasedDesignatedFund DesignatedFund[] @relation(name: 'designationRelease')
+  lastLoginMethod        String?
 
-  
+
+
   @@map("user")
 }
 
@@ -195,12 +196,12 @@ model Account {
 }
 
 model Verification {
-  id         String     @id
+  id         String    @id
   identifier String
   value      String
   expiresAt  DateTime
-  createdAt  DateTime?  @default(now())
-  updatedAt  DateTime?  @default(now()) @updatedAt
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @default(now()) @updatedAt
 
   @@map("verification")
 }
@@ -208,39 +209,39 @@ model Verification {
 
 
 model Organization {
-    id             String       @id
-    name           String
-    slug           String       @unique
-    logo           String?
-    createdAt           DateTime
-    metadata            String?
-    tradingName         String       @length(1,50, "Must be between 1 and 50 characters")
-    legalForm           OrgLegalForm    @default(SoleTrader)
-    legalName           String       @length(1,50, "Must be between 1 and 50 characters")
-    charityNumber       String?
-    taxRef              String?
-    companyNumber       String?
-    companyName         String?
-    idType              OrgIdentificationType     @default(UTR_tax_ref)
-    identification      String       @length(1,50, "Must be between 1 and 50 characters")
-    accountType         OrgPlanType  @default(Trial)
-    members             Member[]
-    postingPeriods      PostingPeriod[]
-    
-    invitations         Invitation[]
-    todoLists           TodoList[]
-    funds               Fund[] @relation(name:'fund')
+  id             String                @id
+  name           String
+  slug           String                @unique
+  logo           String?
+  createdAt      DateTime
+  metadata       String?
+  tradingName    String                @length(1,  50, "Must be between 1 and 50 characters")
+  legalForm      OrgLegalForm          @default(SoleTrader)
+  legalName      String                @length(1,  50, "Must be between 1 and 50 characters")
+  charityNumber  String?
+  taxRef         String?
+  companyNumber  String?
+  companyName    String?
+  idType         OrgIdentificationType @default(UTR_tax_ref)
+  identification String                @length(1,  50, "Must be between 1 and 50 characters")
+  accountType    OrgPlanType           @default(Trial)
+  members        Member[]
+  postingPeriods PostingPeriod[]
 
-    @@map('organization')
+  invitations    Invitation[]
+  todoLists      TodoList[]
+  funds          Fund[]                @relation(name: 'fund')
+
+  @@map('organization')
 }
 
 model Team {
-  id              String        @id
-  name            String
-  organizationId	String
+  id             String       @id
+  name           String
+  organizationId String
   teamMembers    TeamMember[]
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @default(now()) @updatedAt
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
 }
 
 model Member {
@@ -250,7 +251,7 @@ model Member {
   userId         String
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   role           String
-  
+
   createdAt      DateTime     @default(now())
   updatesAt      DateTime     @default(now()) @updatedAt
 
@@ -258,13 +259,13 @@ model Member {
 }
 
 model TeamMember {
-  id            String @id
-  teamId        String
-  team          Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  userId        String
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt      DateTime     @default(now())
-  updatesAt      DateTime     @default(now()) @updatedAt
+  id        String   @id
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatesAt DateTime @default(now()) @updatedAt
 }
 
 model Invitation {
@@ -307,48 +308,40 @@ model Session {
 
 
 model ISOCountry {
-  countryId Int @id @default(autoincrement())
-  code2 String  @unique @length(1,2,"Code must be length 2 char")
-  code3 String  @unique @length(1,3, "ISO address code3 must be 3 char length ")
-  number Int
-  name String
+  countryId   Int             @id @default(autoincrement())
+  code2       String          @unique @length(1,  2, "Code must be length 2 char")
+  code3       String          @unique @length(1,  3, "ISO address code3 must be 3 char length ")
+  number      Int
+  name        String
   description String
-  addresses Address[]
-  regions AddressRegion[]
-  
-
-  
+  addresses   Address[]
+  regions     AddressRegion[]
 }
- model AddressRegion {
-  regionId Int @id @default(autoincrement())
+model AddressRegion {
+  regionId     Int        @id @default(autoincrement())
   isoCountryId Int
-  country ISOCountry @relation(fields: [isoCountryId], references: [countryId])
-  name String
-  
- }
+  country      ISOCountry @relation(fields: [isoCountryId], references: [countryId])
+  name         String
+}
 
 model Address {
-  addressID Int         @id @default(autoincrement())
-  buildingCode String?  @length(0,10, 'building code can be up 10 characters' )
-  room String?          @length(0,10, 'room can be up 10 characters' )
-  careOf String?        @length(0,50, 'Care of be up 10 characters' )
-  street2 String?       @length(0,50, 'Street2 can be up 10 characters' )
-  street3 String?       @length(0,50, 'Street3 can be up 10 characters' )
-  houseNumber Int?      
-  street String         @length(1, 50, 'Street must be upto 50 char')
-  town String?          @length(0,50, 'Town can be up 10 characters' )
-  county String?        @length(0,50, 'County can be up 10 characters' )
-  postCode String?      @length(1,10, 'Post code must be up 10 characters' )
+  addressID    Int        @id @default(autoincrement())
+  buildingCode String?    @length(0,  10, 'building code can be up 10 characters')
+  room         String?    @length(0,  10, 'room can be up 10 characters')
+  careOf       String?    @length(0,  50, 'Care of be up 10 characters')
+  street2      String?    @length(0,  50, 'Street2 can be up 10 characters')
+  street3      String?    @length(0,  50, 'Street3 can be up 10 characters')
+  houseNumber  Int?
+  street       String     @length(1, 50, 'Street must be upto 50 char')
+  town         String?    @length(0,  50, 'Town can be up 10 characters')
+  county       String?    @length(0,  50, 'County can be up 10 characters')
+  postCode     String?    @length(1,  10, 'Post code must be up 10 characters')
   isoCountryId Int
-  country ISOCountry    @relation(fields: [isoCountryId], references: [countryId])
+  country      ISOCountry @relation(fields: [isoCountryId], references: [countryId])
   partnerId    String
-  partners Partner[]
+  partners     Partner[]
   // companyId String
-  companys Company?   @relation('registereOfficeAddress')
-  
-  
-
-
+  companys     Company?   @relation('registereOfficeAddress')
 }
 
 
@@ -381,47 +374,45 @@ model Apikey {
 
   @@map("apikey")
 }
- 
- model GlAccount {
-  id              String @id @default(uuid())
-  name            String
-  balanceSheet    Boolean
-  reportCat       String
-  createdById     String
-  createdBy       User @relation(fields: [createdById], references: [id])
-  ArApRecAccount  ArAPPartner[]
 
- }
+model GlAccount {
+  id             String        @id @default(uuid())
+  name           String
+  balanceSheet   Boolean
+  reportCat      String
+  createdById    String
+  createdBy      User          @relation(fields: [createdById], references: [id])
+  ArApRecAccount ArAPPartner[]
+}
 
- model Partner {
-  id          String    @id @default(uuid())
-  name        String    @length(1,40, 'Partner name is requiredd')
+model Partner {
+  id          String     @id @default(uuid())
+  name        String     @length(1,  40, 'Partner name is requiredd')
   personType  PersonType
-  familyName  String? 
+  familyName  String?
   addressId   Int
-  searchTerm  String    @length( 1,20, 'Search term to find partners')
+  searchTerm  String     @length(1,  20, 'Search term to find partners')
   stripeId    String
-  address     Address   @relation(fields: [addressId], references: [addressID])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
+  address     Address    @relation(fields: [addressId], references: [addressID])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now()) @updatedAt
   createdById String
-  createdBy   User      @relation(fields: [createdById], references: [id])
-  type        String    @length(1,20, 'Type of partner')
+  createdBy   User       @relation(fields: [createdById], references: [id])
+  type        String     @length(1,  20, 'Type of partner')
 
 
   @@delegate(type)
+}
 
- }
-
- model ArAPPartner extends Partner{
-   reconAccountId   String
-   reconAccount     GlAccount @relation(fields: [reconAccountId], references: [id])
-   companyId        String
+model ArAPPartner extends Partner {
+  reconAccountId String
+  reconAccount   GlAccount @relation(fields: [reconAccountId], references: [id])
+  companyId      String
   //  company          Team      @relation(fields: [companyId], references: [id])
- }
+}
 
- model FiscalPeriodRule {
-  id            Int @id @default(autoincrement())
+model FiscalPeriodRule {
+  id            Int       @id @default(autoincrement())
   name          String
   monthNum      Int
   day           Int
@@ -433,57 +424,56 @@ model Apikey {
   @@allow('all', auth().organizationRole == 'admin')
   // deny anonymous users
   // @@deny('all', auth() == null)
+}
 
- }
 
- 
 
- model Parameter {
-  id Int  @id @default(autoincrement())
-  name String
+model Parameter {
+  id    Int    @id @default(autoincrement())
+  name  String
   value String
 
   @@allow('create,read', true)
- }
+}
 
- model Company {
-  id Int @id @default(autoincrement())
-  companyCode String
-  companyName String
-  registeredOfficeAddressId Int @unique
-  regsisteredAddress Address @relation('registereOfficeAddress',fields: [registeredOfficeAddressId], references: [addressID])
-  vatNumber String?
-  fiscalPeriodRuleId Int
-  fiscPeriodRule FiscalPeriodRule @relation('fiscPeriodRule', fields: [fiscalPeriodRuleId], references: [id])
-  postPeriod CompanyPostingPeriod []
- }
+model Company {
+  id                        Int                    @id @default(autoincrement())
+  companyCode               String
+  companyName               String
+  registeredOfficeAddressId Int                    @unique
+  regsisteredAddress        Address                @relation('registereOfficeAddress',  fields: [registeredOfficeAddressId], references: [addressID])
+  vatNumber                 String?
+  fiscalPeriodRuleId        Int
+  fiscPeriodRule            FiscalPeriodRule       @relation('fiscPeriodRule', fields: [fiscalPeriodRuleId], references: [id])
+  postPeriod                CompanyPostingPeriod []
+}
 
 
 
- model CompanyPostingPeriod {
-  companyId Int
+model CompanyPostingPeriod {
+  companyId       Int
   postingPeriodId Int
-  company Company @relation(fields: [companyId], references: [id])
-  postPeriod PostingPeriod @relation(fields: [postingPeriodId], references: [id])
+  company         Company       @relation(fields: [companyId], references: [id])
+  postPeriod      PostingPeriod @relation(fields: [postingPeriodId], references: [id])
   @@id([companyId,postingPeriodId ])
- }
+}
 
- model Fund {
-  id              String     @id @default(uuid())
-  updatedAt       DateTime      @default(now()) @updatedAt
-  createdAt       DateTime  @default(now())
-  fundName        String
-  donarName       String?
-  objective       String?
-  managedById     String
-  organisationId  String
-  organisation    Organization @relation(name:'fund',fields: [organisationId], references: [id], onDelete: Cascade)
-  createdBy       User         @relation(fields: [managedById], references: [id])
-  fundType        String     @default('General')
-  reviewDate      DateTime?
-  type            String
-        
-  
+model Fund {
+  id             String       @id @default(uuid())
+  updatedAt      DateTime     @default(now()) @updatedAt
+  createdAt      DateTime     @default(now())
+  fundName       String
+  donarName      String?
+  objective      String?
+  managedById    String
+  organisationId String
+  organisation   Organization @relation(name: 'fund',  fields: [organisationId], references: [id], onDelete: Cascade)
+  createdBy      User         @relation(fields: [managedById], references: [id])
+  fundType       String       @default('General')
+  reviewDate     DateTime?
+  type           String
+
+
 
   @@delegate(type)
   //restricted by organisation
@@ -495,27 +485,24 @@ model Apikey {
   
 
   // add role that can create/ update/ view
+}
 
- }
+model GeneralFund extends Fund {
 
- model GeneralFund extends Fund {
-  
-  balance  Decimal? @db.Decimal(16,2)
-  balances FundBalance[] @relation(name:'genFundBal')
-
-
- }
- model RestrictedFund extends Fund {
+  balance  Decimal?      @db.Decimal(16,  2)
+  balances FundBalance[] @relation(name: 'genFundBal')
+}
+model RestrictedFund extends Fund {
   projectEndDate      DateTime
   restrictedType      String
   nextDonarReviewDate DateTime?
   returnSurplus       Boolean?
 
   @@delegate(restrictedType)
- }
- model DesignatedFund extends RestrictedFund {
-  designatedBal           Decimal? @db.Decimal(16,2)
-  currentBal              Decimal? @db.Decimal(16,2)
+}
+model DesignatedFund extends RestrictedFund {
+  designatedBal           Decimal?      @db.Decimal(16,  2)
+  currentBal              Decimal?      @db.Decimal(16,  2)
   designatedDate          DateTime
   releasedDate            DateTime?
   designatedById          String
@@ -523,73 +510,67 @@ model Apikey {
   undesignateMeeting      String?
   designationReleasedById String?
   designationCreatedById  String
-  designatedBy            User? @relation(name:'designatedBy', fields: [designatedById], references: [id])
-  designationCreatedBy    User @relation(name:'designationCreate', fields: [designationCreatedById], references: [id])
-  designationReleasedBy   User? @relation(name:'designationRelease', fields: [designationReleasedById], references: [id])
+  designatedBy            User?         @relation(name: 'designatedBy', fields: [designatedById], references: [id])
+  designationCreatedBy    User          @relation(name: 'designationCreate', fields: [designationCreatedById], references: [id])
+  designationReleasedBy   User?         @relation(name: 'designationRelease', fields: [designationReleasedById], references: [id])
   balances                FundBalance [] @relation('designatedBal')
- }
+}
 
- model IncomeFund extends RestrictedFund {
-  balance               Decimal? @db.Decimal(16,2)
-  balances              FundBalance[] @relation('incomeFundBal')
- }
+model IncomeFund extends RestrictedFund {
+  balance  Decimal?      @db.Decimal(16,  2)
+  balances FundBalance[] @relation('incomeFundBal')
+}
 
- model EndownmentPermanent extends RestrictedFund {
-  initalCapitalAmount Decimal? @db.Decimal(16,2)
-  incomeBalance Decimal? @db.Decimal(16,2)
-  capitalBalance Decimal? @db.Decimal(16,2)
+model EndownmentPermanent extends RestrictedFund {
+  initalCapitalAmount      Decimal?      @db.Decimal(16,  2)
+  incomeBalance            Decimal?      @db.Decimal(16,  2)
+  capitalBalance           Decimal?      @db.Decimal(16,  2)
   permanentIncomeBalances  FundBalance[] @relation('permanentIncomeFundBal')
-  permanentCapitalBalances  FundBalance[] @relation('permanentCapitalFundBal')
+  permanentCapitalBalances FundBalance[] @relation('permanentCapitalFundBal')
+}
 
-  
- }
-
- model EndownmentExpendable extends RestrictedFund {
-  initalCapitalAmount Decimal? @db.Decimal(16,2)
-  incomeAmount  Decimal? @db.Decimal(16,2)
-  incomeBalance Decimal? @db.Decimal(16,2)
-  capitalBalance Decimal? @db.Decimal(16,2)
+model EndownmentExpendable extends RestrictedFund {
+  initalCapitalAmount       Decimal?      @db.Decimal(16,  2)
+  incomeAmount              Decimal?      @db.Decimal(16,  2)
+  incomeBalance             Decimal?      @db.Decimal(16,  2)
+  capitalBalance            Decimal?      @db.Decimal(16,  2)
   expendableIncomeBalances  FundBalance[] @relation('expendableIncomeFundBal')
-  expendableCapitalBalances  FundBalance[] @relation('expendableCapitalFundBal')
-  
-  
- }
+  expendableCapitalBalances FundBalance[] @relation('expendableCapitalFundBal')
+}
 
- model FundBalance {
-  id            String    @id @default(uuid())
-  fiscalPeriod  Int  
-  fiscalYear    Int
-  balance       Decimal   @db.Decimal(16,2)
-  generalFundId        String?
-  generalFund   GeneralFund?  @relation(name:'genFundBal',fields: [generalFundId], references: [id])
-  
-  incomeFundId   String?
-  incomeFund    IncomeFund?  @relation(name:'incomeFundBal',fields: [incomeFundId], references: [id])
-  designiatedFundId String?
-  designatedfund DesignatedFund? @relation( name:'designatedBal',fields: [designiatedFundId], references: [id])
-  expendableIncomeFundId String?
-  expendableIncomefund EndownmentExpendable? @relation( name:'expendableIncomeFundBal',fields: [expendableIncomeFundId], references: [id])
+model FundBalance {
+  id                      String                @id @default(uuid())
+  fiscalPeriod            Int
+  fiscalYear              Int
+  balance                 Decimal               @db.Decimal(16,  2)
+  generalFundId           String?
+  generalFund             GeneralFund?          @relation(name: 'genFundBal',  fields: [generalFundId], references: [id])
+
+  incomeFundId            String?
+  incomeFund              IncomeFund?           @relation(name: 'incomeFundBal',  fields: [incomeFundId], references: [id])
+  designiatedFundId       String?
+  designatedfund          DesignatedFund?       @relation(name: 'designatedBal',  fields: [designiatedFundId], references: [id])
+  expendableIncomeFundId  String?
+  expendableIncomefund    EndownmentExpendable? @relation(name: 'expendableIncomeFundBal',  fields: [expendableIncomeFundId], references: [id])
   expendableCapitalFundId String?
-  expendableCapitalfund EndownmentExpendable? @relation( name:'expendableCapitalFundBal',fields: [expendableCapitalFundId], references: [id])
-  permanentIncomeFundId String?
-  permanentIncomefund EndownmentPermanent? @relation( name:'permanentIncomeFundBal',fields: [permanentIncomeFundId], references: [id])
-  permanentCapitalFundId String?
-  permanentCapitalfund EndownmentPermanent? @relation( name:'permanentCapitalFundBal',fields: [permanentCapitalFundId], references: [id])
- }
+  expendableCapitalfund   EndownmentExpendable? @relation(name: 'expendableCapitalFundBal',  fields: [expendableCapitalFundId], references: [id])
+  permanentIncomeFundId   String?
+  permanentIncomefund     EndownmentPermanent?  @relation(name: 'permanentIncomeFundBal',  fields: [permanentIncomeFundId], references: [id])
+  permanentCapitalFundId  String?
+  permanentCapitalfund    EndownmentPermanent?  @relation(name: 'permanentCapitalFundBal',  fields: [permanentCapitalFundId], references: [id])
+}
 
- model JournalDoc {
-  id String @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ref String
-  year Int
+model JournalDoc {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  ref          String
+  year         Int
   fiscalPeriod Int
-  headerText String
+  headerText   String
 
   @@allow('create', auth().role in [RECEIVABLE_POSTER, PAYABLE_POSTER, GL_POSTER])
-
-
- }
+}
 
 
 

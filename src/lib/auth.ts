@@ -11,14 +11,14 @@ import { db } from './db';
 import { reactInvitationEmail } from './email/invitation';
 
 import { ses } from './email/aws-ses';
-import { apiKey } from 'better-auth/plugins';
+
 import { reactResetPasswordEmail } from './email/reset-password';
 import { zenstackAdapter } from '@zenstackhq/better-auth';
-import {
-  ListContactListsCommand,
-  SESv2Client,
-  SendEmailCommand,
-} from '@aws-sdk/client-sesv2';
+// import {
+//   ListContactListsCommand,
+//   SESv2Client,
+//   SendEmailCommand,
+// } from '@aws-sdk/client-sesv2';
 import { awsVerificationEmail } from '../actions/send-email/send-verification';
 import { resend } from './email/resend';
 import { TruckElectric } from 'lucide-react';
@@ -105,7 +105,6 @@ export const auth = betterAuth({
   },
 
   plugins: [
-    apiKey(),
     organization({
       schema: {
         organization: {
@@ -230,6 +229,7 @@ export const auth = betterAuth({
     lastLoginMethod({
       storeInDatabase: true,
     }),
+
     bearer(),
     admin(),
     nextCookies(),

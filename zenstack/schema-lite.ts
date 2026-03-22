@@ -2619,7 +2619,9 @@ export class SchemaType implements SchemaDef {
                 RECEIVABLE_DISPLAY: "RECEIVABLE_DISPLAY",
                 CLERK: "CLERK",
                 user: "user",
-                member: "member"
+                member: "member",
+                admin: "admin",
+                ORG_ADMIN: "ORG_ADMIN"
             }
         },
         OrgLegalForm: {

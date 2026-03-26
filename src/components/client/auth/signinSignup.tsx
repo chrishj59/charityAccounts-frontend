@@ -9,7 +9,7 @@ export default function SignInSignUp() {
       <TabView
         className='mt-6'
         pt={{
-          root: { className: 'w-2xl' },
+          root: { className: 'w-4xl' },
         }}
       >
         <TabPanel header='Sign in'>

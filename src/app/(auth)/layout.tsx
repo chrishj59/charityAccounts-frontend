@@ -25,7 +25,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   const centerContent = (
     // <div className='flex flex-wrap align-items-center gap-3'>
     <span className=' font-bold text-primary-600 text-2xl'>
-      Rationes Charitatis - authentication{' '}
+      Rationes Charitatis - Authentication{' '}
     </span>
     // </div>
   );

@@ -19,6 +19,8 @@ import { Password } from 'primereact/password';
 import { Dialog } from 'primereact/dialog';
 import { required } from 'zod/v4-mini';
 import { db } from '~/src/lib/db';
+import { signUpAdminUserAction } from '~/src/actions/auth/signup-adminUser';
+import { statusEnum } from '~/src/types/helper';
 
 type Props = {
   setUserAction: React.Dispatch<React.SetStateAction<userInputValues>>;
@@ -65,6 +67,23 @@ export function SignUpUser({ setUserAction, setActiveTabAction }: Props) {
 
   const onUserSubmit = async (formData: userInputValues) => {
     // var { firstName, familyName, email, password } = formData;
+    const email: string = formData.email;
+    if (email) {
+      const adminEmail = process.env.site_admin_email
+        ? process.env.site_admin_email
+        : '';
+      if (email.toUpperCase() === adminEmail ? adminEmail.toUpperCase : '') {
+        const res = await signUpAdminUserAction(formData, adminEmail);
+        if (res.status === statusEnum.SUCCESS) {
+          // take user to secure home
+          router.push('/secure');
+          return;
+        } else {
+          setErrMsg(res.message);
+          setShowErrDialog(true);
+        }
+      }
+    }
 
     (setUserAction(formData), setActiveTabAction(1));
     // const { displayName, firstName, familyName, email, password } = formData;

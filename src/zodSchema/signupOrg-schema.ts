@@ -1,4 +1,9 @@
+import { TruckElectricIcon } from 'lucide-react';
 import { z } from 'zod';
+
+const adminAccount = async (email: string): Promise<boolean> => {
+  return true;
+};
 export const orgInputSchema = z.object({
   tradingName: z.string().min(1, 'Trading name is required'),
 

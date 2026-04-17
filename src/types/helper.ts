@@ -34,3 +34,9 @@ export type DB_ERROR = {
   reason: string;
   model: string;
 };
+
+export type userContextType = {
+  userId: string;
+  organizationId: string;
+  organizationRole?: string;
+};

@@ -6,7 +6,7 @@
 /* eslint-disable */
 
 import { schema as $schema, type SchemaType as $Schema } from "./schema-lite";
-import { type ModelResult as $ModelResult, type TypeDefResult as $TypeDefResult } from "@zenstackhq/orm";
+import type { ModelResult as $ModelResult, TypeDefResult as $TypeDefResult } from "@zenstackhq/orm";
 export type TodoList = $ModelResult<$Schema, "TodoList">;
 export type PostingPeriod = $ModelResult<$Schema, "PostingPeriod">;
 export type Todo = $ModelResult<$Schema, "Todo">;

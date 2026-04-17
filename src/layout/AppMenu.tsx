@@ -17,6 +17,10 @@ const AppMenu = () => {
                   label: 'Create Fund',
                   to: '/secure/funds/masterdata/create',
                 },
+                {
+                  label: 'List Funds',
+                  to: '/secure/funds/masterdata/list',
+                },
               ],
             },
           ],

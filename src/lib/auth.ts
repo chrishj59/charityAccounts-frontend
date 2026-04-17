@@ -1,4 +1,5 @@
 import { betterAuth } from 'better-auth';
+import { customSession } from 'better-auth/plugins';
 
 import { nextCookies } from 'better-auth/next-js';
 import {
@@ -27,6 +28,9 @@ import { label } from 'framer-motion/client';
 const from = process.env.BETTER_AUTH_EMAIL || 'delivered@resend.dev';
 const to = process.env.TEST_EMAIL || '';
 
+const getOrgId = async (userId: string) => {
+  return '7MB5idvLxFQ9UfZVckSrcki1rKxnz6vT';
+};
 export const auth = betterAuth({
   appName: 'Rationes-Charitatis',
   database: zenstackAdapter(db, {
@@ -229,7 +233,22 @@ export const auth = betterAuth({
     lastLoginMethod({
       storeInDatabase: true,
     }),
-
+    customSession(async ({ user, session }) => {
+      // const roles = findUserRoles(session.session.userId);
+      const organizationId = await getOrgId(user.id);
+      return {
+        // roles,
+        // user: {
+        //   ...user,
+        //   // newField: "newField",
+        // }
+        user,
+        session: {
+          ...session,
+          organizationId,
+        },
+      };
+    }),
     bearer(),
     admin(),
     nextCookies(),

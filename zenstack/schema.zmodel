@@ -29,11 +29,11 @@ plugin policy {
   provider = '@zenstackhq/plugin-policy'
 }
 
-plugin hooks {
-  provider = "@zenstackhq/tanstack-query"
-  target = "react"
-  output = "./src/lib/hooks/model"
-}
+// plugin hooks {
+//   provider = "@zenstackhq/tanstack-query"
+//   target = "react"
+//   output = "./src/lib/hooks/model"
+// }
 
 
 /// Shape of the `auth()` function
@@ -213,7 +213,7 @@ model Organization {
   name           String
   slug           String                @unique
   logo           String?
-  createdAt      DateTime
+  
   metadata       String?
   tradingName    String                @length(1,  50, "Must be between 1 and 50 characters")
   legalForm      OrgLegalForm          @default(SoleTrader)
@@ -231,7 +231,8 @@ model Organization {
   invitations    Invitation[]
   todoLists      TodoList[]
   funds          Fund[]                @relation(name: 'fund')
-
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @default(now()) @updatedAt
   @@map('organization')
 }
 
@@ -253,8 +254,8 @@ model Member {
   role           String
 
   createdAt      DateTime     @default(now())
-  updatesAt      DateTime     @default(now()) @updatedAt
-
+  
+  updatedAt       DateTime @updatedAt
   @@map("member")
 }
 
@@ -466,8 +467,9 @@ model Fund {
   donarName      String?
   objective      String?
   managedById    String
-  organisationId String
-  organisation   Organization @relation(name: 'fund',  fields: [organisationId], references: [id], onDelete: Cascade)
+  organizationId String       @default('')
+  teamId         String       @default('') 
+  organization   Organization @relation(name: 'fund',  fields: [organizationId], references: [id], onDelete: Cascade)
   createdBy      User         @relation(fields: [managedById], references: [id])
   fundType       String       @default('General')
   reviewDate     DateTime?
@@ -478,7 +480,7 @@ model Fund {
   @@delegate(type)
   //restricted by organisation
   // @@deny('all', auth() == null)
-  // @@deny('all', auth().organizationId != organisationId)
+  @@deny('all', auth().organizationId != organizationId)
 
   @@allow('all', true)
   //@@allow('all', auth().organizationRole == 'admin')
@@ -489,7 +491,7 @@ model Fund {
 
 model GeneralFund extends Fund {
 
-  balance  Decimal?      @db.Decimal(16,  2)
+  balance  Decimal?      @db.Decimal(16,  2) @default(0)
   balances FundBalance[] @relation(name: 'genFundBal')
 }
 model RestrictedFund extends Fund {

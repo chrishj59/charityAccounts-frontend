@@ -5,7 +5,7 @@
 
 /* eslint-disable */
 
-import { type SchemaDef, ExpressionUtils } from "@zenstackhq/orm/schema";
+import { type SchemaDef, type AttributeApplication, type FieldDefault, ExpressionUtils } from "@zenstackhq/schema";
 export class SchemaType implements SchemaDef {
     provider = {
         type: "postgresql",
@@ -19,12 +19,12 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("cuid")
+                    default: ExpressionUtils.call("cuid") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
@@ -43,10 +43,10 @@ export class SchemaType implements SchemaDef {
                 ownerId: {
                     name: "ownerId",
                     type: "String",
-                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["userId"]),
+                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["userId"]) as FieldDefault,
                     foreignKeyFor: [
                         "owner"
-                    ]
+                    ] as readonly string[]
                 },
                 organization: {
                     name: "organization",
@@ -58,10 +58,10 @@ export class SchemaType implements SchemaDef {
                     name: "organizationId",
                     type: "String",
                     optional: true,
-                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]),
+                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]) as FieldDefault,
                     foreignKeyFor: [
                         "organization"
-                    ]
+                    ] as readonly string[]
                 },
                 todos: {
                     name: "todos",
@@ -82,7 +82,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "Int",
                     id: true,
-                    default: ExpressionUtils.call("autoincrement")
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 year: {
                     name: "year",
@@ -112,10 +112,10 @@ export class SchemaType implements SchemaDef {
                     name: "organizationId",
                     type: "String",
                     optional: true,
-                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]),
+                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]) as FieldDefault,
                     foreignKeyFor: [
                         "organization"
-                    ]
+                    ] as readonly string[]
                 }
             },
             idFields: ["id"],
@@ -130,12 +130,12 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("cuid")
+                    default: ExpressionUtils.call("cuid") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
@@ -149,14 +149,14 @@ export class SchemaType implements SchemaDef {
                 done: {
                     name: "done",
                     type: "Boolean",
-                    default: false
+                    default: false as FieldDefault
                 },
                 listId: {
                     name: "listId",
                     type: "String",
                     foreignKeyFor: [
                         "list"
-                    ]
+                    ] as readonly string[]
                 },
                 list: {
                     name: "list",
@@ -176,27 +176,27 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("cuid")
+                    default: ExpressionUtils.call("cuid") as FieldDefault
                 },
                 name: {
                     name: "name",
                     type: "String",
-                    default: ""
+                    default: "" as FieldDefault
                 },
                 displayName: {
                     name: "displayName",
                     type: "String",
-                    default: ""
+                    default: "" as FieldDefault
                 },
                 firstName: {
                     name: "firstName",
                     type: "String",
-                    default: ""
+                    default: "" as FieldDefault
                 },
                 familyName: {
                     name: "familyName",
                     type: "String",
-                    default: ""
+                    default: "" as FieldDefault
                 },
                 email: {
                     name: "email",
@@ -206,7 +206,7 @@ export class SchemaType implements SchemaDef {
                 emailVerified: {
                     name: "emailVerified",
                     type: "Boolean",
-                    default: false
+                    default: false as FieldDefault
                 },
                 image: {
                     name: "image",
@@ -216,18 +216,18 @@ export class SchemaType implements SchemaDef {
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 role: {
                     name: "role",
                     type: "Role",
-                    default: "user"
+                    default: "user" as FieldDefault
                 },
                 banned: {
                     name: "banned",
@@ -355,7 +355,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
@@ -400,7 +400,7 @@ export class SchemaType implements SchemaDef {
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
@@ -437,14 +437,14 @@ export class SchemaType implements SchemaDef {
                     name: "createdAt",
                     type: "DateTime",
                     optional: true,
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     optional: true,
                     updatedAt: true,
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 }
             },
             idFields: ["id"],
@@ -474,10 +474,6 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     optional: true
                 },
-                createdAt: {
-                    name: "createdAt",
-                    type: "DateTime"
-                },
                 metadata: {
                     name: "metadata",
                     type: "String",
@@ -490,7 +486,7 @@ export class SchemaType implements SchemaDef {
                 legalForm: {
                     name: "legalForm",
                     type: "OrgLegalForm",
-                    default: "SoleTrader"
+                    default: "SoleTrader" as FieldDefault
                 },
                 legalName: {
                     name: "legalName",
@@ -519,7 +515,7 @@ export class SchemaType implements SchemaDef {
                 idType: {
                     name: "idType",
                     type: "OrgIdentificationType",
-                    default: "UTR_tax_ref"
+                    default: "UTR_tax_ref" as FieldDefault
                 },
                 identification: {
                     name: "identification",
@@ -528,7 +524,7 @@ export class SchemaType implements SchemaDef {
                 accountType: {
                     name: "accountType",
                     type: "OrgPlanType",
-                    default: "Trial"
+                    default: "Trial" as FieldDefault
                 },
                 members: {
                     name: "members",
@@ -558,7 +554,20 @@ export class SchemaType implements SchemaDef {
                     name: "funds",
                     type: "Fund",
                     array: true,
-                    relation: { opposite: "organisation", name: "fund" }
+                    relation: { opposite: "organization", name: "fund" }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    optional: true,
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    optional: true,
+                    updatedAt: true,
+                    default: ExpressionUtils.call("now") as FieldDefault
                 }
             },
             idFields: ["id"],
@@ -592,13 +601,13 @@ export class SchemaType implements SchemaDef {
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 }
             },
             idFields: ["id"],
@@ -619,7 +628,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "organization"
-                    ]
+                    ] as readonly string[]
                 },
                 organization: {
                     name: "organization",
@@ -631,7 +640,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
@@ -645,13 +654,12 @@ export class SchemaType implements SchemaDef {
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
-                updatesAt: {
-                    name: "updatesAt",
+                updatedAt: {
+                    name: "updatedAt",
                     type: "DateTime",
-                    updatedAt: true,
-                    default: ExpressionUtils.call("now")
+                    updatedAt: true
                 }
             },
             idFields: ["id"],
@@ -672,7 +680,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "team"
-                    ]
+                    ] as readonly string[]
                 },
                 team: {
                     name: "team",
@@ -684,7 +692,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
@@ -694,13 +702,13 @@ export class SchemaType implements SchemaDef {
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatesAt: {
                     name: "updatesAt",
                     type: "DateTime",
                     updatedAt: true,
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 }
             },
             idFields: ["id"],
@@ -721,7 +729,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "organization"
-                    ]
+                    ] as readonly string[]
                 },
                 organization: {
                     name: "organization",
@@ -750,7 +758,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
@@ -802,7 +810,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
@@ -833,7 +841,7 @@ export class SchemaType implements SchemaDef {
                     name: "countryId",
                     type: "Int",
                     id: true,
-                    default: ExpressionUtils.call("autoincrement")
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 code2: {
                     name: "code2",
@@ -884,14 +892,14 @@ export class SchemaType implements SchemaDef {
                     name: "regionId",
                     type: "Int",
                     id: true,
-                    default: ExpressionUtils.call("autoincrement")
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 isoCountryId: {
                     name: "isoCountryId",
                     type: "Int",
                     foreignKeyFor: [
                         "country"
-                    ]
+                    ] as readonly string[]
                 },
                 country: {
                     name: "country",
@@ -915,7 +923,7 @@ export class SchemaType implements SchemaDef {
                     name: "addressID",
                     type: "Int",
                     id: true,
-                    default: ExpressionUtils.call("autoincrement")
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 buildingCode: {
                     name: "buildingCode",
@@ -971,7 +979,7 @@ export class SchemaType implements SchemaDef {
                     type: "Int",
                     foreignKeyFor: [
                         "country"
-                    ]
+                    ] as readonly string[]
                 },
                 country: {
                     name: "country",
@@ -1033,7 +1041,7 @@ export class SchemaType implements SchemaDef {
                     unique: true,
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
@@ -1059,13 +1067,13 @@ export class SchemaType implements SchemaDef {
                     name: "enabled",
                     type: "Boolean",
                     optional: true,
-                    default: true
+                    default: true as FieldDefault
                 },
                 rateLimitEnabled: {
                     name: "rateLimitEnabled",
                     type: "Boolean",
                     optional: true,
-                    default: true
+                    default: true as FieldDefault
                 },
                 rateLimitTimeWindow: {
                     name: "rateLimitTimeWindow",
@@ -1129,7 +1137,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 name: {
                     name: "name",
@@ -1148,7 +1156,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
                 createdBy: {
                     name: "createdBy",
@@ -1174,7 +1182,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 name: {
                     name: "name",
@@ -1194,7 +1202,7 @@ export class SchemaType implements SchemaDef {
                     type: "Int",
                     foreignKeyFor: [
                         "address"
-                    ]
+                    ] as readonly string[]
                 },
                 searchTerm: {
                     name: "searchTerm",
@@ -1212,20 +1220,20 @@ export class SchemaType implements SchemaDef {
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdById: {
                     name: "createdById",
                     type: "String",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
                 createdBy: {
                     name: "createdBy",
@@ -1253,7 +1261,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 name: {
                     name: "name",
@@ -1277,7 +1285,7 @@ export class SchemaType implements SchemaDef {
                     originModel: "Partner",
                     foreignKeyFor: [
                         "address"
-                    ]
+                    ] as readonly string[]
                 },
                 searchTerm: {
                     name: "searchTerm",
@@ -1299,14 +1307,14 @@ export class SchemaType implements SchemaDef {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Partner",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Partner",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdById: {
                     name: "createdById",
@@ -1314,7 +1322,7 @@ export class SchemaType implements SchemaDef {
                     originModel: "Partner",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
                 createdBy: {
                     name: "createdBy",
@@ -1333,7 +1341,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "reconAccount"
-                    ]
+                    ] as readonly string[]
                 },
                 reconAccount: {
                     name: "reconAccount",
@@ -1357,7 +1365,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "Int",
                     id: true,
-                    default: ExpressionUtils.call("autoincrement")
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 name: {
                     name: "name",
@@ -1402,7 +1410,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "Int",
                     id: true,
-                    default: ExpressionUtils.call("autoincrement")
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 name: {
                     name: "name",
@@ -1425,7 +1433,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "Int",
                     id: true,
-                    default: ExpressionUtils.call("autoincrement")
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 companyCode: {
                     name: "companyCode",
@@ -1441,7 +1449,7 @@ export class SchemaType implements SchemaDef {
                     unique: true,
                     foreignKeyFor: [
                         "regsisteredAddress"
-                    ]
+                    ] as readonly string[]
                 },
                 regsisteredAddress: {
                     name: "regsisteredAddress",
@@ -1458,7 +1466,7 @@ export class SchemaType implements SchemaDef {
                     type: "Int",
                     foreignKeyFor: [
                         "fiscPeriodRule"
-                    ]
+                    ] as readonly string[]
                 },
                 fiscPeriodRule: {
                     name: "fiscPeriodRule",
@@ -1487,7 +1495,7 @@ export class SchemaType implements SchemaDef {
                     id: true,
                     foreignKeyFor: [
                         "company"
-                    ]
+                    ] as readonly string[]
                 },
                 postingPeriodId: {
                     name: "postingPeriodId",
@@ -1495,7 +1503,7 @@ export class SchemaType implements SchemaDef {
                     id: true,
                     foreignKeyFor: [
                         "postPeriod"
-                    ]
+                    ] as readonly string[]
                 },
                 company: {
                     name: "company",
@@ -1520,18 +1528,18 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -1552,19 +1560,25 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
@@ -1574,7 +1588,7 @@ export class SchemaType implements SchemaDef {
                 fundType: {
                     name: "fundType",
                     type: "String",
-                    default: "General"
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -1602,20 +1616,20 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -1640,21 +1654,28 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
@@ -1666,7 +1687,7 @@ export class SchemaType implements SchemaDef {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    default: "General"
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -1705,20 +1726,20 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -1743,21 +1764,28 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
@@ -1769,7 +1797,7 @@ export class SchemaType implements SchemaDef {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    default: "General"
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -1818,20 +1846,20 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -1856,21 +1884,28 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
@@ -1882,7 +1917,7 @@ export class SchemaType implements SchemaDef {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    default: "General"
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -1943,7 +1978,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "designatedBy"
-                    ]
+                    ] as readonly string[]
                 },
                 designateMeeting: {
                     name: "designateMeeting",
@@ -1960,14 +1995,14 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "designationReleasedBy"
-                    ]
+                    ] as readonly string[]
                 },
                 designationCreatedById: {
                     name: "designationCreatedById",
                     type: "String",
                     foreignKeyFor: [
                         "designationCreatedBy"
-                    ]
+                    ] as readonly string[]
                 },
                 designatedBy: {
                     name: "designatedBy",
@@ -2006,20 +2041,20 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -2044,21 +2079,28 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
@@ -2070,7 +2112,7 @@ export class SchemaType implements SchemaDef {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    default: "General"
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -2132,20 +2174,20 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -2170,21 +2212,28 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
@@ -2196,7 +2245,7 @@ export class SchemaType implements SchemaDef {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    default: "General"
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -2274,20 +2323,20 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -2312,21 +2361,28 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
@@ -2338,7 +2394,7 @@ export class SchemaType implements SchemaDef {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    default: "General"
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -2420,7 +2476,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 fiscalPeriod: {
                     name: "fiscalPeriod",
@@ -2440,7 +2496,7 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "generalFund"
-                    ]
+                    ] as readonly string[]
                 },
                 generalFund: {
                     name: "generalFund",
@@ -2454,7 +2510,7 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "incomeFund"
-                    ]
+                    ] as readonly string[]
                 },
                 incomeFund: {
                     name: "incomeFund",
@@ -2468,7 +2524,7 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "designatedfund"
-                    ]
+                    ] as readonly string[]
                 },
                 designatedfund: {
                     name: "designatedfund",
@@ -2482,7 +2538,7 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "expendableIncomefund"
-                    ]
+                    ] as readonly string[]
                 },
                 expendableIncomefund: {
                     name: "expendableIncomefund",
@@ -2496,7 +2552,7 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "expendableCapitalfund"
-                    ]
+                    ] as readonly string[]
                 },
                 expendableCapitalfund: {
                     name: "expendableCapitalfund",
@@ -2510,7 +2566,7 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "permanentIncomefund"
-                    ]
+                    ] as readonly string[]
                 },
                 permanentIncomefund: {
                     name: "permanentIncomefund",
@@ -2524,7 +2580,7 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "permanentCapitalfund"
-                    ]
+                    ] as readonly string[]
                 },
                 permanentCapitalfund: {
                     name: "permanentCapitalfund",
@@ -2545,12 +2601,12 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    default: ExpressionUtils.call("uuid")
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    default: ExpressionUtils.call("now")
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
@@ -2605,7 +2661,7 @@ export class SchemaType implements SchemaDef {
             },
             attributes: [
                 { name: "@@auth" }
-            ]
+            ] as readonly AttributeApplication[]
         }
     } as const;
     enums = {

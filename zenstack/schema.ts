@@ -5,7 +5,7 @@
 
 /* eslint-disable */
 
-import { type SchemaDef, ExpressionUtils } from "@zenstackhq/orm/schema";
+import { type SchemaDef, type AttributeApplication, type FieldDefault, ExpressionUtils } from "@zenstackhq/schema";
 export class SchemaType implements SchemaDef {
     provider = {
         type: "postgresql",
@@ -19,20 +19,20 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("cuid") }] }],
-                    default: ExpressionUtils.call("cuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("cuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("cuid") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    attributes: [{ name: "@updatedAt" }]
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
                 },
                 name: {
                     name: "name",
@@ -41,34 +41,34 @@ export class SchemaType implements SchemaDef {
                 owner: {
                     name: "owner",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("ownerId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("ownerId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "todoLists", fields: ["ownerId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 ownerId: {
                     name: "ownerId",
                     type: "String",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.member(ExpressionUtils.call("auth"), ["userId"]) }] }],
-                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["userId"]),
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.member(ExpressionUtils.call("auth"), ["userId"]) }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["userId"]) as FieldDefault,
                     foreignKeyFor: [
                         "owner"
-                    ]
+                    ] as readonly string[]
                 },
                 organization: {
                     name: "organization",
                     type: "Organization",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "todoLists", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 organizationId: {
                     name: "organizationId",
                     type: "String",
                     optional: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]) }] }],
-                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]),
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]) }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]) as FieldDefault,
                     foreignKeyFor: [
                         "organization"
-                    ]
+                    ] as readonly string[]
                 },
                 todos: {
                     name: "todos",
@@ -83,7 +83,7 @@ export class SchemaType implements SchemaDef {
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("create") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["userId"]), "==", ExpressionUtils.field("ownerId")) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.binary(ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["userId"]), "==", ExpressionUtils.field("ownerId")), "||", ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationRole"]), "==", ExpressionUtils.literal("owner"))), "||", ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationRole"]), "==", ExpressionUtils.literal("admin"))) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("read") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.field("organizationId"), "!=", ExpressionUtils._null()) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -96,8 +96,8 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "Int",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
-                    default: ExpressionUtils.call("autoincrement")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 year: {
                     name: "year",
@@ -121,25 +121,25 @@ export class SchemaType implements SchemaDef {
                     name: "organization",
                     type: "Organization",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "postingPeriods", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 organizationId: {
                     name: "organizationId",
                     type: "String",
                     optional: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]) }] }],
-                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]),
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]) }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]) as FieldDefault,
                     foreignKeyFor: [
                         "organization"
-                    ]
+                    ] as readonly string[]
                 }
             },
             attributes: [
                 { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.call("auth"), "==", ExpressionUtils._null()) }] },
                 { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organizationId")) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("read") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.field("organizationId"), "!=", ExpressionUtils._null()) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "Int" }
@@ -152,20 +152,20 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("cuid") }] }],
-                    default: ExpressionUtils.call("cuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("cuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("cuid") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    attributes: [{ name: "@updatedAt" }]
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
                 },
                 title: {
                     name: "title",
@@ -174,26 +174,26 @@ export class SchemaType implements SchemaDef {
                 done: {
                     name: "done",
                     type: "Boolean",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] }],
-                    default: false
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] }] as readonly AttributeApplication[],
+                    default: false as FieldDefault
                 },
                 listId: {
                     name: "listId",
                     type: "String",
                     foreignKeyFor: [
                         "list"
-                    ]
+                    ] as readonly string[]
                 },
                 list: {
                     name: "list",
                     type: "TodoList",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("listId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("listId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "todos", fields: ["listId"], references: ["id"], onDelete: "Cascade" }
                 }
             },
             attributes: [
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.call("check", [ExpressionUtils.field("list"), ExpressionUtils.literal("read")]) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -206,44 +206,44 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("cuid") }] }],
-                    default: ExpressionUtils.call("cuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("cuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("cuid") as FieldDefault
                 },
                 name: {
                     name: "name",
                     type: "String",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }],
-                    default: ""
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
                 },
                 displayName: {
                     name: "displayName",
                     type: "String",
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Display name is required up to 40 characters") }] }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }],
-                    default: ""
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Display name is required up to 40 characters") }] }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
                 },
                 firstName: {
                     name: "firstName",
                     type: "String",
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("First name is required up to 40 characters") }] }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }],
-                    default: ""
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("First name is required up to 40 characters") }] }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
                 },
                 familyName: {
                     name: "familyName",
                     type: "String",
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Family name is required up to 40 characters") }] }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }],
-                    default: ""
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Family name is required up to 40 characters") }] }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
                 },
                 email: {
                     name: "email",
                     type: "String",
                     unique: true,
-                    attributes: [{ name: "@unique" }]
+                    attributes: [{ name: "@unique" }] as readonly AttributeApplication[]
                 },
                 emailVerified: {
                     name: "emailVerified",
                     type: "Boolean",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] }],
-                    default: false
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] }] as readonly AttributeApplication[],
+                    default: false as FieldDefault
                 },
                 image: {
                     name: "image",
@@ -253,21 +253,21 @@ export class SchemaType implements SchemaDef {
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 role: {
                     name: "role",
                     type: "Role",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("user") }] }],
-                    default: "user"
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("user") }] }] as readonly AttributeApplication[],
+                    default: "user" as FieldDefault
                 },
                 banned: {
                     name: "banned",
@@ -348,21 +348,21 @@ export class SchemaType implements SchemaDef {
                     name: "designatedFund",
                     type: "DesignatedFund",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBy") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBy") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "designatedBy", name: "designatedBy" }
                 },
                 createdDesignatedFund: {
                     name: "createdDesignatedFund",
                     type: "DesignatedFund",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationCreate") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationCreate") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "designationCreatedBy", name: "designationCreate" }
                 },
                 releasedDesignatedFund: {
                     name: "releasedDesignatedFund",
                     type: "DesignatedFund",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationRelease") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationRelease") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "designationReleasedBy", name: "designationRelease" }
                 },
                 lastLoginMethod: {
@@ -373,7 +373,7 @@ export class SchemaType implements SchemaDef {
             },
             attributes: [
                 { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("user") }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" },
@@ -387,7 +387,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }]
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
                 accountId: {
                     name: "accountId",
@@ -402,12 +402,12 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "accounts", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
                 },
                 accessToken: {
@@ -448,19 +448,19 @@ export class SchemaType implements SchemaDef {
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    attributes: [{ name: "@updatedAt" }]
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
                 }
             },
             attributes: [
                 { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("account") }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -473,7 +473,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }]
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
                 identifier: {
                     name: "identifier",
@@ -491,21 +491,21 @@ export class SchemaType implements SchemaDef {
                     name: "createdAt",
                     type: "DateTime",
                     optional: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     optional: true,
                     updatedAt: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 }
             },
             attributes: [
                 { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("verification") }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -518,7 +518,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }]
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
                 name: {
                     name: "name",
@@ -528,16 +528,12 @@ export class SchemaType implements SchemaDef {
                     name: "slug",
                     type: "String",
                     unique: true,
-                    attributes: [{ name: "@unique" }]
+                    attributes: [{ name: "@unique" }] as readonly AttributeApplication[]
                 },
                 logo: {
                     name: "logo",
                     type: "String",
                     optional: true
-                },
-                createdAt: {
-                    name: "createdAt",
-                    type: "DateTime"
                 },
                 metadata: {
                     name: "metadata",
@@ -547,18 +543,18 @@ export class SchemaType implements SchemaDef {
                 tradingName: {
                     name: "tradingName",
                     type: "String",
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Must be between 1 and 50 characters") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Must be between 1 and 50 characters") }] }] as readonly AttributeApplication[]
                 },
                 legalForm: {
                     name: "legalForm",
                     type: "OrgLegalForm",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("SoleTrader") }] }],
-                    default: "SoleTrader"
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("SoleTrader") }] }] as readonly AttributeApplication[],
+                    default: "SoleTrader" as FieldDefault
                 },
                 legalName: {
                     name: "legalName",
                     type: "String",
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Must be between 1 and 50 characters") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Must be between 1 and 50 characters") }] }] as readonly AttributeApplication[]
                 },
                 charityNumber: {
                     name: "charityNumber",
@@ -583,19 +579,19 @@ export class SchemaType implements SchemaDef {
                 idType: {
                     name: "idType",
                     type: "OrgIdentificationType",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("UTR_tax_ref") }] }],
-                    default: "UTR_tax_ref"
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("UTR_tax_ref") }] }] as readonly AttributeApplication[],
+                    default: "UTR_tax_ref" as FieldDefault
                 },
                 identification: {
                     name: "identification",
                     type: "String",
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Must be between 1 and 50 characters") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Must be between 1 and 50 characters") }] }] as readonly AttributeApplication[]
                 },
                 accountType: {
                     name: "accountType",
                     type: "OrgPlanType",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("Trial") }] }],
-                    default: "Trial"
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("Trial") }] }] as readonly AttributeApplication[],
+                    default: "Trial" as FieldDefault
                 },
                 members: {
                     name: "members",
@@ -625,13 +621,28 @@ export class SchemaType implements SchemaDef {
                     name: "funds",
                     type: "Fund",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }] }],
-                    relation: { opposite: "organisation", name: "fund" }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "organization", name: "fund" }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    optional: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    optional: true,
+                    updatedAt: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 }
             },
             attributes: [
                 { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("organization") }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" },
@@ -645,7 +656,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }]
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
                 name: {
                     name: "name",
@@ -664,15 +675,15 @@ export class SchemaType implements SchemaDef {
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 }
             },
             idFields: ["id"],
@@ -687,19 +698,19 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }]
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
                 organizationId: {
                     name: "organizationId",
                     type: "String",
                     foreignKeyFor: [
                         "organization"
-                    ]
+                    ] as readonly string[]
                 },
                 organization: {
                     name: "organization",
                     type: "Organization",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "members", fields: ["organizationId"], references: ["id"], onDelete: "Cascade" }
                 },
                 userId: {
@@ -707,12 +718,12 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "members", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
                 },
                 role: {
@@ -722,20 +733,19 @@ export class SchemaType implements SchemaDef {
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
-                updatesAt: {
-                    name: "updatesAt",
+                updatedAt: {
+                    name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
                 }
             },
             attributes: [
                 { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("member") }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -748,19 +758,19 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }]
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
                 teamId: {
                     name: "teamId",
                     type: "String",
                     foreignKeyFor: [
                         "team"
-                    ]
+                    ] as readonly string[]
                 },
                 team: {
                     name: "team",
                     type: "Team",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("teamId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("teamId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "teamMembers", fields: ["teamId"], references: ["id"], onDelete: "Cascade" }
                 },
                 userId: {
@@ -768,26 +778,26 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "teamMembers", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatesAt: {
                     name: "updatesAt",
                     type: "DateTime",
                     updatedAt: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 }
             },
             idFields: ["id"],
@@ -802,25 +812,25 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }]
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
                 organizationId: {
                     name: "organizationId",
                     type: "String",
                     foreignKeyFor: [
                         "organization"
-                    ]
+                    ] as readonly string[]
                 },
                 organization: {
                     name: "organization",
                     type: "Organization",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "invitations", fields: ["organizationId"], references: ["id"], onDelete: "Cascade" }
                 },
                 email: {
                     name: "email",
                     type: "String",
-                    attributes: [{ name: "@email" }]
+                    attributes: [{ name: "@email" }] as readonly AttributeApplication[]
                 },
                 role: {
                     name: "role",
@@ -840,18 +850,18 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("inviterId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("inviterId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "invitations", fields: ["inviterId"], references: ["id"], onDelete: "Cascade" }
                 }
             },
             attributes: [
                 { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("invitation") }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -864,7 +874,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }]
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
                 expiresAt: {
                     name: "expiresAt",
@@ -897,12 +907,12 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "sessions", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
                 },
                 activeOrganizationId: {
@@ -919,7 +929,7 @@ export class SchemaType implements SchemaDef {
             attributes: [
                 { name: "@@unique", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("token")]) }] },
                 { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("session") }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" },
@@ -933,20 +943,20 @@ export class SchemaType implements SchemaDef {
                     name: "countryId",
                     type: "Int",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
-                    default: ExpressionUtils.call("autoincrement")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 code2: {
                     name: "code2",
                     type: "String",
                     unique: true,
-                    attributes: [{ name: "@unique" }, { name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(2) }, { name: "message", value: ExpressionUtils.literal("Code must be length 2 char") }] }]
+                    attributes: [{ name: "@unique" }, { name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(2) }, { name: "message", value: ExpressionUtils.literal("Code must be length 2 char") }] }] as readonly AttributeApplication[]
                 },
                 code3: {
                     name: "code3",
                     type: "String",
                     unique: true,
-                    attributes: [{ name: "@unique" }, { name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(3) }, { name: "message", value: ExpressionUtils.literal("ISO address code3 must be 3 char length ") }] }]
+                    attributes: [{ name: "@unique" }, { name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(3) }, { name: "message", value: ExpressionUtils.literal("ISO address code3 must be 3 char length ") }] }] as readonly AttributeApplication[]
                 },
                 number: {
                     name: "number",
@@ -987,20 +997,20 @@ export class SchemaType implements SchemaDef {
                     name: "regionId",
                     type: "Int",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
-                    default: ExpressionUtils.call("autoincrement")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 isoCountryId: {
                     name: "isoCountryId",
                     type: "Int",
                     foreignKeyFor: [
                         "country"
-                    ]
+                    ] as readonly string[]
                 },
                 country: {
                     name: "country",
                     type: "ISOCountry",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("isoCountryId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("countryId")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("isoCountryId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("countryId")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "regions", fields: ["isoCountryId"], references: ["countryId"] }
                 },
                 name: {
@@ -1020,38 +1030,38 @@ export class SchemaType implements SchemaDef {
                     name: "addressID",
                     type: "Int",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
-                    default: ExpressionUtils.call("autoincrement")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 buildingCode: {
                     name: "buildingCode",
                     type: "String",
                     optional: true,
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(10) }, { name: "message", value: ExpressionUtils.literal("building code can be up 10 characters") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(10) }, { name: "message", value: ExpressionUtils.literal("building code can be up 10 characters") }] }] as readonly AttributeApplication[]
                 },
                 room: {
                     name: "room",
                     type: "String",
                     optional: true,
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(10) }, { name: "message", value: ExpressionUtils.literal("room can be up 10 characters") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(10) }, { name: "message", value: ExpressionUtils.literal("room can be up 10 characters") }] }] as readonly AttributeApplication[]
                 },
                 careOf: {
                     name: "careOf",
                     type: "String",
                     optional: true,
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Care of be up 10 characters") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Care of be up 10 characters") }] }] as readonly AttributeApplication[]
                 },
                 street2: {
                     name: "street2",
                     type: "String",
                     optional: true,
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Street2 can be up 10 characters") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Street2 can be up 10 characters") }] }] as readonly AttributeApplication[]
                 },
                 street3: {
                     name: "street3",
                     type: "String",
                     optional: true,
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Street3 can be up 10 characters") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Street3 can be up 10 characters") }] }] as readonly AttributeApplication[]
                 },
                 houseNumber: {
                     name: "houseNumber",
@@ -1061,37 +1071,37 @@ export class SchemaType implements SchemaDef {
                 street: {
                     name: "street",
                     type: "String",
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Street must be upto 50 char") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Street must be upto 50 char") }] }] as readonly AttributeApplication[]
                 },
                 town: {
                     name: "town",
                     type: "String",
                     optional: true,
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Town can be up 10 characters") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Town can be up 10 characters") }] }] as readonly AttributeApplication[]
                 },
                 county: {
                     name: "county",
                     type: "String",
                     optional: true,
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("County can be up 10 characters") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("County can be up 10 characters") }] }] as readonly AttributeApplication[]
                 },
                 postCode: {
                     name: "postCode",
                     type: "String",
                     optional: true,
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(10) }, { name: "message", value: ExpressionUtils.literal("Post code must be up 10 characters") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(10) }, { name: "message", value: ExpressionUtils.literal("Post code must be up 10 characters") }] }] as readonly AttributeApplication[]
                 },
                 isoCountryId: {
                     name: "isoCountryId",
                     type: "Int",
                     foreignKeyFor: [
                         "country"
-                    ]
+                    ] as readonly string[]
                 },
                 country: {
                     name: "country",
                     type: "ISOCountry",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("isoCountryId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("countryId")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("isoCountryId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("countryId")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "addresses", fields: ["isoCountryId"], references: ["countryId"] }
                 },
                 partnerId: {
@@ -1108,7 +1118,7 @@ export class SchemaType implements SchemaDef {
                     name: "companys",
                     type: "Company",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("registereOfficeAddress") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("registereOfficeAddress") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "regsisteredAddress", name: "registereOfficeAddress" }
                 }
             },
@@ -1124,7 +1134,7 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }]
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
                 name: {
                     name: "name",
@@ -1149,15 +1159,15 @@ export class SchemaType implements SchemaDef {
                     name: "userId",
                     type: "String",
                     unique: true,
-                    attributes: [{ name: "@unique" }],
+                    attributes: [{ name: "@unique" }] as readonly AttributeApplication[],
                     foreignKeyFor: [
                         "user"
-                    ]
+                    ] as readonly string[]
                 },
                 user: {
                     name: "user",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "apiKey", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
                 },
                 refillInterval: {
@@ -1179,15 +1189,15 @@ export class SchemaType implements SchemaDef {
                     name: "enabled",
                     type: "Boolean",
                     optional: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(true) }] }],
-                    default: true
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(true) }] }] as readonly AttributeApplication[],
+                    default: true as FieldDefault
                 },
                 rateLimitEnabled: {
                     name: "rateLimitEnabled",
                     type: "Boolean",
                     optional: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(true) }] }],
-                    default: true
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(true) }] }] as readonly AttributeApplication[],
+                    default: true as FieldDefault
                 },
                 rateLimitTimeWindow: {
                     name: "rateLimitTimeWindow",
@@ -1240,7 +1250,7 @@ export class SchemaType implements SchemaDef {
             },
             attributes: [
                 { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("apikey") }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" },
@@ -1254,8 +1264,8 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 name: {
                     name: "name",
@@ -1274,12 +1284,12 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "glaccounts", fields: ["createdById"], references: ["id"] }
                 },
                 ArApRecAccount: {
@@ -1301,13 +1311,13 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 name: {
                     name: "name",
                     type: "String",
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Partner name is requiredd") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Partner name is requiredd") }] }] as readonly AttributeApplication[]
                 },
                 personType: {
                     name: "personType",
@@ -1323,12 +1333,12 @@ export class SchemaType implements SchemaDef {
                     type: "Int",
                     foreignKeyFor: [
                         "address"
-                    ]
+                    ] as readonly string[]
                 },
                 searchTerm: {
                     name: "searchTerm",
                     type: "String",
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Search term to find partners") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Search term to find partners") }] }] as readonly AttributeApplication[]
                 },
                 stripeId: {
                     name: "stripeId",
@@ -1337,45 +1347,45 @@ export class SchemaType implements SchemaDef {
                 address: {
                     name: "address",
                     type: "Address",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressID")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressID")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "partners", fields: ["addressId"], references: ["addressID"] }
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdById: {
                     name: "createdById",
                     type: "String",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "partners", fields: ["createdById"], references: ["id"] }
                 },
                 type: {
                     name: "type",
                     type: "String",
                     isDiscriminator: true,
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Type of partner") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Type of partner") }] }] as readonly AttributeApplication[]
                 }
             },
             attributes: [
                 { name: "@@delegate", args: [{ name: "discriminator", value: ExpressionUtils.field("type") }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -1391,14 +1401,14 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 name: {
                     name: "name",
                     type: "String",
                     originModel: "Partner",
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Partner name is requiredd") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(40) }, { name: "message", value: ExpressionUtils.literal("Partner name is requiredd") }] }] as readonly AttributeApplication[]
                 },
                 personType: {
                     name: "personType",
@@ -1417,13 +1427,13 @@ export class SchemaType implements SchemaDef {
                     originModel: "Partner",
                     foreignKeyFor: [
                         "address"
-                    ]
+                    ] as readonly string[]
                 },
                 searchTerm: {
                     name: "searchTerm",
                     type: "String",
                     originModel: "Partner",
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Search term to find partners") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Search term to find partners") }] }] as readonly AttributeApplication[]
                 },
                 stripeId: {
                     name: "stripeId",
@@ -1434,23 +1444,23 @@ export class SchemaType implements SchemaDef {
                     name: "address",
                     type: "Address",
                     originModel: "Partner",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressID")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressID")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "partners", fields: ["addressId"], references: ["addressID"] }
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Partner",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Partner",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdById: {
                     name: "createdById",
@@ -1458,13 +1468,13 @@ export class SchemaType implements SchemaDef {
                     originModel: "Partner",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Partner",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "partners", fields: ["createdById"], references: ["id"] }
                 },
                 type: {
@@ -1472,19 +1482,19 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     originModel: "Partner",
                     isDiscriminator: true,
-                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Type of partner") }] }]
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(20) }, { name: "message", value: ExpressionUtils.literal("Type of partner") }] }] as readonly AttributeApplication[]
                 },
                 reconAccountId: {
                     name: "reconAccountId",
                     type: "String",
                     foreignKeyFor: [
                         "reconAccount"
-                    ]
+                    ] as readonly string[]
                 },
                 reconAccount: {
                     name: "reconAccount",
                     type: "GlAccount",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("reconAccountId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("reconAccountId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "ArApRecAccount", fields: ["reconAccountId"], references: ["id"] }
                 },
                 companyId: {
@@ -1504,8 +1514,8 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "Int",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
-                    default: ExpressionUtils.call("autoincrement")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 name: {
                     name: "name",
@@ -1535,14 +1545,14 @@ export class SchemaType implements SchemaDef {
                     name: "companies",
                     type: "Company",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "fiscPeriodRule", name: "fiscPeriodRule" }
                 }
             },
             attributes: [
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationRole"]), "==", ExpressionUtils.literal("admin")) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "Int" }
@@ -1555,8 +1565,8 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "Int",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
-                    default: ExpressionUtils.call("autoincrement")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 name: {
                     name: "name",
@@ -1569,7 +1579,7 @@ export class SchemaType implements SchemaDef {
             },
             attributes: [
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("create,read") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "Int" }
@@ -1582,8 +1592,8 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "Int",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }],
-                    default: ExpressionUtils.call("autoincrement")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
                 companyCode: {
                     name: "companyCode",
@@ -1597,15 +1607,15 @@ export class SchemaType implements SchemaDef {
                     name: "registeredOfficeAddressId",
                     type: "Int",
                     unique: true,
-                    attributes: [{ name: "@unique" }],
+                    attributes: [{ name: "@unique" }] as readonly AttributeApplication[],
                     foreignKeyFor: [
                         "regsisteredAddress"
-                    ]
+                    ] as readonly string[]
                 },
                 regsisteredAddress: {
                     name: "regsisteredAddress",
                     type: "Address",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("registereOfficeAddress") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("registeredOfficeAddressId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressID")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("registereOfficeAddress") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("registeredOfficeAddressId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressID")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "companys", name: "registereOfficeAddress", fields: ["registeredOfficeAddressId"], references: ["addressID"] }
                 },
                 vatNumber: {
@@ -1618,12 +1628,12 @@ export class SchemaType implements SchemaDef {
                     type: "Int",
                     foreignKeyFor: [
                         "fiscPeriodRule"
-                    ]
+                    ] as readonly string[]
                 },
                 fiscPeriodRule: {
                     name: "fiscPeriodRule",
                     type: "FiscalPeriodRule",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("fiscalPeriodRuleId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("fiscalPeriodRuleId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "companies", name: "fiscPeriodRule", fields: ["fiscalPeriodRuleId"], references: ["id"] }
                 },
                 postPeriod: {
@@ -1648,7 +1658,7 @@ export class SchemaType implements SchemaDef {
                     id: true,
                     foreignKeyFor: [
                         "company"
-                    ]
+                    ] as readonly string[]
                 },
                 postingPeriodId: {
                     name: "postingPeriodId",
@@ -1656,24 +1666,24 @@ export class SchemaType implements SchemaDef {
                     id: true,
                     foreignKeyFor: [
                         "postPeriod"
-                    ]
+                    ] as readonly string[]
                 },
                 company: {
                     name: "company",
                     type: "Company",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("companyId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("companyId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "postPeriod", fields: ["companyId"], references: ["id"] }
                 },
                 postPeriod: {
                     name: "postPeriod",
                     type: "PostingPeriod",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("postingPeriodId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("postingPeriodId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "postPeriod", fields: ["postingPeriodId"], references: ["id"] }
                 }
             },
             attributes: [
                 { name: "@@id", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("companyId"), ExpressionUtils.field("postingPeriodId")]) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["companyId", "postingPeriodId"],
             uniqueFields: {
                 companyId_postingPeriodId: { companyId: { type: "Int" }, postingPeriodId: { type: "Int" } }
@@ -1686,21 +1696,21 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -1721,32 +1731,40 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organisationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
                     type: "String",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
-                    default: "General"
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }] as readonly AttributeApplication[],
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -1761,8 +1779,9 @@ export class SchemaType implements SchemaDef {
             },
             attributes: [
                 { name: "@@delegate", args: [{ name: "discriminator", value: ExpressionUtils.field("type") }] },
+                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organizationId")) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -1778,23 +1797,23 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -1819,36 +1838,45 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organisationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
-                    default: "General"
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }] as readonly AttributeApplication[],
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -1866,19 +1894,20 @@ export class SchemaType implements SchemaDef {
                     name: "balance",
                     type: "Decimal",
                     optional: true,
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 balances: {
                     name: "balances",
                     type: "FundBalance",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("genFundBal") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("genFundBal") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "generalFund", name: "genFundBal" }
                 }
             },
             attributes: [
+                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organizationId")) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -1892,23 +1921,23 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -1933,36 +1962,45 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organisationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
-                    default: "General"
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }] as readonly AttributeApplication[],
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -1997,9 +2035,10 @@ export class SchemaType implements SchemaDef {
                 }
             },
             attributes: [
+                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organizationId")) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] },
                 { name: "@@delegate", args: [{ name: "discriminator", value: ExpressionUtils.field("restrictedType") }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -2015,23 +2054,23 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -2056,36 +2095,45 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organisationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
-                    default: "General"
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }] as readonly AttributeApplication[],
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -2126,13 +2174,13 @@ export class SchemaType implements SchemaDef {
                     name: "designatedBal",
                     type: "Decimal",
                     optional: true,
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 currentBal: {
                     name: "currentBal",
                     type: "Decimal",
                     optional: true,
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 designatedDate: {
                     name: "designatedDate",
@@ -2148,7 +2196,7 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     foreignKeyFor: [
                         "designatedBy"
-                    ]
+                    ] as readonly string[]
                 },
                 designateMeeting: {
                     name: "designateMeeting",
@@ -2165,46 +2213,47 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "designationReleasedBy"
-                    ]
+                    ] as readonly string[]
                 },
                 designationCreatedById: {
                     name: "designationCreatedById",
                     type: "String",
                     foreignKeyFor: [
                         "designationCreatedBy"
-                    ]
+                    ] as readonly string[]
                 },
                 designatedBy: {
                     name: "designatedBy",
                     type: "User",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designatedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designatedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "designatedFund", name: "designatedBy", fields: ["designatedById"], references: ["id"] }
                 },
                 designationCreatedBy: {
                     name: "designationCreatedBy",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationCreate") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designationCreatedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationCreate") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designationCreatedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "createdDesignatedFund", name: "designationCreate", fields: ["designationCreatedById"], references: ["id"] }
                 },
                 designationReleasedBy: {
                     name: "designationReleasedBy",
                     type: "User",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationRelease") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designationReleasedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationRelease") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designationReleasedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "releasedDesignatedFund", name: "designationRelease", fields: ["designationReleasedById"], references: ["id"] }
                 },
                 balances: {
                     name: "balances",
                     type: "FundBalance",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBal") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBal") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "designatedfund", name: "designatedBal" }
                 }
             },
             attributes: [
+                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organizationId")) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -2218,23 +2267,23 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -2259,36 +2308,45 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organisationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
-                    default: "General"
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }] as readonly AttributeApplication[],
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -2329,19 +2387,20 @@ export class SchemaType implements SchemaDef {
                     name: "balance",
                     type: "Decimal",
                     optional: true,
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 balances: {
                     name: "balances",
                     type: "FundBalance",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("incomeFundBal") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("incomeFundBal") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "incomeFund", name: "incomeFundBal" }
                 }
             },
             attributes: [
+                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organizationId")) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -2355,23 +2414,23 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -2396,36 +2455,45 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organisationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
-                    default: "General"
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }] as readonly AttributeApplication[],
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -2466,38 +2534,39 @@ export class SchemaType implements SchemaDef {
                     name: "initalCapitalAmount",
                     type: "Decimal",
                     optional: true,
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 incomeBalance: {
                     name: "incomeBalance",
                     type: "Decimal",
                     optional: true,
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 capitalBalance: {
                     name: "capitalBalance",
                     type: "Decimal",
                     optional: true,
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 permanentIncomeBalances: {
                     name: "permanentIncomeBalances",
                     type: "FundBalance",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentIncomeFundBal") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentIncomeFundBal") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "permanentIncomefund", name: "permanentIncomeFundBal" }
                 },
                 permanentCapitalBalances: {
                     name: "permanentCapitalBalances",
                     type: "FundBalance",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentCapitalFundBal") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentCapitalFundBal") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "permanentCapitalfund", name: "permanentCapitalFundBal" }
                 }
             },
             attributes: [
+                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organizationId")) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -2511,23 +2580,23 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 fundName: {
                     name: "fundName",
@@ -2552,36 +2621,45 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     foreignKeyFor: [
                         "createdBy"
-                    ]
+                    ] as readonly string[]
                 },
-                organisationId: {
-                    name: "organisationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault,
                     foreignKeyFor: [
-                        "organisation"
-                    ]
+                        "organization"
+                    ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                teamId: {
+                    name: "teamId",
+                    type: "String",
+                    originModel: "Fund",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
+                },
+                organization: {
+                    name: "organization",
                     type: "Organization",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organisationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }],
-                    relation: { opposite: "funds", name: "fund", fields: ["organisationId"], references: ["id"], onDelete: "Cascade" }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
                     type: "String",
                     originModel: "Fund",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }],
-                    default: "General"
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("General") }] }] as readonly AttributeApplication[],
+                    default: "General" as FieldDefault
                 },
                 reviewDate: {
                     name: "reviewDate",
@@ -2622,44 +2700,45 @@ export class SchemaType implements SchemaDef {
                     name: "initalCapitalAmount",
                     type: "Decimal",
                     optional: true,
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 incomeAmount: {
                     name: "incomeAmount",
                     type: "Decimal",
                     optional: true,
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 incomeBalance: {
                     name: "incomeBalance",
                     type: "Decimal",
                     optional: true,
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 capitalBalance: {
                     name: "capitalBalance",
                     type: "Decimal",
                     optional: true,
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 expendableIncomeBalances: {
                     name: "expendableIncomeBalances",
                     type: "FundBalance",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableIncomeFundBal") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableIncomeFundBal") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "expendableIncomefund", name: "expendableIncomeFundBal" }
                 },
                 expendableCapitalBalances: {
                     name: "expendableCapitalBalances",
                     type: "FundBalance",
                     array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableCapitalFundBal") }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableCapitalFundBal") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "expendableCapitalfund", name: "expendableCapitalFundBal" }
                 }
             },
             attributes: [
+                { name: "@@deny", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "!=", ExpressionUtils.field("organizationId")) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -2672,8 +2751,8 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 fiscalPeriod: {
                     name: "fiscalPeriod",
@@ -2686,7 +2765,7 @@ export class SchemaType implements SchemaDef {
                 balance: {
                     name: "balance",
                     type: "Decimal",
-                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }]
+                    attributes: [{ name: "@db.Decimal", args: [{ name: "p", value: ExpressionUtils.literal(16) }, { name: "s", value: ExpressionUtils.literal(2) }] }] as readonly AttributeApplication[]
                 },
                 generalFundId: {
                     name: "generalFundId",
@@ -2694,13 +2773,13 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "generalFund"
-                    ]
+                    ] as readonly string[]
                 },
                 generalFund: {
                     name: "generalFund",
                     type: "GeneralFund",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("genFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("generalFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("genFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("generalFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "balances", name: "genFundBal", fields: ["generalFundId"], references: ["id"] }
                 },
                 incomeFundId: {
@@ -2709,13 +2788,13 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "incomeFund"
-                    ]
+                    ] as readonly string[]
                 },
                 incomeFund: {
                     name: "incomeFund",
                     type: "IncomeFund",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("incomeFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("incomeFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("incomeFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("incomeFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "balances", name: "incomeFundBal", fields: ["incomeFundId"], references: ["id"] }
                 },
                 designiatedFundId: {
@@ -2724,13 +2803,13 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "designatedfund"
-                    ]
+                    ] as readonly string[]
                 },
                 designatedfund: {
                     name: "designatedfund",
                     type: "DesignatedFund",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designiatedFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designatedBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("designiatedFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "balances", name: "designatedBal", fields: ["designiatedFundId"], references: ["id"] }
                 },
                 expendableIncomeFundId: {
@@ -2739,13 +2818,13 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "expendableIncomefund"
-                    ]
+                    ] as readonly string[]
                 },
                 expendableIncomefund: {
                     name: "expendableIncomefund",
                     type: "EndownmentExpendable",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableIncomeFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("expendableIncomeFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableIncomeFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("expendableIncomeFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "expendableIncomeBalances", name: "expendableIncomeFundBal", fields: ["expendableIncomeFundId"], references: ["id"] }
                 },
                 expendableCapitalFundId: {
@@ -2754,13 +2833,13 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "expendableCapitalfund"
-                    ]
+                    ] as readonly string[]
                 },
                 expendableCapitalfund: {
                     name: "expendableCapitalfund",
                     type: "EndownmentExpendable",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableCapitalFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("expendableCapitalFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableCapitalFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("expendableCapitalFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "expendableCapitalBalances", name: "expendableCapitalFundBal", fields: ["expendableCapitalFundId"], references: ["id"] }
                 },
                 permanentIncomeFundId: {
@@ -2769,13 +2848,13 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "permanentIncomefund"
-                    ]
+                    ] as readonly string[]
                 },
                 permanentIncomefund: {
                     name: "permanentIncomefund",
                     type: "EndownmentPermanent",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentIncomeFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("permanentIncomeFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentIncomeFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("permanentIncomeFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "permanentIncomeBalances", name: "permanentIncomeFundBal", fields: ["permanentIncomeFundId"], references: ["id"] }
                 },
                 permanentCapitalFundId: {
@@ -2784,13 +2863,13 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     foreignKeyFor: [
                         "permanentCapitalfund"
-                    ]
+                    ] as readonly string[]
                 },
                 permanentCapitalfund: {
                     name: "permanentCapitalfund",
                     type: "EndownmentPermanent",
                     optional: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentCapitalFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("permanentCapitalFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }],
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentCapitalFundBal") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("permanentCapitalFundId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "permanentCapitalBalances", name: "permanentCapitalFundBal", fields: ["permanentCapitalFundId"], references: ["id"] }
                 }
             },
@@ -2806,20 +2885,20 @@ export class SchemaType implements SchemaDef {
                     name: "id",
                     type: "String",
                     id: true,
-                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }],
-                    default: ExpressionUtils.call("uuid")
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }],
-                    default: ExpressionUtils.call("now")
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
                 updatedAt: {
                     name: "updatedAt",
                     type: "DateTime",
                     updatedAt: true,
-                    attributes: [{ name: "@updatedAt" }]
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
                 },
                 ref: {
                     name: "ref",
@@ -2840,7 +2919,7 @@ export class SchemaType implements SchemaDef {
             },
             attributes: [
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("create") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["role"]), "in", ExpressionUtils.array("Role", [ExpressionUtils.literal("RECEIVABLE_POSTER"), ExpressionUtils.literal("PAYABLE_POSTER"), ExpressionUtils.literal("GL_POSTER")])) }] }
-            ],
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
@@ -2854,7 +2933,7 @@ export class SchemaType implements SchemaDef {
                 userId: {
                     name: "userId",
                     type: "String",
-                    attributes: [{ name: "@id" }]
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
                 organizationId: {
                     name: "organizationId",
@@ -2873,7 +2952,7 @@ export class SchemaType implements SchemaDef {
             },
             attributes: [
                 { name: "@@auth" }
-            ]
+            ] as readonly AttributeApplication[]
         }
     } as const;
     enums = {

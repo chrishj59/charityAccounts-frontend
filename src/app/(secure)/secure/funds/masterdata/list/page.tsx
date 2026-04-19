@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { RedirectType } from 'next/navigation';
 import { redirect } from 'next/navigation';
+import ListFundsUI from '~/src/components/client/funds/listFunds';
 import { auth } from '~/src/lib/auth';
 import { authDb, getUserDb } from '~/src/lib/db';
 import { userContextType } from '~/src/types/helper';
@@ -25,7 +26,7 @@ export default async function ListFundsPage() {
   return (
     <>
       <div>
-        List funds page funds {`Funds ${JSON.stringify(funds, null, 2)}`}
+        <ListFundsUI fundList={funds} />
       </div>
     </>
   );

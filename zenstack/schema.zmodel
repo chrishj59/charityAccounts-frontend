@@ -480,20 +480,19 @@ model Fund {
   @@delegate(type)
   //restricted by organisation
   // @@deny('all', auth() == null)
-  @@deny('all', auth().organizationId != organizationId)
-
-  @@allow('all', true)
-  //@@allow('all', auth().organizationRole == 'admin')
+  // @@deny('all', auth().organizationId != organizationId)
+  @@allow('all', auth().organizationId == organizationId)
   
-
-  // add role that can create/ update/ view
+  
 }
 
 model GeneralFund extends Fund {
 
   balance  Decimal?      @db.Decimal(16,  2) @default(0)
   balances FundBalance[] @relation(name: 'genFundBal')
+   @@allow('all', auth().organizationId == organizationId)
 }
+
 model RestrictedFund extends Fund {
   projectEndDate      DateTime
   restrictedType      String

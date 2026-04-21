@@ -1704,7 +1704,8 @@ export class SchemaType implements SchemaDef {
                 balance: {
                     name: "balance",
                     type: "Decimal",
-                    optional: true
+                    optional: true,
+                    default: 0 as FieldDefault
                 },
                 balances: {
                     name: "balances",

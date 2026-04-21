@@ -3,10 +3,13 @@
 import { auth } from '~/src/lib/auth';
 import { FundNewFormValues } from '~/src/zodSchema/fund-new-schema';
 import { FundType, GeneralFund } from '~/zenstack/models';
-import { authDb } from '~/src/lib/db';
+import { authDb, db, getUserDb } from '~/src/lib/db';
 import { responseType, statusEnum } from '~/src/types/helper';
+import Decimal from 'decimal.js';
+import { AddressGroupByArgs } from '../../../../zenstack/input';
+import { ORMError } from '@zenstackhq/orm';
 
-const generalFund = async (
+const addGeneralFund = async (
   fundType: string,
   fund: FundNewFormValues,
 
@@ -22,17 +25,30 @@ const generalFund = async (
       objective: fund.objective,
       reviewDate: fund.reviewDate,
       managedById: userId,
-      organisationId: orgId,
+      organizationId: orgId,
+      // balance: new Decimal(0),
     },
   };
   try {
-    const resp = await authDb.generalFund.create(payload);
+    const userDb = await getUserDb();
+
+    console.log(`payload ${JSON.stringify(payload, null, 2)}`);
+    const funds = await userDb.generalFund.findMany();
+    console.log(`funds in add ${JSON.stringify(funds, null, 2)}`);
+
+    const resp = await userDb.generalFund.create(payload);
 
     return {
       status: statusEnum.SUCCESS,
       message: `Created General fund ${payload.data.fundName}`,
     };
   } catch (error) {
+    if (error instanceof ORMError) {
+      console.log(
+        `Permission error ${JSON.stringify(error.rejectedByPolicyReason)}`,
+      );
+      console.log(`error cause ${JSON.stringify(error.cause)}`);
+    }
     console.error(`Error from create General Fund ${JSON.stringify(error)}`);
     return {
       status: statusEnum.ERROR,
@@ -97,7 +113,7 @@ const incomeFund = async (
       objective: fund.objective,
       reviewDate: fund.reviewDate,
       managedById: userId,
-      organisationId: orgId,
+      organizationId: orgId,
       designatedDate: fund.designatedDate ? fund.designatedDate : new Date(),
       designateMeeting: fund.designatedMeeting,
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
@@ -175,7 +191,7 @@ const permanentFund = async (
       objective: fund.objective,
       reviewDate: fund.reviewDate,
       managedById: userId,
-      organisationId: orgId,
+      organizationId: orgId,
       designatedDate: fund.designatedDate ? fund.designatedDate : new Date(),
       designateMeeting: fund.designatedMeeting,
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
@@ -206,7 +222,7 @@ export async function fundAddAction(
   const fundType = fund.fundType;
   switch (fundType) {
     case 'General':
-      return generalFund(fundType, fund, userId, orgId);
+      return addGeneralFund(fundType, fund, userId, orgId);
 
     case 'Designated':
       return designatedFund(fundType, fund, userId, orgId);

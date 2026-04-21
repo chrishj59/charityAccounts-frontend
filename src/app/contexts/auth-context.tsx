@@ -39,7 +39,7 @@ const defaultOrg = {
   organisationCategory: organisationCategoryEnum.Company,
   organisationIdType: organisationIdTypeEnum.CompanyNum,
   displayName: '',
-  organisationId: '',
+  organizationId: '',
   address: address,
   created: false,
 };

@@ -40,7 +40,7 @@ export interface RationesUser {
 export interface RationesOrganisation {
   organisationCategory: organisationCategoryType;
   organisationIdType: organisationIdType;
-  organisationId: string;
+  organizationId: string;
   displayName: string;
   address: Address;
   created: boolean;

@@ -38,9 +38,9 @@ async function getClient() {
   let organizationRole: string | undefined = undefined;
   const { session } = sessionResult;
 
-  if (session.activeOrganizationId) {
+  if (session.organizationId) {
     // if there's an active orgId, get the role of the user in the org
-    organizationId = session.activeOrganizationId;
+    organizationId = session.organizationId;
     const org = await auth.api.getFullOrganization({ headers: reqHeaders });
     if (org?.members) {
       const myMember = org.members.find((m) => m.userId === session.userId);

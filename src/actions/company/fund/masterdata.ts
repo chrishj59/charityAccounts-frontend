@@ -3,7 +3,7 @@
 import { auth } from '~/src/lib/auth';
 import { FundNewFormValues } from '~/src/zodSchema/fund-new-schema';
 import { FundType, GeneralFund } from '~/zenstack/models';
-import { authDb, db, getUserDb } from '~/src/lib/db';
+import { authDb, db, getDb, getUserDb } from '~/src/lib/db';
 import { responseType, statusEnum } from '~/src/types/helper';
 import Decimal from 'decimal.js';
 import { AddressGroupByArgs } from '../../../../zenstack/input';
@@ -74,7 +74,7 @@ const designatedFund = async (
       objective: fund.objective,
       reviewDate: fund.reviewDate,
       managedById: userId,
-      organisationId: orgId,
+      organizationId: orgId,
       designatedDate: fund.designatedDate ? fund.designatedDate : new Date(),
       designateMeeting: fund.designatedMeeting,
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
@@ -83,12 +83,21 @@ const designatedFund = async (
     },
   };
   try {
-    await authDb.designatedFund.create(payload);
+    // const userDb = await getUserDb();
+    const userDb = await getDb();
+    await userDb.designatedFund.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Designated fund ${payload.data.fundName}`,
     };
   } catch (error) {
+    if (error instanceof ORMError) {
+      console.log(
+        `Permission error ${JSON.stringify(error.rejectedByPolicyReason)}`,
+      );
+      console.log(`error cause ${JSON.stringify(error.cause)}`);
+    }
+
     return {
       status: statusEnum.ERROR,
       message: `Could not create Designated Fund ${payload.data.fundName}`,
@@ -122,12 +131,19 @@ const incomeFund = async (
     },
   };
   try {
-    await authDb.designatedFund.create(payload);
+    const userDb = await getDb();
+    await userDb.designatedFund.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Designated fund ${payload.data.fundName}`,
     };
   } catch (error) {
+    if (error instanceof ORMError) {
+      console.log(
+        `Permission error ${JSON.stringify(error.rejectedByPolicyReason)}`,
+      );
+      console.log(`error cause ${JSON.stringify(error.cause)}`);
+    }
     return {
       status: statusEnum.ERROR,
       message: `Could not create Designated Fund ${payload.data.fundName}`,
@@ -152,21 +168,28 @@ const expendableFund = async (
       objective: fund.objective,
       reviewDate: fund.reviewDate,
       managedById: userId,
-      organisationId: orgId,
-      designatedDate: fund.designatedDate ? fund.designatedDate : new Date(),
-      designateMeeting: fund.designatedMeeting,
+      organizationId: orgId,
+      nextDonarReviewDate: fund.nextDonarReviewDate
+        ? fund.nextDonarReviewDate
+        : new Date(),
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
-      designationCreatedById: userId,
-      designatedById: userId,
+      // returnSurplus: fund.returnSurplus,
     },
   };
   try {
-    await authDb.endownmentExpendable.create(payload);
+    const userDb = await getDb();
+    await userDb.endownmentExpendable.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Designated fund ${payload.data.fundName}`,
     };
   } catch (error) {
+    if (error instanceof ORMError) {
+      console.log(
+        `Permission error ${JSON.stringify(error.rejectedByPolicyReason)}`,
+      );
+      console.log(`error cause ${JSON.stringify(error.cause)}`);
+    }
     return {
       status: statusEnum.ERROR,
       message: `Could not create Designated Fund ${payload.data.fundName}`,
@@ -192,20 +215,27 @@ const permanentFund = async (
       reviewDate: fund.reviewDate,
       managedById: userId,
       organizationId: orgId,
-      designatedDate: fund.designatedDate ? fund.designatedDate : new Date(),
-      designateMeeting: fund.designatedMeeting,
+      nextDonarReviewDate: fund.nextDonarReviewDate
+        ? fund.nextDonarReviewDate
+        : new Date(),
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
-      designationCreatedById: userId,
-      designatedById: userId,
+      returnSurplus: fund.returnSurplus,
     },
   };
   try {
-    await authDb.endownmentPermanent.create(payload);
+    const userDb = await getDb();
+    await userDb.endownmentPermanent.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Designated fund ${payload.data.fundName}`,
     };
   } catch (error) {
+    if (error instanceof ORMError) {
+      console.log(
+        `Permission error ${JSON.stringify(error.rejectedByPolicyReason)}`,
+      );
+      console.log(`error cause ${JSON.stringify(error.cause)}`);
+    }
     return {
       status: statusEnum.ERROR,
       message: `Could not create Designated Fund ${payload.data.fundName}`,

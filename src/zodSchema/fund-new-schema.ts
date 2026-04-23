@@ -37,29 +37,31 @@ export const fundNewSchema = z
         });
       }
 
-      if (values.designatedMeeting === '') {
+      // if (values.designatedMeeting === '') {
+      //   context.addIssue({
+      //     code: 'custom',
+      //     message: 'Fund designation must be approved in Mangement meeting',
+      //     path: ['designatedMeeting'],
+      //   });
+      // }
+      // if (
+      //   values.fundType === 'Income' ||
+      //   values.fundType === 'Expendable' ||
+      //   values.fundType === 'Permanent'
+      // ) {
+      if (values.donar === '') {
         context.addIssue({
           code: 'custom',
-          message: 'Fund designation must be approved in Mangement meeting',
-          path: ['designatedMeeting'],
+          message: 'Donar is required',
+          path: ['donar'],
         });
-      }
-      if (
-        values.fundType === 'Income' ||
-        values.fundType === 'Expendable' ||
-        values.fundType === 'Permanent'
-      ) {
-        if (values.donar === '') {
-          context.addIssue({
-            code: 'custom',
-            message: 'Donar is required',
-            path: ['donar'],
-          });
-        }
       }
       return;
     }
     if (values.fundType === 'Designated') {
+      console.warn(
+        `in Designated fund values ${JSON.stringify(values, null, 2)}`,
+      );
       if (!values.objective) {
         context.addIssue({
           code: 'custom',

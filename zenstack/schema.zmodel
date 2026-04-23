@@ -490,7 +490,7 @@ model GeneralFund extends Fund {
 
   balance  Decimal?      @db.Decimal(16,  2) @default(0)
   balances FundBalance[] @relation(name: 'genFundBal')
-   @@allow('all', auth().organizationId == organizationId)
+  @@allow('all', auth().organizationId == organizationId)
 }
 
 model RestrictedFund extends Fund {
@@ -498,7 +498,7 @@ model RestrictedFund extends Fund {
   restrictedType      String
   nextDonarReviewDate DateTime?
   returnSurplus       Boolean?
-
+  // @@allow('all', auth().organizationId == organizationId)
   @@delegate(restrictedType)
 }
 model DesignatedFund extends RestrictedFund {

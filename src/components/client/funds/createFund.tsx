@@ -170,6 +170,8 @@ export default function CreateFund({ userId, orgId }: props) {
   };
 
   const handleObjectiveChange = async (e: string) => {
+    setValue('objective', e);
+
     const valid = await trigger(['name', 'fundType', 'objective']);
     if (valid) {
       setCanSave(true);

@@ -17,10 +17,14 @@ export const db = new ZenStackClient(schema, {
     }),
   }),
   log: ['query', 'error'],
-}).$use(defineCachePlugin({ provider: new MemoryCacheProvider() }));
+});
+// .$use(defineCachePlugin({ provider: new MemoryCacheProvider() }));
 
 export const authDb = db.$use(new PolicyPlugin());
 
+export const getDb = async () => {
+  return db;
+};
 export const getUserDb = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),

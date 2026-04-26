@@ -1,6 +1,6 @@
 // Component showing Todo list for the current user
 
-import { authDb } from '~/src/server/db';
+import { authDb } from '~/src/lib/db';
 // import CreateList from '../client/CreateList';
 import Link from 'next/link';
 

@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js';
 
 export type GeneralFundUI = {
-  balance: Decimal;
+  balance: number;
 };
 
 export type FundUI = {

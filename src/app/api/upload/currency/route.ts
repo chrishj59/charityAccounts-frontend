@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import Papa from 'papaparse';
+// import Papa from 'papaparse';
 
 type CsvRow = Record<string, string>;
 
@@ -13,12 +13,12 @@ export async function POST(req: Request) {
 
   const text = await file.text();
 
-  const result = Papa.parse<CsvRow>(text, {
-    header: true,
-    skipEmptyLines: true,
-  });
+  // const result = Papa.parse<CsvRow>(text, {
+  //   header: true,
+  //   skipEmptyLines: true,
+  // });
 
   return NextResponse.json({
-    data: result.data,
+    data: text, //result.data,
   });
 }

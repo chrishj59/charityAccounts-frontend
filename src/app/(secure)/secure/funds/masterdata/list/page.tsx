@@ -3,7 +3,7 @@ import { RedirectType } from 'next/navigation';
 import { redirect } from 'next/navigation';
 import ListFundsUI from '~/src/components/client/funds/listFunds';
 import { auth } from '~/src/lib/auth';
-import { authDb, getUserDb } from '~/src/lib/db';
+import { authDb } from '~/src/lib/db';
 import { userContextType } from '~/src/types/helper';
 import { Fund } from '~/zenstack/models';
 
@@ -17,9 +17,7 @@ export default async function ListFundsPage() {
     redirect('/sign-in', RedirectType.replace);
   }
 
-  const userDb = await getUserDb();
-
-  const funds: Fund[] = await userDb.fund.findMany();
+  const funds: Fund[] = await authDb.fund.findMany();
 
   console.log(`funds from DB${JSON.stringify(funds, null, 2)}`);
 

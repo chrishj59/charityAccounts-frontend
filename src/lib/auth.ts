@@ -8,7 +8,7 @@ import {
   organization,
   lastLoginMethod,
 } from 'better-auth/plugins';
-import { db } from './db';
+import { authDb, allDb, db } from './db';
 import { reactInvitationEmail } from './email/invitation';
 
 import { ses } from './email/aws-ses';
@@ -24,12 +24,38 @@ import { awsVerificationEmail } from '../actions/send-email/send-verification';
 import { resend } from './email/resend';
 import { TruckElectric } from 'lucide-react';
 import { label } from 'framer-motion/client';
+import { ORMError } from '@zenstackhq/orm';
 
 const from = process.env.BETTER_AUTH_EMAIL || 'delivered@resend.dev';
 const to = process.env.TEST_EMAIL || '';
 
 const getOrgId = async (userId: string) => {
-  return '7MB5idvLxFQ9UfZVckSrcki1rKxnz6vT';
+  console.log(`getOrgId called with ${userId}`);
+  const orgId = await db.member.findFirst({
+    select: { organizationId: true },
+    where: { userId: userId },
+  });
+  console.log(`orgId used in custom Session ${JSON.stringify(orgId)}`);
+  return orgId; // '7MB5idvLxFQ9UfZVckSrcki1rKxnz6vT';
+};
+
+const getDisplayName = async (userId: string) => {
+  try {
+    const displayName = await db.user.findFirst({
+      select: { displayName: true },
+      where: { id: userId },
+    });
+    return displayName;
+  } catch (err) {
+    if (err instanceof ORMError) {
+      console.log(
+        `Permission Error ${JSON.stringify(err.rejectedByPolicyReason)}`,
+      );
+      console.log(
+        `sql ${JSON.stringify(err.sql)} params ${JSON.stringify(err.sqlParams)}`,
+      );
+    }
+  }
 };
 export const auth = betterAuth({
   appName: 'Rationes-Charitatis',
@@ -236,13 +262,16 @@ export const auth = betterAuth({
     customSession(async ({ user, session }) => {
       // const roles = findUserRoles(session.session.userId);
       const organizationId = await getOrgId(user.id);
+
       return {
         // roles,
         // user: {
         //   ...user,
         //   // newField: "newField",
         // }
-        user,
+        user: {
+          ...user,
+        },
         session: {
           ...session,
           organizationId,

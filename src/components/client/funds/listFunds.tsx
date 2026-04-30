@@ -41,7 +41,7 @@ export default function ListFundsUI({ fundList }: FundListProps) {
       };
       if (_fundDB.type === 'GeneralFund') {
         const _generalFund: GeneralFundUI = {
-          balance: _fundDB.balance ? _fundDB.balance : new Decimal(0),
+          balance: _fundDB.balance ? _fundDB.balance : Number(0),
         };
         _fund.generalFund = _generalFund;
 

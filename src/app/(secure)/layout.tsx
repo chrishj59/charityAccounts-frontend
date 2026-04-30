@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
-import { unauthorized } from 'next/navigation';
+import { redirect, RedirectType, unauthorized } from 'next/navigation';
 import { Toolbar } from 'primereact/toolbar';
 import Layout from '~/src/layout/layout';
 import { auth } from '~/src/lib/auth';
+import { client, useSession } from '~/src/lib/auth-client';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -33,11 +34,18 @@ export const metadata: Metadata = {
 
 export default async function SecureLayout({ children }: MainLayoutProps) {
   console.log('MainLayout (app/(secure)/layout');
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect('/sign-in', RedirectType.replace);
+  }
 
   const centerContent = (
     // <div className='flex flex-wrap align-items-center gap-3'>
     <span className=' font-bold text-primary-600 text-2xl'>
-      Rationes Charitatis
+      Rationes Charitatis - {session.user.name}
     </span>
     // </div>
   );

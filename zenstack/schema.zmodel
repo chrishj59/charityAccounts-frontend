@@ -257,6 +257,7 @@ model Member {
   
   updatedAt       DateTime @updatedAt
   @@map("member")
+  @@allow('all', true)
 }
 
 model TeamMember {
@@ -475,12 +476,9 @@ model Fund {
   reviewDate     DateTime?
   type           String
 
-
-
   @@delegate(type)
   //restricted by organisation
-  // @@deny('all', auth() == null)
-  // @@deny('all', auth().organizationId != organizationId)
+
   @@allow('all', auth().organizationId == organizationId)
   
   
@@ -488,7 +486,8 @@ model Fund {
 
 model GeneralFund extends Fund {
 
-  balance  Decimal?      @db.Decimal(16,  2) @default(0)
+  balance  Int      @db.Integer @default(0)
+  currCode String   @default('')
   balances FundBalance[] @relation(name: 'genFundBal')
   @@allow('all', auth().organizationId == organizationId)
 }
@@ -498,12 +497,14 @@ model RestrictedFund extends Fund {
   restrictedType      String
   nextDonarReviewDate DateTime?
   returnSurplus       Boolean?
-  // @@allow('all', auth().organizationId == organizationId)
+  @@allow('all', auth().organizationId == organizationId)
   @@delegate(restrictedType)
 }
 model DesignatedFund extends RestrictedFund {
-  designatedBal           Decimal?      @db.Decimal(16,  2)
-  currentBal              Decimal?      @db.Decimal(16,  2)
+  designatedBal   Int      @db.Integer @default(0)
+  currCodeDesignatedBal String   @default('')
+  currentBal Int      @db.Integer @default(0)
+  currCodecurrentBal String   @default('')
   designatedDate          DateTime
   releasedDate            DateTime?
   designatedById          String
@@ -515,35 +516,48 @@ model DesignatedFund extends RestrictedFund {
   designationCreatedBy    User          @relation(name: 'designationCreate', fields: [designationCreatedById], references: [id])
   designationReleasedBy   User?         @relation(name: 'designationRelease', fields: [designationReleasedById], references: [id])
   balances                FundBalance [] @relation('designatedBal')
+  @@allow('all', auth().organizationId == organizationId)
 }
 
 model IncomeFund extends RestrictedFund {
-  balance  Decimal?      @db.Decimal(16,  2)
+  balance  Int      @db.Integer @default(0)
+  currCodeBalance String   @default('')
   balances FundBalance[] @relation('incomeFundBal')
+  @@allow('all', auth().organizationId == organizationId)
 }
 
 model EndownmentPermanent extends RestrictedFund {
-  initalCapitalAmount      Decimal?      @db.Decimal(16,  2)
-  incomeBalance            Decimal?      @db.Decimal(16,  2)
-  capitalBalance           Decimal?      @db.Decimal(16,  2)
+  initalCapitalAmount      Int      @db.Integer @default(0)
+  currCodeCurrentCapitalAmount String   @default('')
+  incomeBalance            Int      @db.Integer @default(0)
+  currCodeIncomeBal String   @default('')
+  capitalBalance           Int      @db.Integer @default(0)
+  currCodeCapitalBal String   @default('')
   permanentIncomeBalances  FundBalance[] @relation('permanentIncomeFundBal')
   permanentCapitalBalances FundBalance[] @relation('permanentCapitalFundBal')
+  @@allow('all', auth().organizationId == organizationId)
 }
 
 model EndownmentExpendable extends RestrictedFund {
-  initalCapitalAmount       Decimal?      @db.Decimal(16,  2)
-  incomeAmount              Decimal?      @db.Decimal(16,  2)
-  incomeBalance             Decimal?      @db.Decimal(16,  2)
-  capitalBalance            Decimal?      @db.Decimal(16,  2)
+  initalCapital       Int      @db.Integer @default(0)
+  currCodeInitialCapital String   @default('')
+  incomeAmount              Int      @db.Integer @default(0)
+  currCodeIncomeAmount String   @default('')
+  incomeBalance             Int      @db.Integer @default(0)
+  currCodeIncomeBalance String   @default('')
+  capitalBalance            Int      @db.Integer @default(0)
+  currCodeCapitalBal String   @default('')
   expendableIncomeBalances  FundBalance[] @relation('expendableIncomeFundBal')
   expendableCapitalBalances FundBalance[] @relation('expendableCapitalFundBal')
+  @@allow('all', auth().organizationId == organizationId)
 }
 
 model FundBalance {
   id                      String                @id @default(uuid())
   fiscalPeriod            Int
   fiscalYear              Int
-  balance                 Decimal               @db.Decimal(16,  2)
+  balance                 Int      @db.Integer @default(0)
+  currCodeBalance String   @default('')
   generalFundId           String?
   generalFund             GeneralFund?          @relation(name: 'genFundBal',  fields: [generalFundId], references: [id])
 

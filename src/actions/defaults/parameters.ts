@@ -1,3 +1,4 @@
+'use server';
 import { Parameter } from '~/zenstack/models';
 
 import { authDb } from '~/src/lib/db';
@@ -11,7 +12,7 @@ async function fetchParameters(name?: string): Promise<Parameter[]> {
   }
 }
 
-export function getParameters(name?: string) {
+export async function getParameters(name?: string) {
   const key = name ?? 'ALL';
   return unstable_cache(
     async (): Promise<Parameter[]> => {

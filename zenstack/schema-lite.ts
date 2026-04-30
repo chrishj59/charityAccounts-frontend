@@ -1703,9 +1703,13 @@ export class SchemaType implements SchemaDef {
                 },
                 balance: {
                     name: "balance",
-                    type: "Decimal",
-                    optional: true,
+                    type: "Int",
                     default: 0 as FieldDefault
+                },
+                currCode: {
+                    name: "currCode",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 balances: {
                     name: "balances",
@@ -1957,13 +1961,23 @@ export class SchemaType implements SchemaDef {
                 },
                 designatedBal: {
                     name: "designatedBal",
-                    type: "Decimal",
-                    optional: true
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                currCodeDesignatedBal: {
+                    name: "currCodeDesignatedBal",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 currentBal: {
                     name: "currentBal",
-                    type: "Decimal",
-                    optional: true
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                currCodecurrentBal: {
+                    name: "currCodecurrentBal",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 designatedDate: {
                     name: "designatedDate",
@@ -2152,8 +2166,13 @@ export class SchemaType implements SchemaDef {
                 },
                 balance: {
                     name: "balance",
-                    type: "Decimal",
-                    optional: true
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                currCodeBalance: {
+                    name: "currCodeBalance",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 balances: {
                     name: "balances",
@@ -2285,18 +2304,33 @@ export class SchemaType implements SchemaDef {
                 },
                 initalCapitalAmount: {
                     name: "initalCapitalAmount",
-                    type: "Decimal",
-                    optional: true
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                currCodeCurrentCapitalAmount: {
+                    name: "currCodeCurrentCapitalAmount",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 incomeBalance: {
                     name: "incomeBalance",
-                    type: "Decimal",
-                    optional: true
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                currCodeIncomeBal: {
+                    name: "currCodeIncomeBal",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 capitalBalance: {
                     name: "capitalBalance",
-                    type: "Decimal",
-                    optional: true
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                currCodeCapitalBal: {
+                    name: "currCodeCapitalBal",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 permanentIncomeBalances: {
                     name: "permanentIncomeBalances",
@@ -2432,25 +2466,45 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "RestrictedFund"
                 },
-                initalCapitalAmount: {
-                    name: "initalCapitalAmount",
-                    type: "Decimal",
-                    optional: true
+                initalCapital: {
+                    name: "initalCapital",
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                currCodeInitialCapital: {
+                    name: "currCodeInitialCapital",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 incomeAmount: {
                     name: "incomeAmount",
-                    type: "Decimal",
-                    optional: true
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                currCodeIncomeAmount: {
+                    name: "currCodeIncomeAmount",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 incomeBalance: {
                     name: "incomeBalance",
-                    type: "Decimal",
-                    optional: true
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                currCodeIncomeBalance: {
+                    name: "currCodeIncomeBalance",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 capitalBalance: {
                     name: "capitalBalance",
-                    type: "Decimal",
-                    optional: true
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                currCodeCapitalBal: {
+                    name: "currCodeCapitalBal",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 expendableIncomeBalances: {
                     name: "expendableIncomeBalances",
@@ -2489,7 +2543,13 @@ export class SchemaType implements SchemaDef {
                 },
                 balance: {
                     name: "balance",
-                    type: "Decimal"
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                currCodeBalance: {
+                    name: "currCodeBalance",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 generalFundId: {
                     name: "generalFundId",

@@ -1,13 +1,11 @@
 'use server';
 
-import { auth } from '~/src/lib/auth';
 import { FundNewFormValues } from '~/src/zodSchema/fund-new-schema';
-import { FundType, GeneralFund } from '~/zenstack/models';
-import { authDb, db, getDb, getUserDb } from '~/src/lib/db';
+
+import { getUserDb } from '~/src/lib/db';
 import { responseType, statusEnum } from '~/src/types/helper';
-import Decimal from 'decimal.js';
-import { AddressGroupByArgs } from '../../../../zenstack/input';
-import { ORMError } from '@zenstackhq/orm';
+
+import { ORMError, ORMErrorReason } from '@zenstackhq/orm';
 
 const addGeneralFund = async (
   fundType: string,
@@ -16,6 +14,7 @@ const addGeneralFund = async (
   userId: string,
   orgId: string,
 ): Promise<responseType> => {
+  const userDb = getUserDb(userId, orgId);
   const payload = {
     data: {
       fundName: fund.name,
@@ -30,13 +29,19 @@ const addGeneralFund = async (
     },
   };
   try {
-    const userDb = await getUserDb();
-
     console.log(`payload ${JSON.stringify(payload, null, 2)}`);
     const funds = await userDb.generalFund.findMany();
     console.log(`funds in add ${JSON.stringify(funds, null, 2)}`);
-
-    const resp = await userDb.generalFund.create(payload);
+    try {
+      const resp = await userDb.generalFund.create(payload);
+    } catch (err) {
+      if (err instanceof ORMError) {
+        console.log(`Error reason ${err.reason}`);
+        console.log(`Model with issue ${err.model}`);
+        console.log(`Permission error ${err.rejectedByPolicyReason}`);
+        console.log(`Cause ${err.cause}`);
+      }
+    }
 
     return {
       status: statusEnum.SUCCESS,
@@ -65,6 +70,7 @@ const designatedFund = async (
   userId: string,
   orgId: string,
 ): Promise<responseType> => {
+  const userDb = getUserDb(userId, orgId);
   const payload = {
     data: {
       fundName: fund.name,
@@ -83,8 +89,6 @@ const designatedFund = async (
     },
   };
   try {
-    // const userDb = await getUserDb();
-    const userDb = await getDb();
     await userDb.designatedFund.create(payload);
     return {
       status: statusEnum.SUCCESS,
@@ -113,6 +117,8 @@ const incomeFund = async (
   userId: string,
   orgId: string,
 ): Promise<responseType> => {
+  const userDb = getUserDb(userId, orgId);
+
   const payload = {
     data: {
       fundName: fund.name,
@@ -123,16 +129,15 @@ const incomeFund = async (
       reviewDate: fund.reviewDate,
       managedById: userId,
       organizationId: orgId,
-      designatedDate: fund.designatedDate ? fund.designatedDate : new Date(),
-      designateMeeting: fund.designatedMeeting,
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
-      designationCreatedById: userId,
-      designatedById: userId,
+
+      nextDonarReviewDate: fund.nextDonarReviewDate,
+
+      returnSurplus: fund.returnSurplus,
     },
   };
   try {
-    const userDb = await getDb();
-    await userDb.designatedFund.create(payload);
+    await userDb.incomeFund.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Designated fund ${payload.data.fundName}`,
@@ -159,6 +164,7 @@ const expendableFund = async (
   userId: string,
   orgId: string,
 ): Promise<responseType> => {
+  const userDb = getUserDb(userId, orgId);
   const payload = {
     data: {
       fundName: fund.name,
@@ -177,11 +183,10 @@ const expendableFund = async (
     },
   };
   try {
-    const userDb = await getDb();
     await userDb.endownmentExpendable.create(payload);
     return {
       status: statusEnum.SUCCESS,
-      message: `Created Designated fund ${payload.data.fundName}`,
+      message: `Created Expendable Endownmentfund: ${payload.data.fundName}`,
     };
   } catch (error) {
     if (error instanceof ORMError) {
@@ -205,6 +210,7 @@ const permanentFund = async (
   userId: string,
   orgId: string,
 ): Promise<responseType> => {
+  const userDb = getUserDb(userId, orgId);
   const payload = {
     data: {
       fundName: fund.name,
@@ -223,11 +229,10 @@ const permanentFund = async (
     },
   };
   try {
-    const userDb = await getDb();
     await userDb.endownmentPermanent.create(payload);
     return {
       status: statusEnum.SUCCESS,
-      message: `Created Designated fund ${payload.data.fundName}`,
+      message: `Created Permanent Endownment fund:  ${payload.data.fundName}`,
     };
   } catch (error) {
     if (error instanceof ORMError) {

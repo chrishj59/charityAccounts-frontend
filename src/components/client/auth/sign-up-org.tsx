@@ -7,7 +7,7 @@ import { classNames } from 'primereact/utils';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { redirect, RedirectType, useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Toast, ToastMessage } from 'primereact/toast';
@@ -30,6 +30,7 @@ import type { userInputValues } from '~/src/zodSchema/signupUser-schema';
 import { signupPost } from '~/src/types/signup';
 import { signUpUserOrgAction } from '~/src/actions/auth/signup-organisation';
 import { statusEnum } from '~/src/types/helper';
+import { getParameters } from '~/src/actions/defaults/parameters';
 
 type Props = {
   user: userInputValues;
@@ -43,6 +44,7 @@ export function SignUpOrg({ user, setActiveTabAction }: Props) {
   const [errMsgHeader, setErrMsgHeader] = useState<string>('');
   const [errMsgBody, setErrMsgBody] = useState<string>('');
   const [userCreated, setUserCreated] = useState<boolean>(false);
+  const [adminEmail, setAdminEmail] = useState<string>('');
   const [newOrgName, setNewOrgName] = useState<string>('');
   const [legalFormSelected, setLegalFormSelected] =
     useState<string>('SoleTrader');
@@ -90,6 +92,13 @@ export function SignUpOrg({ user, setActiveTabAction }: Props) {
     setValue('legalForm', 'SoleTrader');
     setValue('idType', 0);
     setValue('accountType', 0);
+    const loadParameters = async () => {
+      const _adminEmail = await getParameters('CHARITATIS_ADMIN_EMAIL');
+      if (_adminEmail && _adminEmail.length > 0) {
+        setAdminEmail(_adminEmail[0].value);
+      }
+    };
+    loadParameters();
   }, []);
 
   const showToast = (
@@ -125,23 +134,22 @@ export function SignUpOrg({ user, setActiveTabAction }: Props) {
     );
   };
 
-  async function fetchParameters() {
-    const res = await fetch(`/api/parameter/CHARITATIS_ADMIN_EMAIL`);
-    if (!res.ok) {
-      throw new Error('Failed to fetch posts');
-    }
-    return res.json();
-  }
+  //   const res = await fetch(`/api/parameter/CHARITATIS_ADMIN_EMAIL`);
+  //   if (!res.ok) {
+  //     throw new Error('Failed to fetch posts');
+  //   }
+  //   return res.json();
+  // }
 
-  const {
-    data: adminEmailParam,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ['parameters'],
-    queryFn: fetchParameters,
-  });
+  // const {
+  //   data: adminEmailParam,
+  //   isLoading,
+  //   isError,
+  //   error,
+  // } = useQuery({
+  //   queryKey: ['parameters'],
+  //   queryFn: fetchParameters,
+  // });
 
   const onOrgSubmit = async (formData: orgInputValues) => {
     setLoading(true);
@@ -150,7 +158,7 @@ export function SignUpOrg({ user, setActiveTabAction }: Props) {
       user,
       formData,
 
-      adminEmailParam.value,
+      adminEmail,
     );
 
     if (result.status === statusEnum.ERROR) {
@@ -164,6 +172,7 @@ export function SignUpOrg({ user, setActiveTabAction }: Props) {
         `User ${result?.data?.user?.name}`,
         false,
       );
+      redirect('/secure', RedirectType.replace);
     }
 
     setLoading(false);

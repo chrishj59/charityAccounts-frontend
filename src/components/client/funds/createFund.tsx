@@ -23,6 +23,8 @@ import { TabPanel, TabView, TabViewTabChangeEvent } from 'primereact/tabview';
 import { InputSwitch } from 'primereact/inputswitch';
 import { statusEnum } from '~/src/types/helper';
 import { Value } from '../../../generated/prisma/runtime/library';
+import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 interface props {
   userId: string;
@@ -30,6 +32,7 @@ interface props {
 }
 export default function CreateFund({ userId, orgId }: props) {
   const toast = useRef<Toast>(null);
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [fundTypeSelected, setFundTypeSelected] = useState<string>('General');
@@ -55,6 +58,7 @@ export default function CreateFund({ userId, orgId }: props) {
     getValues,
     trigger,
     handleSubmit,
+
     formState: { errors },
     control,
   } = useForm<FundNewFormValues>({
@@ -93,18 +97,18 @@ export default function CreateFund({ userId, orgId }: props) {
     {
       id: 'Designated',
       name: 'Designated',
-      description: 'Designated Fund - specific project',
+      description: 'Restricted - Designated Fund ',
     },
     { id: 'Income', name: 'Income', description: 'Restricted - Income' },
     {
       id: 'Expendable',
       name: 'Expendable',
-      description: 'Expendable Endownment',
+      description: 'Restricted - Expendable Endownment',
     },
     {
       id: 'Permanent',
       name: 'Permanent',
-      description: 'Permanent Endownment',
+      description: 'Restricted - Permanent Endownment',
     },
   ];
 
@@ -237,7 +241,9 @@ export default function CreateFund({ userId, orgId }: props) {
     const fundType = formData.fundType;
     try {
       const resp = await fundAddAction(formData, userId, orgId);
+
       if (resp.status === statusEnum.SUCCESS) {
+        reset();
         showToast(
           'success',
           resp.message,
@@ -245,18 +251,18 @@ export default function CreateFund({ userId, orgId }: props) {
           true,
         );
 
-        onFundReset();
+        router.push('/secure/funds/masterdata/create');
       } else {
         showToast(
           'error',
-          resp.message,
+          resp.message + 'else block',
           resp.errMessage ? resp.errMessage : '',
           true,
         );
       }
       setLoading(false);
     } catch (error) {
-      showToast('error', 'Could not create Fund ', `invalid fund type`, false);
+      showToast('error', 'Could not create Fund ', `invalid fund type`, true);
     }
   };
 

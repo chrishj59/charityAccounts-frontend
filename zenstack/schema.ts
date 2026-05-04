@@ -984,11 +984,92 @@ export class SchemaType implements SchemaDef {
                     relation: { opposite: "country" }
                 }
             },
+            attributes: [
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
+            ] as readonly AttributeApplication[],
             idFields: ["countryId"],
             uniqueFields: {
                 countryId: { type: "Int" },
                 code2: { type: "String" },
                 code3: { type: "String" }
+            }
+        },
+        ISO4217Currency: {
+            name: "ISO4217Currency",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
+                },
+                entity: {
+                    name: "entity",
+                    type: "String"
+                },
+                currency: {
+                    name: "currency",
+                    type: "String"
+                },
+                alphabeticCode: {
+                    name: "alphabeticCode",
+                    type: "String"
+                },
+                numericCode: {
+                    name: "numericCode",
+                    type: "Int"
+                },
+                minorUnit: {
+                    name: "minorUnit",
+                    type: "String"
+                },
+                withdrawalDate: {
+                    name: "withdrawalDate",
+                    type: "String"
+                },
+                generalFund: {
+                    name: "generalFund",
+                    type: "GeneralFund",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("genFundCurr") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "currency", name: "genFundCurr" }
+                },
+                incomeFund: {
+                    name: "incomeFund",
+                    type: "IncomeFund",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("incomeFundCurr") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "currency", name: "incomeFundCurr" }
+                },
+                endownmentPermanent: {
+                    name: "endownmentPermanent",
+                    type: "EndownmentPermanent",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("endownmentPermanentCurr") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "currency", name: "endownmentPermanentCurr" }
+                },
+                endownmentExpendable: {
+                    name: "endownmentExpendable",
+                    type: "EndownmentExpendable",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("endownmentExpendableCurr") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "currency", name: "endownmentExpendableCurr" }
+                },
+                fundBalance: {
+                    name: "fundBalance",
+                    type: "FundBalance",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundBalanceCurr") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "currency", name: "fundBalanceCurr" }
+                }
+            },
+            attributes: [
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" }
             }
         },
         AddressRegion: {
@@ -1896,8 +1977,8 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCode: {
-                    name: "currCode",
+                curcyCode: {
+                    name: "curcyCode",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
@@ -1908,6 +1989,19 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("genFundBal") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "generalFund", name: "genFundBal" }
+                },
+                currencyId: {
+                    name: "currencyId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "currency"
+                    ] as readonly string[]
+                },
+                currency: {
+                    name: "currency",
+                    type: "ISO4217Currency",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("genFundCurr") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("currencyId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "generalFund", name: "genFundCurr", fields: ["currencyId"], references: ["id"] }
                 }
             },
             attributes: [
@@ -2182,8 +2276,8 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCodeDesignatedBal: {
-                    name: "currCodeDesignatedBal",
+                curcyCodeDesignatedBal: {
+                    name: "curcyCodeDesignatedBal",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
@@ -2194,8 +2288,8 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCodecurrentBal: {
-                    name: "currCodecurrentBal",
+                curcyCodecurrentBal: {
+                    name: "curcyCodecurrentBal",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
@@ -2216,9 +2310,11 @@ export class SchemaType implements SchemaDef {
                         "designatedBy"
                     ] as readonly string[]
                 },
-                designateMeeting: {
-                    name: "designateMeeting",
-                    type: "String"
+                designatedMeeting: {
+                    name: "designatedMeeting",
+                    type: "String",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
+                    default: "" as FieldDefault
                 },
                 undesignateMeeting: {
                     name: "undesignateMeeting",
@@ -2408,8 +2504,8 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCodeBalance: {
-                    name: "currCodeBalance",
+                curcyCodeBalance: {
+                    name: "curcyCodeBalance",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
@@ -2420,6 +2516,19 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("incomeFundBal") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "incomeFund", name: "incomeFundBal" }
+                },
+                currencyId: {
+                    name: "currencyId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "currency"
+                    ] as readonly string[]
+                },
+                currency: {
+                    name: "currency",
+                    type: "ISO4217Currency",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("incomeFundCurr") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("currencyId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "incomeFund", name: "incomeFundCurr", fields: ["currencyId"], references: ["id"] }
                 }
             },
             attributes: [
@@ -2562,8 +2671,8 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCodeCurrentCapitalAmount: {
-                    name: "currCodeCurrentCapitalAmount",
+                curcyCodeInitialCapitalAmount: {
+                    name: "curcyCodeInitialCapitalAmount",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
@@ -2574,8 +2683,8 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCodeIncomeBal: {
-                    name: "currCodeIncomeBal",
+                curcyCodeIncomeBal: {
+                    name: "curcyCodeIncomeBal",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
@@ -2586,8 +2695,8 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCodeCapitalBal: {
-                    name: "currCodeCapitalBal",
+                curcyCodeCapitalBal: {
+                    name: "curcyCodeCapitalBal",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
@@ -2605,6 +2714,19 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("permanentCapitalFundBal") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "permanentCapitalfund", name: "permanentCapitalFundBal" }
+                },
+                currencyId: {
+                    name: "currencyId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "currency"
+                    ] as readonly string[]
+                },
+                currency: {
+                    name: "currency",
+                    type: "ISO4217Currency",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("endownmentPermanentCurr") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("currencyId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "endownmentPermanent", name: "endownmentPermanentCurr", fields: ["currencyId"], references: ["id"] }
                 }
             },
             attributes: [
@@ -2747,8 +2869,8 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCodeInitialCapital: {
-                    name: "currCodeInitialCapital",
+                curcyCodeInitialCapital: {
+                    name: "curcyCodeInitialCapital",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
@@ -2759,8 +2881,8 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCodeIncomeAmount: {
-                    name: "currCodeIncomeAmount",
+                curcyCodeIncomeAmount: {
+                    name: "curcyCodeIncomeAmount",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
@@ -2771,8 +2893,8 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCodeIncomeBalance: {
-                    name: "currCodeIncomeBalance",
+                curcyCodeIncomeBalance: {
+                    name: "curcyCodeIncomeBalance",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
@@ -2783,8 +2905,8 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCodeCapitalBal: {
-                    name: "currCodeCapitalBal",
+                curcyCodeCapitalBal: {
+                    name: "curcyCodeCapitalBal",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
@@ -2802,6 +2924,19 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("expendableCapitalFundBal") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "expendableCapitalfund", name: "expendableCapitalFundBal" }
+                },
+                currencyId: {
+                    name: "currencyId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "currency"
+                    ] as readonly string[]
+                },
+                currency: {
+                    name: "currency",
+                    type: "ISO4217Currency",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("endownmentExpendableCurr") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("currencyId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "endownmentExpendable", name: "endownmentExpendableCurr", fields: ["currencyId"], references: ["id"] }
                 }
             },
             attributes: [
@@ -2838,11 +2973,24 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@db.Integer" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
                     default: 0 as FieldDefault
                 },
-                currCodeBalance: {
-                    name: "currCodeBalance",
+                curcyCodeBalance: {
+                    name: "curcyCodeBalance",
                     type: "String",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("") }] }] as readonly AttributeApplication[],
                     default: "" as FieldDefault
+                },
+                currencyId: {
+                    name: "currencyId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "currency"
+                    ] as readonly string[]
+                },
+                currency: {
+                    name: "currency",
+                    type: "ISO4217Currency",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundBalanceCurr") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("currencyId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundBalance", name: "fundBalanceCurr", fields: ["currencyId"], references: ["id"] }
                 },
                 generalFundId: {
                     name: "generalFundId",

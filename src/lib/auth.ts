@@ -39,6 +39,17 @@ const getOrgId = async (userId: string) => {
   return orgId; // '7MB5idvLxFQ9UfZVckSrcki1rKxnz6vT';
 };
 
+const getOrganizationRole = async (userId: string) => {
+  const members = await db.member.findMany();
+  let organizationRole = '';
+  if (members) {
+    const currMember = members.find((m) => m.userId === userId);
+    if (currMember) {
+      return currMember.role;
+    }
+  }
+};
+
 const getDisplayName = async (userId: string) => {
   try {
     const displayName = await db.user.findFirst({
@@ -262,7 +273,7 @@ export const auth = betterAuth({
     customSession(async ({ user, session }) => {
       // const roles = findUserRoles(session.session.userId);
       const organizationId = await getOrgId(user.id);
-
+      const organizationRole = await getOrganizationRole(user.id);
       return {
         // roles,
         // user: {
@@ -275,6 +286,7 @@ export const auth = betterAuth({
         session: {
           ...session,
           organizationId,
+          organizationRole,
         },
       };
     }),

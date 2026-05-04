@@ -30,10 +30,10 @@ const addGeneralFund = async (
   };
   try {
     console.log(`payload ${JSON.stringify(payload, null, 2)}`);
-    const funds = await userDb.generalFund.findMany();
+    const funds = await (await userDb).generalFund.findMany();
     console.log(`funds in add ${JSON.stringify(funds, null, 2)}`);
     try {
-      const resp = await userDb.generalFund.create(payload);
+      const resp = await (await userDb).generalFund.create(payload);
     } catch (err) {
       if (err instanceof ORMError) {
         console.log(`Error reason ${err.reason}`);
@@ -89,7 +89,7 @@ const designatedFund = async (
     },
   };
   try {
-    await userDb.designatedFund.create(payload);
+    await (await userDb).designatedFund.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Designated fund ${payload.data.fundName}`,
@@ -137,7 +137,7 @@ const incomeFund = async (
     },
   };
   try {
-    await userDb.incomeFund.create(payload);
+    await (await userDb).incomeFund.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Designated fund ${payload.data.fundName}`,
@@ -183,7 +183,7 @@ const expendableFund = async (
     },
   };
   try {
-    await userDb.endownmentExpendable.create(payload);
+    await (await userDb).endownmentExpendable.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Expendable Endownmentfund: ${payload.data.fundName}`,
@@ -229,7 +229,7 @@ const permanentFund = async (
     },
   };
   try {
-    await userDb.endownmentPermanent.create(payload);
+    (await userDb).endownmentPermanent.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Permanent Endownment fund:  ${payload.data.fundName}`,

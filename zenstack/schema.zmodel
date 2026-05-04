@@ -318,7 +318,28 @@ model ISOCountry {
   description String
   addresses   Address[]
   regions     AddressRegion[]
+  // global data
+  @@allow('all', true)
 }
+
+model ISO4217Currency {
+  id Int  @id @default(autoincrement()) 
+  entity String
+  currency String
+  alphabeticCode String
+  numericCode Int
+  minorUnit String 
+  withdrawalDate String?
+  generalFund GeneralFund[] @relation(name: 'genFundCurr')
+  incomeFund IncomeFund[] @relation(name: 'incomeFundCurr')
+  endownmentPermanent EndownmentPermanent[] @relation(name: 'endownmentPermanentCurr')
+  endownmentExpendable EndownmentExpendable[]    @relation(name: 'endownmentExpendableCurr')
+  fundBalance FundBalance[] @relation(name: 'fundBalanceCurr')
+   
+  @@allow('all', true)
+
+}
+
 model AddressRegion {
   regionId     Int        @id @default(autoincrement())
   isoCountryId Int
@@ -487,8 +508,10 @@ model Fund {
 model GeneralFund extends Fund {
 
   balance  Int      @db.Integer @default(0)
-  currCode String   @default('')
-  balances FundBalance[] @relation(name: 'genFundBal')
+  curcyCode String   @default('')
+  balances FundBalance[] @relation( name: 'genFundBal')
+  currencyId  Int
+  currency ISO4217Currency @relation(name: 'genFundCurr',fields: [currencyId], references: [id])
   @@allow('all', auth().organizationId == organizationId)
 }
 
@@ -502,13 +525,13 @@ model RestrictedFund extends Fund {
 }
 model DesignatedFund extends RestrictedFund {
   designatedBal   Int      @db.Integer @default(0)
-  currCodeDesignatedBal String   @default('')
+  curcyCodeDesignatedBal String   @default('')
   currentBal Int      @db.Integer @default(0)
-  currCodecurrentBal String   @default('')
+  curcyCodecurrentBal String   @default('')
   designatedDate          DateTime
   releasedDate            DateTime?
   designatedById          String
-  designateMeeting        String
+  designatedMeeting       String @default('')
   undesignateMeeting      String?
   designationReleasedById String?
   designationCreatedById  String
@@ -521,34 +544,40 @@ model DesignatedFund extends RestrictedFund {
 
 model IncomeFund extends RestrictedFund {
   balance  Int      @db.Integer @default(0)
-  currCodeBalance String   @default('')
+  curcyCodeBalance String   @default('')
   balances FundBalance[] @relation('incomeFundBal')
+  currencyId  Int
+  currency ISO4217Currency @relation(name: 'incomeFundCurr',fields: [currencyId], references: [id])
   @@allow('all', auth().organizationId == organizationId)
 }
 
 model EndownmentPermanent extends RestrictedFund {
   initalCapitalAmount      Int      @db.Integer @default(0)
-  currCodeCurrentCapitalAmount String   @default('')
+  curcyCodeInitialCapitalAmount String   @default('')
   incomeBalance            Int      @db.Integer @default(0)
-  currCodeIncomeBal String   @default('')
+  curcyCodeIncomeBal String   @default('')
   capitalBalance           Int      @db.Integer @default(0)
-  currCodeCapitalBal String   @default('')
+  curcyCodeCapitalBal String   @default('')
   permanentIncomeBalances  FundBalance[] @relation('permanentIncomeFundBal')
   permanentCapitalBalances FundBalance[] @relation('permanentCapitalFundBal')
+  currencyId  Int
+  currency ISO4217Currency @relation(name: 'endownmentPermanentCurr',fields: [currencyId], references: [id])
   @@allow('all', auth().organizationId == organizationId)
 }
 
 model EndownmentExpendable extends RestrictedFund {
   initalCapital       Int      @db.Integer @default(0)
-  currCodeInitialCapital String   @default('')
+  curcyCodeInitialCapital String   @default('')
   incomeAmount              Int      @db.Integer @default(0)
-  currCodeIncomeAmount String   @default('')
+  curcyCodeIncomeAmount String   @default('')
   incomeBalance             Int      @db.Integer @default(0)
-  currCodeIncomeBalance String   @default('')
+  curcyCodeIncomeBalance String   @default('')
   capitalBalance            Int      @db.Integer @default(0)
-  currCodeCapitalBal String   @default('')
+  curcyCodeCapitalBal String   @default('')
   expendableIncomeBalances  FundBalance[] @relation('expendableIncomeFundBal')
   expendableCapitalBalances FundBalance[] @relation('expendableCapitalFundBal')
+  currencyId  Int
+  currency ISO4217Currency @relation(name: 'endownmentExpendableCurr',fields: [currencyId], references: [id])
   @@allow('all', auth().organizationId == organizationId)
 }
 
@@ -557,7 +586,9 @@ model FundBalance {
   fiscalPeriod            Int
   fiscalYear              Int
   balance                 Int      @db.Integer @default(0)
-  currCodeBalance String   @default('')
+  curcyCodeBalance String   @default('')
+  currencyId  Int
+  currency ISO4217Currency @relation(name: 'fundBalanceCurr',fields: [currencyId], references: [id])
   generalFundId           String?
   generalFund             GeneralFund?          @relation(name: 'genFundBal',  fields: [generalFundId], references: [id])
 

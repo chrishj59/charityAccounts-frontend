@@ -47,6 +47,11 @@ const AppMenu = () => {
               label: 'Fisc Period Rule',
               to: '/secure/set-up/basic/fiscalPeriodRule',
             },
+            {
+              icon: 'pi-pencil',
+              label: 'Load currencies',
+              to: '/secure/set-up/basic/uploadCurrency',
+            },
           ],
         },
         {

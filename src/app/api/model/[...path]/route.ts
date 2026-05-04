@@ -34,7 +34,7 @@ async function getClient() {
     return authDb;
   }
 
-  let organizationId: string | undefined = undefined;
+  let organizationId;
   let organizationRole: string | undefined = undefined;
   const { session } = sessionResult;
 

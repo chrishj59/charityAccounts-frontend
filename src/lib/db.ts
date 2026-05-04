@@ -10,7 +10,6 @@ import { headers } from 'next/headers';
 import { auth } from './auth';
 import { redirect, RedirectType } from 'next/navigation';
 
-
 export const db = new ZenStackClient(schema, {
   dialect: new PostgresDialect({
     pool: new Pool({
@@ -24,12 +23,21 @@ export const db = new ZenStackClient(schema, {
 export const allDb = db;
 export const authDb = db.$use(new PolicyPlugin());
 
-export const getUserDb = (userId: string , orgId: string ) => {
- const userContext = {
-     userId: userId,
-     organizationId: orgId,
-     organizationRole: '',
-   };
-   return authDb.$setAuth(userContext);
-   
-}
+export const getUserDb = async (userId: string, orgId: string) => {
+  const members = await db.member.findMany();
+  let organizationRole = '';
+  if (members) {
+    const currMember = members.find((m) => m.userId === userId);
+    if (currMember) {
+      organizationRole = currMember.role;
+    }
+  }
+  console.log(`organizationRole ${organizationRole}`);
+
+  const userContext = {
+    userId: userId,
+    organizationId: orgId,
+    organizationRole,
+  };
+  return authDb.$setAuth(userContext);
+};

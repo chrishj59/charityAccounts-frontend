@@ -20,6 +20,7 @@ export type TeamMember = $ModelResult<$Schema, "TeamMember">;
 export type Invitation = $ModelResult<$Schema, "Invitation">;
 export type Session = $ModelResult<$Schema, "Session">;
 export type ISOCountry = $ModelResult<$Schema, "ISOCountry">;
+export type ISO4217Currency = $ModelResult<$Schema, "ISO4217Currency">;
 export type AddressRegion = $ModelResult<$Schema, "AddressRegion">;
 export type Address = $ModelResult<$Schema, "Address">;
 export type Apikey = $ModelResult<$Schema, "Apikey">;

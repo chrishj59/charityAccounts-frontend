@@ -331,11 +331,12 @@ model ISO4217Currency {
   minorUnit String 
   withdrawalDate String?
   generalFund GeneralFund[] @relation(name: 'genFundCurr')
+  designatedFund DesignatedFund[] @relation(name: 'designatedFundCurr')
   incomeFund IncomeFund[] @relation(name: 'incomeFundCurr')
   endownmentPermanent EndownmentPermanent[] @relation(name: 'endownmentPermanentCurr')
   endownmentExpendable EndownmentExpendable[]    @relation(name: 'endownmentExpendableCurr')
   fundBalance FundBalance[] @relation(name: 'fundBalanceCurr')
-   
+   @@index(fields: [currency], map: 'idx_ISO4217Currency_currency')
   @@allow('all', true)
 
 }
@@ -508,7 +509,7 @@ model Fund {
 model GeneralFund extends Fund {
 
   balance  Int      @db.Integer @default(0)
-  curcyCode String   @default('')
+  curcyCode String  @default('') @db.Char(3)
   balances FundBalance[] @relation( name: 'genFundBal')
   currencyId  Int
   currency ISO4217Currency @relation(name: 'genFundCurr',fields: [currencyId], references: [id])
@@ -525,9 +526,9 @@ model RestrictedFund extends Fund {
 }
 model DesignatedFund extends RestrictedFund {
   designatedBal   Int      @db.Integer @default(0)
-  curcyCodeDesignatedBal String   @default('')
+  curcyCode String   @default('')
   currentBal Int      @db.Integer @default(0)
-  curcyCodecurrentBal String   @default('')
+  
   designatedDate          DateTime
   releasedDate            DateTime?
   designatedById          String
@@ -538,13 +539,15 @@ model DesignatedFund extends RestrictedFund {
   designatedBy            User?         @relation(name: 'designatedBy', fields: [designatedById], references: [id])
   designationCreatedBy    User          @relation(name: 'designationCreate', fields: [designationCreatedById], references: [id])
   designationReleasedBy   User?         @relation(name: 'designationRelease', fields: [designationReleasedById], references: [id])
+  currencyId  Int
+  currency ISO4217Currency @relation(name: 'designatedFundCurr',fields: [currencyId], references: [id])
   balances                FundBalance [] @relation('designatedBal')
   @@allow('all', auth().organizationId == organizationId)
 }
 
 model IncomeFund extends RestrictedFund {
   balance  Int      @db.Integer @default(0)
-  curcyCodeBalance String   @default('')
+  curcyCode String   @default('')
   balances FundBalance[] @relation('incomeFundBal')
   currencyId  Int
   currency ISO4217Currency @relation(name: 'incomeFundCurr',fields: [currencyId], references: [id])
@@ -553,13 +556,15 @@ model IncomeFund extends RestrictedFund {
 
 model EndownmentPermanent extends RestrictedFund {
   initalCapitalAmount      Int      @db.Integer @default(0)
-  curcyCodeInitialCapitalAmount String   @default('')
+  
   incomeBalance            Int      @db.Integer @default(0)
-  curcyCodeIncomeBal String   @default('')
+  
   capitalBalance           Int      @db.Integer @default(0)
-  curcyCodeCapitalBal String   @default('')
+  
   permanentIncomeBalances  FundBalance[] @relation('permanentIncomeFundBal')
   permanentCapitalBalances FundBalance[] @relation('permanentCapitalFundBal')
+  
+  curcyCode String   @default('')
   currencyId  Int
   currency ISO4217Currency @relation(name: 'endownmentPermanentCurr',fields: [currencyId], references: [id])
   @@allow('all', auth().organizationId == organizationId)
@@ -567,15 +572,16 @@ model EndownmentPermanent extends RestrictedFund {
 
 model EndownmentExpendable extends RestrictedFund {
   initalCapital       Int      @db.Integer @default(0)
-  curcyCodeInitialCapital String   @default('')
+  
   incomeAmount              Int      @db.Integer @default(0)
-  curcyCodeIncomeAmount String   @default('')
+  
   incomeBalance             Int      @db.Integer @default(0)
-  curcyCodeIncomeBalance String   @default('')
+  
   capitalBalance            Int      @db.Integer @default(0)
-  curcyCodeCapitalBal String   @default('')
+  
   expendableIncomeBalances  FundBalance[] @relation('expendableIncomeFundBal')
   expendableCapitalBalances FundBalance[] @relation('expendableCapitalFundBal')
+  curcyCode String   @default('')
   currencyId  Int
   currency ISO4217Currency @relation(name: 'endownmentExpendableCurr',fields: [currencyId], references: [id])
   @@allow('all', auth().organizationId == organizationId)

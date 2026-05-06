@@ -916,13 +916,20 @@ export class SchemaType implements SchemaDef {
                 },
                 withdrawalDate: {
                     name: "withdrawalDate",
-                    type: "String"
+                    type: "String",
+                    optional: true
                 },
                 generalFund: {
                     name: "generalFund",
                     type: "GeneralFund",
                     array: true,
                     relation: { opposite: "currency", name: "genFundCurr" }
+                },
+                designatedFund: {
+                    name: "designatedFund",
+                    type: "DesignatedFund",
+                    array: true,
+                    relation: { opposite: "currency", name: "designatedFundCurr" }
                 },
                 incomeFund: {
                     name: "incomeFund",
@@ -2045,8 +2052,8 @@ export class SchemaType implements SchemaDef {
                     type: "Int",
                     default: 0 as FieldDefault
                 },
-                curcyCodeDesignatedBal: {
-                    name: "curcyCodeDesignatedBal",
+                curcyCode: {
+                    name: "curcyCode",
                     type: "String",
                     default: "" as FieldDefault
                 },
@@ -2054,11 +2061,6 @@ export class SchemaType implements SchemaDef {
                     name: "currentBal",
                     type: "Int",
                     default: 0 as FieldDefault
-                },
-                curcyCodecurrentBal: {
-                    name: "curcyCodecurrentBal",
-                    type: "String",
-                    default: "" as FieldDefault
                 },
                 designatedDate: {
                     name: "designatedDate",
@@ -2117,6 +2119,18 @@ export class SchemaType implements SchemaDef {
                     type: "User",
                     optional: true,
                     relation: { opposite: "releasedDesignatedFund", name: "designationRelease", fields: ["designationReleasedById"], references: ["id"] }
+                },
+                currencyId: {
+                    name: "currencyId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "currency"
+                    ] as readonly string[]
+                },
+                currency: {
+                    name: "currency",
+                    type: "ISO4217Currency",
+                    relation: { opposite: "designatedFund", name: "designatedFundCurr", fields: ["currencyId"], references: ["id"] }
                 },
                 balances: {
                     name: "balances",
@@ -2251,8 +2265,8 @@ export class SchemaType implements SchemaDef {
                     type: "Int",
                     default: 0 as FieldDefault
                 },
-                curcyCodeBalance: {
-                    name: "curcyCodeBalance",
+                curcyCode: {
+                    name: "curcyCode",
                     type: "String",
                     default: "" as FieldDefault
                 },
@@ -2401,30 +2415,15 @@ export class SchemaType implements SchemaDef {
                     type: "Int",
                     default: 0 as FieldDefault
                 },
-                curcyCodeInitialCapitalAmount: {
-                    name: "curcyCodeInitialCapitalAmount",
-                    type: "String",
-                    default: "" as FieldDefault
-                },
                 incomeBalance: {
                     name: "incomeBalance",
                     type: "Int",
                     default: 0 as FieldDefault
                 },
-                curcyCodeIncomeBal: {
-                    name: "curcyCodeIncomeBal",
-                    type: "String",
-                    default: "" as FieldDefault
-                },
                 capitalBalance: {
                     name: "capitalBalance",
                     type: "Int",
                     default: 0 as FieldDefault
-                },
-                curcyCodeCapitalBal: {
-                    name: "curcyCodeCapitalBal",
-                    type: "String",
-                    default: "" as FieldDefault
                 },
                 permanentIncomeBalances: {
                     name: "permanentIncomeBalances",
@@ -2437,6 +2436,11 @@ export class SchemaType implements SchemaDef {
                     type: "FundBalance",
                     array: true,
                     relation: { opposite: "permanentCapitalfund", name: "permanentCapitalFundBal" }
+                },
+                curcyCode: {
+                    name: "curcyCode",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 currencyId: {
                     name: "currencyId",
@@ -2577,40 +2581,20 @@ export class SchemaType implements SchemaDef {
                     type: "Int",
                     default: 0 as FieldDefault
                 },
-                curcyCodeInitialCapital: {
-                    name: "curcyCodeInitialCapital",
-                    type: "String",
-                    default: "" as FieldDefault
-                },
                 incomeAmount: {
                     name: "incomeAmount",
                     type: "Int",
                     default: 0 as FieldDefault
-                },
-                curcyCodeIncomeAmount: {
-                    name: "curcyCodeIncomeAmount",
-                    type: "String",
-                    default: "" as FieldDefault
                 },
                 incomeBalance: {
                     name: "incomeBalance",
                     type: "Int",
                     default: 0 as FieldDefault
                 },
-                curcyCodeIncomeBalance: {
-                    name: "curcyCodeIncomeBalance",
-                    type: "String",
-                    default: "" as FieldDefault
-                },
                 capitalBalance: {
                     name: "capitalBalance",
                     type: "Int",
                     default: 0 as FieldDefault
-                },
-                curcyCodeCapitalBal: {
-                    name: "curcyCodeCapitalBal",
-                    type: "String",
-                    default: "" as FieldDefault
                 },
                 expendableIncomeBalances: {
                     name: "expendableIncomeBalances",
@@ -2623,6 +2607,11 @@ export class SchemaType implements SchemaDef {
                     type: "FundBalance",
                     array: true,
                     relation: { opposite: "expendableCapitalfund", name: "expendableCapitalFundBal" }
+                },
+                curcyCode: {
+                    name: "curcyCode",
+                    type: "String",
+                    default: "" as FieldDefault
                 },
                 currencyId: {
                     name: "currencyId",

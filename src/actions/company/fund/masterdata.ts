@@ -6,7 +6,36 @@ import { getUserDb } from '~/src/lib/db';
 import { responseType, statusEnum } from '~/src/types/helper';
 
 import { ORMError, ORMErrorReason } from '@zenstackhq/orm';
+import { ISO4217Currency } from '~/zenstack/models';
+// TODO: Add currencyb param from UI when other currencies support
+const getCurrency = async (
+  currcode: string,
+  userId: string,
+  orgId: string,
+): Promise<ISO4217Currency> => {
+  const userDb = await getUserDb(userId, orgId);
+  try {
+    const _currency = await userDb.iSO4217Currency.findFirst({
+      where: { alphabeticCode: 'GBP' },
+    });
 
+    if (!_currency) {
+      throw Error(`no Currency found `);
+    }
+
+    return _currency;
+  } catch (err) {
+    if (err instanceof ORMError) {
+      console.error(`Permission issue ${err.rejectedByPolicyReason}`);
+      console.error(`db error ${err.dbErrorCode} ${err.dbErrorMessage}`);
+      console.error(`reason ${err.reason} ${err.cause}`);
+      if (err.dbErrorCode) {
+        console.error(`sql ${err.sql} params ${err.sqlParams}`);
+      }
+    }
+    throw Error(`No Currency found other error `);
+  }
+};
 const addGeneralFund = async (
   fundType: string,
   fund: FundNewFormValues,
@@ -15,6 +44,7 @@ const addGeneralFund = async (
   orgId: string,
 ): Promise<responseType> => {
   const userDb = getUserDb(userId, orgId);
+  const _currency = await getCurrency('GBP', userId, orgId);
   const payload = {
     data: {
       fundName: fund.name,
@@ -25,15 +55,18 @@ const addGeneralFund = async (
       reviewDate: fund.reviewDate,
       managedById: userId,
       organizationId: orgId,
-      // balance: new Decimal(0),
+      balance: 0,
+      curcyCode: _currency.alphabeticCode,
+      currencyId: _currency.id,
     },
   };
   try {
     console.log(`payload ${JSON.stringify(payload, null, 2)}`);
     const funds = await (await userDb).generalFund.findMany();
+
     console.log(`funds in add ${JSON.stringify(funds, null, 2)}`);
     try {
-      const resp = await (await userDb).generalFund.create(payload);
+      await (await userDb).generalFund.create(payload);
     } catch (err) {
       if (err instanceof ORMError) {
         console.log(`Error reason ${err.reason}`);
@@ -70,7 +103,9 @@ const designatedFund = async (
   userId: string,
   orgId: string,
 ): Promise<responseType> => {
-  const userDb = getUserDb(userId, orgId);
+  const userDb = await getUserDb(userId, orgId);
+  const _currency = await getCurrency('GBP', userId, orgId);
+
   const payload = {
     data: {
       fundName: fund.name,
@@ -82,10 +117,12 @@ const designatedFund = async (
       managedById: userId,
       organizationId: orgId,
       designatedDate: fund.designatedDate ? fund.designatedDate : new Date(),
-      designateMeeting: fund.designatedMeeting,
+      designatedMeeting: fund.designatedMeeting,
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
       designationCreatedById: userId,
       designatedById: userId,
+      curcyCode: _currency.currency,
+      currencyId: _currency.id,
     },
   };
   try {
@@ -117,8 +154,8 @@ const incomeFund = async (
   userId: string,
   orgId: string,
 ): Promise<responseType> => {
-  const userDb = getUserDb(userId, orgId);
-
+  const userDb = await getUserDb(userId, orgId);
+  const _currency = await getCurrency('GBP', userId, orgId);
   const payload = {
     data: {
       fundName: fund.name,
@@ -134,10 +171,12 @@ const incomeFund = async (
       nextDonarReviewDate: fund.nextDonarReviewDate,
 
       returnSurplus: fund.returnSurplus,
+      curcyCode: _currency.currency,
+      currencyId: _currency.id,
     },
   };
   try {
-    await (await userDb).incomeFund.create(payload);
+    await userDb.incomeFund.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Designated fund ${payload.data.fundName}`,
@@ -164,7 +203,8 @@ const expendableFund = async (
   userId: string,
   orgId: string,
 ): Promise<responseType> => {
-  const userDb = getUserDb(userId, orgId);
+  const userDb = await getUserDb(userId, orgId);
+  const _currency = await getCurrency('GBP', userId, orgId);
   const payload = {
     data: {
       fundName: fund.name,
@@ -180,10 +220,12 @@ const expendableFund = async (
         : new Date(),
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
       // returnSurplus: fund.returnSurplus,
+      curcyCode: _currency.currency,
+      currencyId: _currency.id,
     },
   };
   try {
-    await (await userDb).endownmentExpendable.create(payload);
+    await userDb.endownmentExpendable.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Expendable Endownmentfund: ${payload.data.fundName}`,
@@ -210,7 +252,8 @@ const permanentFund = async (
   userId: string,
   orgId: string,
 ): Promise<responseType> => {
-  const userDb = getUserDb(userId, orgId);
+  const userDb = await getUserDb(userId, orgId);
+  const _currency = await getCurrency('GBP', userId, orgId);
   const payload = {
     data: {
       fundName: fund.name,
@@ -226,6 +269,8 @@ const permanentFund = async (
         : new Date(),
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
       returnSurplus: fund.returnSurplus,
+      curcyCode: _currency.currency,
+      currencyId: _currency.id,
     },
   };
   try {

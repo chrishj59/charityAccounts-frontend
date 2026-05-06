@@ -49,6 +49,8 @@ export default function CreateFund({ userId, orgId }: props) {
     donar: '',
     returnSurplus: false,
     designatedMeeting: '',
+    objective: '',
+    fundType: 'General',
   };
   const [activeTab, setActiveTab] = useState<number>(0);
 
@@ -73,6 +75,7 @@ export default function CreateFund({ userId, orgId }: props) {
     summary: string,
     detail: string,
     sticky: boolean,
+    life: number,
   ) => {
     toast.current?.show({ severity, summary, detail, sticky });
   };
@@ -136,6 +139,7 @@ export default function CreateFund({ userId, orgId }: props) {
       objective: '',
       returnSurplus: false,
       designatedMeeting: '',
+      fundType: 'General',
     });
   };
 
@@ -243,26 +247,38 @@ export default function CreateFund({ userId, orgId }: props) {
       const resp = await fundAddAction(formData, userId, orgId);
 
       if (resp.status === statusEnum.SUCCESS) {
-        reset();
+        // reset();
+        // router.push('/secure/funds/masterdata/create');
         showToast(
           'success',
           resp.message,
           `Fund name ${formData.name} Objective ${formData.objective}`,
-          true,
+          false,
+          3000,
         );
-
-        router.push('/secure/funds/masterdata/create');
+        setTimeout(() => {
+          reset();
+          setFundTypeSelected('General');
+          router.push('/secure');
+        }, 3000);
       } else {
         showToast(
           'error',
           resp.message + 'else block',
           resp.errMessage ? resp.errMessage : '',
           true,
+          3000,
         );
       }
       setLoading(false);
     } catch (error) {
-      showToast('error', 'Could not create Fund ', `invalid fund type`, true);
+      showToast(
+        'error',
+        'Could not create Fund ',
+        `invalid fund type`,
+        true,
+        3000,
+      );
     }
   };
 

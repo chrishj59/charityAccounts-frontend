@@ -2410,8 +2410,13 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "RestrictedFund"
                 },
-                initalCapitalAmount: {
-                    name: "initalCapitalAmount",
+                initalCapital: {
+                    name: "initalCapital",
+                    type: "Int",
+                    default: 0 as FieldDefault
+                },
+                incomeEarned: {
+                    name: "incomeEarned",
                     type: "Int",
                     default: 0 as FieldDefault
                 },
@@ -2581,8 +2586,8 @@ export class SchemaType implements SchemaDef {
                     type: "Int",
                     default: 0 as FieldDefault
                 },
-                incomeAmount: {
-                    name: "incomeAmount",
+                incomeEarned: {
+                    name: "incomeEarned",
                     type: "Int",
                     default: 0 as FieldDefault
                 },
@@ -2653,8 +2658,8 @@ export class SchemaType implements SchemaDef {
                     type: "Int",
                     default: 0 as FieldDefault
                 },
-                curcyCodeBalance: {
-                    name: "curcyCodeBalance",
+                curcyCode: {
+                    name: "curcyCode",
                     type: "String",
                     default: "" as FieldDefault
                 },

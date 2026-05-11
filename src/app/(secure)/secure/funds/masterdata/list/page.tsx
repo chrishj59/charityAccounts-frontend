@@ -23,8 +23,8 @@ export default async function ListFundsPage() {
   const usr = session.user;
   const userOrgId = orgs[0].id;
 
-  const userDb = getUserDb(usr.id, userOrgId);
-  const funds: Fund[] = await (await userDb).fund.findMany();
+  const userDb = await getUserDb(usr.id, userOrgId);
+  const funds: Fund[] = await userDb.fund.findMany();
 
   console.log(
     `${JSON.stringify(funds.length)} funds from DB${JSON.stringify(funds, null, 2)}`,

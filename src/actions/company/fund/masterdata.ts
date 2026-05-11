@@ -121,7 +121,7 @@ const designatedFund = async (
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
       designationCreatedById: userId,
       designatedById: userId,
-      curcyCode: _currency.currency,
+      curcyCode: _currency.alphabeticCode,
       currencyId: _currency.id,
     },
   };
@@ -171,7 +171,7 @@ const incomeFund = async (
       nextDonarReviewDate: fund.nextDonarReviewDate,
 
       returnSurplus: fund.returnSurplus,
-      curcyCode: _currency.currency,
+      curcyCode: _currency.alphabeticCode,
       currencyId: _currency.id,
     },
   };
@@ -220,7 +220,7 @@ const expendableFund = async (
         : new Date(),
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
       // returnSurplus: fund.returnSurplus,
-      curcyCode: _currency.currency,
+      curcyCode: _currency.alphabeticCode,
       currencyId: _currency.id,
     },
   };
@@ -269,12 +269,16 @@ const permanentFund = async (
         : new Date(),
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
       returnSurplus: fund.returnSurplus,
-      curcyCode: _currency.currency,
+      curcyCode: _currency.alphabeticCode,
       currencyId: _currency.id,
     },
   };
   try {
-    (await userDb).endownmentPermanent.create(payload);
+    console.log(`create permanentFund`);
+    const res = await userDb.endownmentPermanent.create(payload);
+    console.log(
+      `result of userDb.endownmentPermanent.create ${JSON.stringify(res, null, 2)}`,
+    );
     return {
       status: statusEnum.SUCCESS,
       message: `Created Permanent Endownment fund:  ${payload.data.fundName}`,

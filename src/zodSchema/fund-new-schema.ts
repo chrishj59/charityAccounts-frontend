@@ -69,6 +69,13 @@ export const fundNewSchema = z
           path: ['objective'],
         });
       }
+      if (!values.designatedMeeting || values.designatedMeeting.length === 0) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Designated meeting is required',
+          path: ['designatedMeeting'],
+        });
+      }
     }
   });
 

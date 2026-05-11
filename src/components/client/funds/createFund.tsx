@@ -243,12 +243,13 @@ export default function CreateFund({ userId, orgId }: props) {
   const onFundSubmit = async (formData: FundNewFormValues) => {
     setLoading(true);
     const fundType = formData.fundType;
+
     try {
       const resp = await fundAddAction(formData, userId, orgId);
 
       if (resp.status === statusEnum.SUCCESS) {
         // reset();
-        // router.push('/secure/funds/masterdata/create');
+        //    /funds/masterdata/create');
         showToast(
           'success',
           resp.message,
@@ -394,7 +395,7 @@ export default function CreateFund({ userId, orgId }: props) {
                                 onChange={handleFundTypeChange}
                                 placeholder='Select fund type'
                                 value={fundTypeSelected}
-                                // defaultValue={fundTypes[0].name}
+                                defaultValue={fundTypes[0].name}
                                 options={fundTypes}
                                 optionValue='id'
                                 optionLabel='description'

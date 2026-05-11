@@ -2,28 +2,37 @@ type FundBalanceUI = {
   fiscalPeriod: number;
   fiscalYear: number;
   balance: number;
-  curcyCodeBalance: number;
+  curcyCode: string;
 };
 
 export type GeneralFundUI = {
   balance: number;
+  curcyCode: string;
 };
 
+export type RestrictedFundUI = {
+  projectEndDate?: Date;
+  nextDonarReviewDate?: Date;
+  returnSurplus?: boolean;
+  designatedFund?: DesignatedFundUI;
+  incomeFund?: IncomeFundUI;
+  endownmentPermanent?: EndownmentPermanentUI;
+  endownmentExpendable?: EndownmentExpendableUI;
+};
 export type DesignatedFundUI = {
-  projectEndDate: Date;
   designateMeeting: string;
   designatedBal: number;
-  curcyCodeDesignatedBal: string;
+  curcyCode: string;
   currentBal: number;
-  curcyCodecurrentBal: string;
-  designatedDate: string;
-  releasedDate: string;
+
+  designatedDate: Date;
+  releasedDate: Date | null;
   designatedMeeting: string;
-  undesignateMeeting: string;
-  designatedById: string;
-  designationReleasedById: string;
-  designationCreatedById: string;
-  balances: FundBalanceUI[];
+  undesignateMeeting?: string;
+  designatedById?: string;
+  designationReleasedById?: string;
+  designationCreatedById?: string;
+  balances?: FundBalanceUI[];
 };
 
 export type IncomeFundUI = {
@@ -32,27 +41,23 @@ export type IncomeFundUI = {
 };
 
 export type EndownmentPermanentUI = {
-  initalCapitalAmount: number;
-  curcyCodeInitialCapitalAmount: string;
+  initalCapital: number;
+  incomeEarned: number;
   incomeBalance: number;
-  curcyCodeIncomeBal: string;
   capitalBalance: number;
-  curcyCodeCapitalBal: string;
-  permanentIncomeBalances: FundBalanceUI[];
-  permanentCapitalBalances: FundBalanceUI[];
+  curcyCode: string;
+  permanentIncomeBalances?: FundBalanceUI[];
+  permanentCapitalBalances?: FundBalanceUI[];
 };
 
 export type EndownmentExpendableUI = {
   initalCapital: number;
-  curcyCodeInitialCapital: string;
-  incomeAmount: number;
-  curcyCodeIncomeAmount: string;
+  incomeEarned: number;
   incomeBalance: number;
-  curcyCodeIncomeBalance: string;
   capitalBalance: number;
-  curcyCodeCapitalBal: number;
-  expendableIncomeBalances: FundBalanceUI[];
-  expendableCapitalBalances: FundBalanceUI[];
+  curcyCode: string;
+  expendableIncomeBalances?: FundBalanceUI[];
+  expendableCapitalBalances?: FundBalanceUI[];
 };
 
 export type FundUI = {
@@ -62,9 +67,8 @@ export type FundUI = {
   objective?: string;
   fundType: string;
   reviewDate: Date;
+  restrictedFund?: RestrictedFundUI;
   generalFund?: GeneralFundUI;
-  designatedFund?: DesignatedFundUI;
-  incomefund?: IncomeFundUI;
-  endownmentPermanent?: EndownmentPermanentUI;
   endownmentExpendable?: EndownmentExpendableUI;
+  endownmentPermanent?: EndownmentPermanentUI;
 };

@@ -1,4 +1,4 @@
-import { LayoutProvider } from '../layout/context/layoutcontext';
+// import { LayoutProvider } from '../layout/context/layoutcontext';
 
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
@@ -12,10 +12,7 @@ import '~/src/styles/globals.css';
 import Footer from './components/footer';
 import { Suspense } from 'react';
 
-import { TanstackProvider } from '../components/client/providers/tanstack-provider';
-import { auth } from '../lib/auth';
-import { headers } from 'next/headers';
-import { unauthorized } from 'next/navigation';
+import Providers from './providers';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -37,18 +34,19 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       </head>
       <body>
         <Suspense>
-          <PrimeReactProvider>
+          <Providers>{children}</Providers>
+          {/* <PrimeReactProvider>
             {/* <div className='flex  min-h-screen '> */}
-            <LayoutProvider>
+          {/* <LayoutProvider>
               <TanstackProvider>{children}</TanstackProvider>
-            </LayoutProvider>
-            {/* </div> */}
-            <div className='fixed bottom-0  right-0 left-0 '>
+            </LayoutProvider> */}
+          {/* </div> */}
+          {/* <div className='fixed bottom-0  right-0 left-0 '>
               <div className='flex align-self-center align-items-center justify-content-center '>
                 <Footer />
               </div>
             </div>
-          </PrimeReactProvider>
+          </PrimeReactProvider> */}
         </Suspense>
       </body>
     </html>

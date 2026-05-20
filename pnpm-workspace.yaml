@@ -1,0 +1,9 @@
+allowBuilds:
+  '@prisma/client': set this to true or false
+  '@prisma/engines': set this to true or false
+  '@tree-sitter-grammars/tree-sitter-yaml': true
+  core-js-pure: true
+  prisma: set this to true or false
+  sharp: set this to true or false
+  tree-sitter: true
+  tree-sitter-json: true

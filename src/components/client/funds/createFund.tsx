@@ -3,7 +3,7 @@
 import { Card } from 'primereact/card';
 import { Toast, ToastMessage } from 'primereact/toast';
 
-import { SyntheticEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -22,8 +22,7 @@ import { fundAddAction } from '~/src/actions/company/fund/masterdata';
 import { TabPanel, TabView, TabViewTabChangeEvent } from 'primereact/tabview';
 import { InputSwitch } from 'primereact/inputswitch';
 import { statusEnum } from '~/src/types/helper';
-import { Value } from '../../../generated/prisma/runtime/library';
-import { redirect } from 'next/navigation';
+
 import { useRouter } from 'next/navigation';
 
 interface props {

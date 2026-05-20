@@ -54,6 +54,9 @@ async function getClient() {
     organizationId,
     organizationRole,
   };
+  console.log(`userContext ${JSON.stringify(userContext, null, 2)}`)
+  
+  
   return authDb.$setAuth(userContext as any);
 }
 

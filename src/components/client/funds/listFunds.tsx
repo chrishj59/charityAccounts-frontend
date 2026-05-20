@@ -45,10 +45,10 @@ export default function ListFundsUI({ fundList }: FundListProps) {
     DataTableExpandedRows | GeneralFundUI[]
   >([]);
 
-  const formatter = new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-  });
+  // const formatter = new Intl.NumberFormat('en-GB', {
+  //   style: 'currency',
+  //   currency: 'GBP',
+  // });
 
   const gbpFormatter = getGbpFormatter();
   const shortDateFormatter = getShortDateFormatter();

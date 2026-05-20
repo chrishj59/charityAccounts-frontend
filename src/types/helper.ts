@@ -3,6 +3,7 @@ import { ToastMessage } from 'primereact/toast';
 
 import { Dispatch, SetStateAction } from 'react';
 import { FiscalPeriodRule } from '~/zenstack/models';
+import { FundUI } from './ui-types/fund';
 
 export type Dispatcher<S> = Dispatch<SetStateAction<S>>;
 
@@ -40,3 +41,12 @@ export type userContextType = {
   organizationId: string;
   organizationRole?: string;
 };
+
+export function isFundUI(value: FundUI | responseType): value is FundUI {
+  return (
+    value != null &&
+    typeof value === 'object' &&
+    'id' in value &&
+    'fundName' in value
+  );
+}

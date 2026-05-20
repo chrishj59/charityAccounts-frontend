@@ -66,7 +66,7 @@ export type FundUI = {
   donarName?: string;
   objective?: string;
   fundType: string;
-  reviewDate: Date;
+  reviewDate?: Date;
   restrictedFund?: RestrictedFundUI;
   generalFund?: GeneralFundUI;
   endownmentExpendable?: EndownmentExpendableUI;

@@ -6,7 +6,8 @@ import { getUserDb } from '~/src/lib/db';
 import { responseType, statusEnum } from '~/src/types/helper';
 
 import { ORMError, ORMErrorReason } from '@zenstackhq/orm';
-import { ISO4217Currency } from '~/zenstack/models';
+import { Fund, ISO4217Currency } from '~/zenstack/models';
+import { FundUI } from '~/src/types/ui-types/fund';
 // TODO: Add currencyb param from UI when other currencies support
 const getCurrency = async (
   currcode: string,
@@ -298,6 +299,73 @@ const permanentFund = async (
   }
 };
 
+export async function getFundById(
+  fundId: string,
+  userId: string,
+  orgId: string,
+): Promise<FundUI | responseType> {
+  const userDb = await getUserDb(userId, orgId);
+
+  try {
+    const fund = await userDb.fund.findFirst({ where: { id: fundId } });
+    console.log(`getFundById returns ${JSON.stringify(fund, null, 2)}`);
+    if (!fund) {
+      return {
+        status: statusEnum.ERROR,
+        message: `Could not find  Fund by id ${fundId}`,
+        // errMessage: `Update error ${JSON.stringify(error)}`,
+      };
+    } else {
+      let _fund: FundUI = {
+        id: fund.id,
+        fundName: fund.fundName,
+        fundType: fund.fundType,
+        reviewDate: fund.reviewDate ? fund.reviewDate : undefined,
+      };
+      _fund.fundName = fund.fundName;
+      return _fund;
+    }
+    designatedFund;
+  } catch (error) {
+    if (error instanceof ORMError) {
+      return {
+        status: statusEnum.ERROR,
+        message: error.message,
+        errMessage: error.reason,
+      };
+    }
+  }
+  return {
+    status: statusEnum.ERROR,
+    message: `Could not find  Fund by id ${fundId}`,
+    // errMessage: `Update error ${JSON.stringify(error)}`,
+  };
+}
+export async function fundUpdateAction(
+  fund: FundNewFormValues,
+  userId: string,
+  orgId: string,
+): Promise<responseType> {
+  const fundType = fund.fundType;
+  switch (fundType) {
+    case 'General':
+      return addGeneralFund(fundType, fund, userId, orgId);
+
+    case 'Designated':
+      return designatedFund(fundType, fund, userId, orgId);
+    case 'Income':
+      return incomeFund(fundType, fund, userId, orgId);
+    case 'Expendable':
+      return expendableFund(fundType, fund, userId, orgId);
+    case 'Permanent':
+      return permanentFund(fundType, fund, userId, orgId);
+  }
+  return {
+    status: statusEnum.ERROR,
+    message: `Fund type  ${fundType} is not known`,
+    errMessage: `Invalid fund type ${fundType}`,
+  };
+}
 export async function fundAddAction(
   fund: FundNewFormValues,
   userId: string,

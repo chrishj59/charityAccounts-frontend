@@ -34,13 +34,16 @@ async function getClient() {
     return authDb;
   }
 
-  let organizationId;
+  let organizationId: string = '';
   let organizationRole: string | undefined = undefined;
   const { session } = sessionResult;
 
   if (session.organizationId) {
     // if there's an active orgId, get the role of the user in the org
-    organizationId = session.organizationId;
+    const rawOrgId = session.organizationId;
+    organizationId =
+      typeof rawOrgId === 'string' ? rawOrgId : rawOrgId?.organizationId;
+
     const org = await auth.api.getFullOrganization({ headers: reqHeaders });
     if (org?.members) {
       const myMember = org.members.find((m) => m.userId === session.userId);
@@ -49,20 +52,22 @@ async function getClient() {
   }
 
   // create enhanced client with user context
+
   const userContext = {
     userId: session.userId,
     organizationId,
     organizationRole,
   };
-  console.log(`userContext ${JSON.stringify(userContext, null, 2)}`)
-  
-  
+
   return authDb.$setAuth(userContext as any);
 }
 
 const handler = NextRequestHandler({
   apiHandler: new RPCApiHandler({ schema }),
-  // apiHandler: new RestApiHandler({ schema, endpoint: 'http://localhost/api' }),
+  // apiHandler: new RestApiHandler({
+  //   schema,
+  //   endpoint: `${process.env.NEXT_PUBLIC_APP_URL}/api/model`,
+  // }),
   getClient,
   useAppDir: true,
 });

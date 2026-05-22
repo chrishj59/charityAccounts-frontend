@@ -26,12 +26,11 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { FloatLabel } from 'primereact/floatlabel';
 import { Calendar } from 'primereact/calendar';
-import { Fund } from '~/zenstack/models';
+
 import { FundUI } from '../../../types/ui-types/fund';
 import { useClientQueries } from '@zenstackhq/tanstack-query/react';
 import { schema } from '~/zenstack/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { data } from 'framer-motion/client';
 
 interface FundListProps {
   userId: string;
@@ -54,14 +53,16 @@ export default function EditFund({ userId, orgId, selectList }: FundListProps) {
     fundType: 'General',
   };
   // selected item from the dropdown (id + name only)
-const [selectedFund, setSelectedFund] = useState<fundSelectInterface | null>(null);
+  const [selectedFund, setSelectedFund] = useState<fundSelectInterface | null>(
+    null,
+  );
   // const [selectedFund, setSelectedFund] =
   //   useState<fundSelectInterface>(defaultSelectedFund);
-  
+
   // const [currentFund, setCurrentFund] = useState<FundUI>();
 
   // full fund data loaded from DB
-   const [currentFund, setCurrentFund] = useState<FundUI | null>(null);
+  const [currentFund, setCurrentFund] = useState<FundUI | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [reviewDate, setReviewDate] = useState<Date>(new Date());
@@ -129,37 +130,37 @@ const [selectedFund, setSelectedFund] = useState<fundSelectInterface | null>(nul
     reValidateMode: 'onChange',
   });
 
-  const { data: fundData } = 
-  client.fund.useFindFirst(
-  { where: { id: selectedFund?.id ?? '' } },
-  { enabled: !!selectedFund?.id }
-);
+  const {
+    data: fundData,
+    isLoading,
+    isError,
+  } = client.fund.useFindUnique(
+    { where: { id: selectedFund?.id ?? '' } },
+    { enabled: !!selectedFund?.id },
+  );
 
-useEffect(() => {
-  alert(`fund useEffect called  with fundData ${JSON.stringify(fundData, null, 2)}`)
-  if (!fundData) return;
- alert(`fundData ${JSON.stringify(fundData, null, 2)}`)
-  const fundUI: FundUI = {
-    id: fundData.id,
-    fundName: fundData.fundName,
-    objective: fundData.objective ?? undefined,
-    fundType: fundData.fundType,
-    // ...map remaining fields
-  };
+  useEffect(() => {
+    if (!fundData) return;
 
-  setCurrentFund(fundUI);
+    const fundUI: FundUI = {
+      id: fundData.id,
+      fundName: fundData.fundName,
+      objective: fundData.objective ?? undefined,
+      fundType: fundData.fundType,
+      // ...map remaining fields
+    };
 
-  reset({
-    name: fundData.fundName,
-    objective: fundData.objective ?? '',
-  });
-}, [fundData]);
+    setCurrentFund(fundUI);
 
+    reset({
+      name: fundData.fundName,
+      objective: fundData.objective, //fundData.objective ?? '',
+    });
+  }, [fundData]);
 
   const onFundChange = (e: { value: fundSelectInterface }) => {
-    alert(`call setSelectedFund`)
-  setSelectedFund(e.value);   // { id, name } — triggers useFindFirst
-};
+    setSelectedFund(e.value); // { id, name } — triggers useFindFirst
+  };
 
   const handleObjectiveChange = async (e: string) => {
     setValue('objective', e);
@@ -177,8 +178,6 @@ useEffect(() => {
   const onFundSubmit = async (formData: FundNewFormValues) => {
     setLoading(true);
     const fundType = formData.fundType;
-
-    
 
     try {
       const resp = await fundUpdateAction(formData, userId, orgId);

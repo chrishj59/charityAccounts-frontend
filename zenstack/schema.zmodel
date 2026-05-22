@@ -502,8 +502,8 @@ model Fund {
   @@delegate(type)
   //restricted by organisation
 
-  // @@allow('all', auth().organizationId == organizationId)
-  @@allow('all', true)
+  @@allow('all', auth().organizationId == organizationId)
+  
   
 }
 
@@ -515,6 +515,8 @@ model GeneralFund extends Fund {
   currencyId  Int
   currency ISO4217Currency @relation(name: 'genFundCurr',fields: [currencyId], references: [id])
   @@allow('all', auth().organizationId == organizationId)
+  
+
 }
 
 model RestrictedFund extends Fund {

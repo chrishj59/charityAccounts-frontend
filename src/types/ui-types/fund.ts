@@ -1,3 +1,5 @@
+import { UserUI } from './user';
+
 type FundBalanceUI = {
   fiscalPeriod: number;
   fiscalYear: number;
@@ -20,7 +22,7 @@ export type RestrictedFundUI = {
   endownmentExpendable?: EndownmentExpendableUI;
 };
 export type DesignatedFundUI = {
-  designateMeeting: string;
+  // designateMeeting: string;
   designatedBal: number;
   curcyCode: string;
   currentBal: number;
@@ -32,6 +34,7 @@ export type DesignatedFundUI = {
   designatedById?: string;
   designationReleasedById?: string;
   designationCreatedById?: string;
+  designationCreatedBy?: UserUI;
   balances?: FundBalanceUI[];
 };
 
@@ -67,8 +70,17 @@ export type FundUI = {
   objective?: string;
   fundType: string;
   reviewDate?: Date;
+  designatedFund?: DesignatedFundUI;
   restrictedFund?: RestrictedFundUI;
   generalFund?: GeneralFundUI;
   endownmentExpendable?: EndownmentExpendableUI;
   endownmentPermanent?: EndownmentPermanentUI;
 };
+
+export enum FundTypeEnum {
+  'General',
+  'Designated',
+  'Income',
+  'Expendable',
+  'Permanent',
+}

@@ -4,7 +4,8 @@ import EditFund from '~/src/components/client/funds/EditFund';
 import { fundSelectInterface } from '~/src/interface/fundSelect.interface';
 import { auth } from '~/src/lib/auth';
 import { getUserDb } from '~/src/lib/db';
-import { Fund } from '~/zenstack/models';
+import { UserUI } from '~/src/types/ui-types/user';
+import { Fund, User } from '~/zenstack/models';
 
 export default async function EditFundPage() {
   const session = await auth.api.getSession({
@@ -36,7 +37,24 @@ export default async function EditFundPage() {
     selectOptions.push(selOption);
   });
 
+  const userList: UserUI[] = [];
+  const users: User[] = await userDb.user.findMany();
+  users.forEach((fnd) => {
+    const _user: UserUI = {
+      id: fnd.id,
+      name: fnd.name,
+      displayName: fnd.displayName,
+    };
+    userList.push(_user);
+  });
+  console.log(`EditFundPage has users ${JSON.stringify(userList, null, 2)}`);
+
   return (
-    <EditFund userId={usr.id} orgId={userOrgId} selectList={selectOptions} />
+    <EditFund
+      userId={usr.id}
+      orgId={userOrgId}
+      selectList={selectOptions}
+      userList={userList}
+    />
   );
 }

@@ -65,118 +65,120 @@ export default function ListFundsUI({ fundList }: FundListProps) {
         fundType: _fundDB.fundType,
         reviewDate: _fundDB.reviewDate ? _fundDB.reviewDate : new Date(),
       };
-      if (_fundDB.type === 'GeneralFund') {
-        const _generalFund: GeneralFundUI = {
-          balance: _fundDB.balance ? _fundDB.balance : Number(0),
-          curcyCode: _fundDB.curcyCode,
-        };
-        _fund.generalFund = _generalFund;
 
-        const _funds = funds;
-        _funds.push(_fund);
-        setFunds(_funds);
-      } else if (
-        _fundDB.type === 'RestrictedFund' &&
-        _fundDB.restrictedType === 'DesignatedFund'
-      ) {
-        console.log(`Designated fund ${JSON.stringify(_fundDB, null, 2)}`);
+      funds.push(_fund);
+      // if (_fundDB.type === 'GeneralFund') {
+      //   const _generalFund: GeneralFundUI = {
+      //     balance: _fundDB.balance ? _fundDB.balance : Number(0),
+      //     curcyCode: _fundDB.curcyCode,
+      //   };
+      //   _fund.generalFund = _generalFund;
 
-        const _restrictedFund: RestrictedFundUI = {
-          nextDonarReviewDate: _fundDB.nextDonarReviewDate
-            ? _fundDB.nextDonarReviewDate
-            : new Date(),
-        };
-        _fund.restrictedFund = _restrictedFund;
-        const _designatedFund: DesignatedFundUI = {
-          designateMeeting: _fundDB.designatedMeeting,
-          designatedBal: _fundDB.designatedBal,
-          curcyCode: _fundDB.curcyCode,
-          currentBal: _fundDB.currentBal,
-          designatedDate: _fundDB.designatedDate,
-          releasedDate: _fundDB.releasedDate,
-          designatedMeeting: _fundDB.designatedMeeting,
-          undesignateMeeting: _fundDB.undesignateMeeting
-            ? _fundDB.undesignateMeeting
-            : '',
-        };
+      //   const _funds = funds;
+      //   _funds.push(_fund);
+      //   setFunds(_funds);
+      // } else if (
+      //   _fundDB.type === 'RestrictedFund' &&
+      //   _fundDB.restrictedType === 'DesignatedFund'
+      // ) {
+      //   console.log(`Designated fund ${JSON.stringify(_fundDB, null, 2)}`);
 
-        _fund.restrictedFund.designatedFund = _designatedFund;
-        const _funds = funds;
-        _funds.push(_fund);
-        setFunds(_funds);
-      } else if (
-        _fundDB.type === 'RestrictedFund' &&
-        _fundDB.restrictedType === 'IncomeFund'
-      ) {
-        const _restrictedFund: RestrictedFundUI = {
-          projectEndDate: _fundDB.projectEndDate,
-          nextDonarReviewDate: _fundDB.nextDonarReviewDate
-            ? _fundDB.nextDonarReviewDate
-            : new Date(),
-          returnSurplus: _fundDB.returnSurplus ? _fundDB.returnSurplus : false,
-        };
+      //   const _restrictedFund: RestrictedFundUI = {
+      //     nextDonarReviewDate: _fundDB.nextDonarReviewDate
+      //       ? _fundDB.nextDonarReviewDate
+      //       : new Date(),
+      //   };
+      //   _fund.restrictedFund = _restrictedFund;
+      //   const _designatedFund: DesignatedFundUI = {
+      //     // designateMeeting: _fundDB.designatedMeeting,
+      //     designatedBal: _fundDB.designatedBal,
+      //     curcyCode: _fundDB.curcyCode,
+      //     currentBal: _fundDB.currentBal,
+      //     designatedDate: _fundDB.designatedDate,
+      //     releasedDate: _fundDB.releasedDate,
+      //     designatedMeeting: _fundDB.designatedMeeting,
+      //     undesignateMeeting: _fundDB.undesignateMeeting
+      //       ? _fundDB.undesignateMeeting
+      //       : '',
+      //   };
 
-        _fund.restrictedFund = _restrictedFund;
-        console.log(`Income fund ${JSON.stringify(_fundDB, null, 2)}`);
-        const _incomeFund: IncomeFundUI = {
-          balance: _fundDB.balance ? _fundDB.balance : Number(0),
-          curcyCodeBalance: _fundDB.curcyCode,
-        };
-        _fund.restrictedFund.incomeFund = _incomeFund;
-        const _funds = funds;
-        _funds.push(_fund);
-        setFunds(_funds);
-      } else if (
-        _fundDB.type === 'RestrictedFund' &&
-        _fundDB.restrictedType === 'EndownmentExpendable'
-      ) {
-        const _restrictedFund: RestrictedFundUI = {
-          projectEndDate: _fundDB.projectEndDate,
-          nextDonarReviewDate: _fundDB.nextDonarReviewDate
-            ? _fundDB.nextDonarReviewDate
-            : new Date(),
-          returnSurplus: _fundDB.returnSurplus ? _fundDB.returnSurplus : false,
-        };
+      //   _fund.restrictedFund.designatedFund = _designatedFund;
+      //   const _funds = funds;
+      //   _funds.push(_fund);
+      //   setFunds(_funds);
+      // } else if (
+      //   _fundDB.type === 'RestrictedFund' &&
+      //   _fundDB.restrictedType === 'IncomeFund'
+      // ) {
+      //   const _restrictedFund: RestrictedFundUI = {
+      //     projectEndDate: _fundDB.projectEndDate,
+      //     nextDonarReviewDate: _fundDB.nextDonarReviewDate
+      //       ? _fundDB.nextDonarReviewDate
+      //       : new Date(),
+      //     returnSurplus: _fundDB.returnSurplus ? _fundDB.returnSurplus : false,
+      //   };
 
-        _fund.restrictedFund = _restrictedFund;
+      //   _fund.restrictedFund = _restrictedFund;
+      //   console.log(`Income fund ${JSON.stringify(_fundDB, null, 2)}`);
+      //   const _incomeFund: IncomeFundUI = {
+      //     balance: _fundDB.balance ? _fundDB.balance : Number(0),
+      //     curcyCodeBalance: _fundDB.curcyCode,
+      //   };
+      //   _fund.restrictedFund.incomeFund = _incomeFund;
+      //   const _funds = funds;
+      //   _funds.push(_fund);
+      //   setFunds(_funds);
+      // } else if (
+      //   _fundDB.type === 'RestrictedFund' &&
+      //   _fundDB.restrictedType === 'EndownmentExpendable'
+      // ) {
+      //   const _restrictedFund: RestrictedFundUI = {
+      //     projectEndDate: _fundDB.projectEndDate,
+      //     nextDonarReviewDate: _fundDB.nextDonarReviewDate
+      //       ? _fundDB.nextDonarReviewDate
+      //       : new Date(),
+      //     returnSurplus: _fundDB.returnSurplus ? _fundDB.returnSurplus : false,
+      //   };
 
-        const _endownmentExpendable: EndownmentExpendableUI = {
-          initalCapital: _fundDB.initalCapital,
-          incomeEarned: _fundDB.incomeEarned,
-          incomeBalance: _fundDB.incomeBalance,
-          capitalBalance: _fundDB.capitalBalance,
-          curcyCode: _fundDB.curcyCode,
-        };
-        _fund.restrictedFund.endownmentExpendable = _endownmentExpendable;
-        const _funds = funds;
-        _funds.push(_fund);
-        setFunds(_funds);
-      } else if (
-        _fundDB.type === 'RestrictedFund' &&
-        _fundDB.restrictedType === 'EndownmentPermanent'
-      ) {
-        const _restrictedFund: RestrictedFundUI = {
-          projectEndDate: _fundDB.projectEndDate,
-          nextDonarReviewDate: _fundDB.nextDonarReviewDate
-            ? _fundDB.nextDonarReviewDate
-            : new Date(),
-          returnSurplus: _fundDB.returnSurplus ? _fundDB.returnSurplus : false,
-        };
+      //   _fund.restrictedFund = _restrictedFund;
 
-        _fund.restrictedFund = _restrictedFund;
+      //   const _endownmentExpendable: EndownmentExpendableUI = {
+      //     initalCapital: _fundDB.initalCapital,
+      //     incomeEarned: _fundDB.incomeEarned,
+      //     incomeBalance: _fundDB.incomeBalance,
+      //     capitalBalance: _fundDB.capitalBalance,
+      //     curcyCode: _fundDB.curcyCode,
+      //   };
+      //   _fund.restrictedFund.endownmentExpendable = _endownmentExpendable;
+      //   const _funds = funds;
+      //   _funds.push(_fund);
+      //   setFunds(_funds);
+      // } else if (
+      //   _fundDB.type === 'RestrictedFund' &&
+      //   _fundDB.restrictedType === 'EndownmentPermanent'
+      // ) {
+      //   const _restrictedFund: RestrictedFundUI = {
+      //     projectEndDate: _fundDB.projectEndDate,
+      //     nextDonarReviewDate: _fundDB.nextDonarReviewDate
+      //       ? _fundDB.nextDonarReviewDate
+      //       : new Date(),
+      //     returnSurplus: _fundDB.returnSurplus ? _fundDB.returnSurplus : false,
+      //   };
 
-        const endownmentPermanent: EndownmentPermanentUI = {
-          initalCapital: _fundDB.initalCapital,
-          incomeEarned: _fundDB.incomeEarned,
-          incomeBalance: _fundDB.incomeBalance,
-          capitalBalance: _fundDB.capitalBalance,
-          curcyCode: _fundDB.curcyCode,
-        };
-        _fund.restrictedFund.endownmentPermanent = endownmentPermanent;
-        const _funds = funds;
-        _funds.push(_fund);
-        setFunds(_funds);
-      }
+      //   _fund.restrictedFund = _restrictedFund;
+
+      //   const endownmentPermanent: EndownmentPermanentUI = {
+      //     initalCapital: _fundDB.initalCapital,
+      //     incomeEarned: _fundDB.incomeEarned,
+      //     incomeBalance: _fundDB.incomeBalance,
+      //     capitalBalance: _fundDB.capitalBalance,
+      //     curcyCode: _fundDB.curcyCode,
+      //   };
+      //   _fund.restrictedFund.endownmentPermanent = endownmentPermanent;
+      //   const _funds = funds;
+      //   _funds.push(_fund);
+      //   setFunds(_funds);
+      // }
     }
   }, []);
 
@@ -258,7 +260,7 @@ export default function ListFundsUI({ fundList }: FundListProps) {
               <div> </div>
               <div className='font-medium'>Designated meeting:</div>
               <div className='font-medium'>
-                {fund.restrictedFund?.designatedFund?.designateMeeting}
+                {fund.restrictedFund?.designatedFund?.designatedMeeting}
               </div>
             </div>
             <div className='mt-4 flex justify-center'>
@@ -491,6 +493,7 @@ export default function ListFundsUI({ fundList }: FundListProps) {
         dataKey='id'
       >
         <Column expander={allowExpansion} style={{ width: '5rem' }} />
+        {/* <Column field='id' header='id' /> */}
         <Column field='fundName' header='Fund'></Column>
         <Column field='donarName' header='Donar'></Column>
         <Column field='objective' header='Fund Objective'></Column>

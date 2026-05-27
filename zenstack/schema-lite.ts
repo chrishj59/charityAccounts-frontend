@@ -326,6 +326,20 @@ export class SchemaType implements SchemaDef {
                     name: "lastLoginMethod",
                     type: "String",
                     optional: true
+                },
+                organizationId: {
+                    name: "organizationId",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "organization"
+                    ] as readonly string[]
+                },
+                organization: {
+                    name: "organization",
+                    type: "Organization",
+                    optional: true,
+                    relation: { opposite: "users", fields: ["organizationId"], references: ["id"] }
                 }
             },
             idFields: ["id"],
@@ -535,6 +549,12 @@ export class SchemaType implements SchemaDef {
                 postingPeriods: {
                     name: "postingPeriods",
                     type: "PostingPeriod",
+                    array: true,
+                    relation: { opposite: "organization" }
+                },
+                users: {
+                    name: "users",
+                    type: "User",
                     array: true,
                     relation: { opposite: "organization" }
                 },

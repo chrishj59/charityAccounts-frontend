@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Card } from 'primereact/card';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast, ToastMessage } from 'primereact/toast';
-import { useEffect, useRef, useState } from 'react';
+import { JSX, useEffect, useRef, useState } from 'react';
 import { fundSelectInterface } from '~/src/interface/fundSelect.interface';
 import { Stepper } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
@@ -27,18 +27,38 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { FloatLabel } from 'primereact/floatlabel';
 import { Calendar } from 'primereact/calendar';
 
-import { FundUI } from '../../../types/ui-types/fund';
+import {
+  FundUI,
+  FundTypeEnum,
+  DesignatedFundUI,
+} from '~/src/types/ui-types/fund'; //'../../../types/ui-types/fund';
 import { useClientQueries } from '@zenstackhq/tanstack-query/react';
 import { schema } from '~/zenstack/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { getGbpFormatter } from '~/src/lib/Intl/numberFormatter';
+import { getShortDateFormatter } from '~/src/lib/Intl/dateFormatter';
+import { ISOCountryCheckedCreateInput } from '../../../../zenstack/input';
+
+import {
+  FundEditFormValues,
+  fundEditSchema,
+} from '~/src/zodSchema/fund-edit-schema';
+import { UserUI } from '~/src/types/ui-types/user';
+import { userInputValues } from '~/src/zodSchema/signupUser-schema';
 
 interface FundListProps {
   userId: string;
   orgId: string;
   selectList: fundSelectInterface[];
+  userList: UserUI[];
 }
 
-export default function EditFund({ userId, orgId, selectList }: FundListProps) {
+export default function EditFund({
+  userId,
+  orgId,
+  selectList,
+  userList,
+}: FundListProps) {
   const client = useClientQueries(schema);
   const toast = useRef<Toast>(null);
   const router = useRouter();
@@ -56,6 +76,12 @@ export default function EditFund({ userId, orgId, selectList }: FundListProps) {
   const [selectedFund, setSelectedFund] = useState<fundSelectInterface | null>(
     null,
   );
+  const [selectedDesignatedBy, setSelecteDesignatedBy] =
+    useState<UserUI | null>(null);
+  const [selectedDesignationCreatedBy, setSelectedDesignationCreatedBy] =
+    useState<UserUI | null>(null);
+  const [selectedDesignationReleasedBy, setSelectedDesignationReleasedBy] =
+    useState<UserUI | null>(null);
   // const [selectedFund, setSelectedFund] =
   //   useState<fundSelectInterface>(defaultSelectedFund);
 
@@ -95,6 +121,9 @@ export default function EditFund({ userId, orgId, selectList }: FundListProps) {
       description: 'Restricted - Permanent Endownment',
     },
   ];
+  const gbpFormatter = getGbpFormatter();
+  const shortDateFormatter = getShortDateFormatter();
+
   const currDate = new Date();
   const getFormErrorMessage = (name: string) => {
     return (
@@ -123,8 +152,8 @@ export default function EditFund({ userId, orgId, selectList }: FundListProps) {
 
     formState: { errors },
     control,
-  } = useForm<FundNewFormValues>({
-    resolver: zodResolver(fundNewSchema), // Integrate Zod for schema-based validation
+  } = useForm<FundEditFormValues>({
+    resolver: zodResolver(fundEditSchema), // Integrate Zod for schema-based validation
     defaultValues: fundDefaultValues,
     mode: 'onChange',
     reValidateMode: 'onChange',
@@ -132,29 +161,90 @@ export default function EditFund({ userId, orgId, selectList }: FundListProps) {
 
   const {
     data: fundData,
+    isSuccess,
     isLoading,
-    isError,
-  } = client.fund.useFindUnique(
-    { where: { id: selectedFund?.id ?? '' } },
-    { enabled: !!selectedFund?.id },
-  );
+  } = client.fund.useFindUnique({
+    where: { id: selectedFund?.id ?? '' },
+  });
+
+  const isDesignated = fundData?.type === 'DesignatedFund';
+  const {
+    data: designatedFundData,
+    isSuccess: designatedSuccess,
+    isLoading: designatedIsLoading,
+  } = client.designatedFund.useFindUnique({
+    where: { id: isDesignated ? (selectedFund?.id ?? '') : '' },
+    include: {
+      createdBy: true,
+      organization: true,
+      // ZenStack v3 chained delegate — nest through each level
+      RestrictedFund: {
+        include: {
+          DesignatedFund: {
+            include: {
+              designationCreatedBy: true,
+              designationReleasedBy: true,
+              designatedBy: true,
+              currency: true,
+              balances: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const fundLoaded = isSuccess && !!fundData;
+  const designatedLoaded = designatedSuccess && !!designatedFundData;
 
   useEffect(() => {
-    if (!fundData) return;
+    console.log(`fundData: ${JSON.stringify(fundData, null, 2)}`);
+    console.log(
+      `designatedLoaded: ${JSON.stringify(designatedLoaded, null, 2)}`,
+    );
 
+    if (!fundData) return;
+    const _fundType = fundData.fundType;
     const fundUI: FundUI = {
       id: fundData.id,
       fundName: fundData.fundName,
       objective: fundData.objective ?? undefined,
       fundType: fundData.fundType,
+      reviewDate: fundData.reviewDate,
       // ...map remaining fields
     };
+    switch (_fundType) {
+      case 'Designated':
+        console.log(
+          `designated by id ${JSON.stringify(fundData.designatedById, null, 2)}`,
+        );
+        const designatedUI: DesignatedFundUI = {
+          designatedBal: fundData.designatedBal,
+          curcyCode: fundData.curcyCode,
+          currentBal: fundData.currentBal,
+          designatedDate: fundData.designatedDate,
+          releasedDate: fundData.releasedDate,
+          designatedMeeting: fundData.designatedMeeting,
+          undesignateMeeting: fundData.undesignateMeeting,
+          designatedById: fundData.designatedById,
+          designationReleasedById: fundData.designationReleasedById,
+        };
+        fundUI.designatedFund = designatedUI;
+        break;
+    }
 
+    console.log(`fundUI ${JSON.stringify(fundUI, null, 2)}`);
     setCurrentFund(fundUI);
 
     reset({
       name: fundData.fundName,
       objective: fundData.objective, //fundData.objective ?? '',
+      fundType: fundData.fundType,
+      designatedMeeting: fundData.designatedMeeting,
+      designatedDate: fundData.designatedDate,
+      undesignateMeeting: fundData.undesignateMeeting,
+      designatedById: fundData.designatedById,
+      designationReleasedById: fundData.designationReleasedById,
     });
   }, [fundData]);
 
@@ -175,6 +265,367 @@ export default function EditFund({ userId, orgId, selectList }: FundListProps) {
 
     (setReviewDate(value), setValue('reviewDate', value));
   };
+
+  const getNextStepperStep = () => {
+    stepperRef.current?.nextCallback();
+  };
+
+  const getPreviousStepperStep = () => {
+    stepperRef.current?.prevCallback();
+  };
+  const selectedUserStatusTemplate = (option: UserUI, props: any) => {
+    if (option) {
+      return (
+        <div className='flex align-items-center'>
+          <div>{option.name}</div>
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const userStatusOptionTemplate = (option: UserUI) => {
+    return (
+      <div className='flex align-items-center'>
+        <div className='mr-2'>User:</div>
+        <div>{option.name}</div>
+      </div>
+    );
+  };
+  const renderFundBasic = (): JSX.Element => {
+    return (
+      <div className='flex flex-column '>
+        <div className='border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-left align-items-center font-medium'>
+          <div className='formgrid grid'>
+            {/* Name line */}
+            <div className='field col-12'>
+              <Controller
+                name='name'
+                control={control}
+                render={({ field, fieldState }) => (
+                  <>
+                    <label
+                      htmlFor={field.name}
+                      className={classNames({
+                        'p-error': errors.name,
+                      })}
+                    ></label>
+                    <span className='p-float-label'>
+                      <InputText
+                        id={field.name}
+                        width={'100%'}
+                        value={field.value}
+                        className={classNames({
+                          'p-invalid': fieldState.error,
+                        })}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                      <label htmlFor={field.name}>Fund Name</label>
+                    </span>
+                    {getFormErrorMessage(field.name)}
+                  </>
+                )}
+              />
+            </div>
+
+            {/* Objective */}
+            <div className='field col-12'>
+              <Controller
+                name='objective'
+                control={control}
+                render={({ field, fieldState }) => (
+                  <>
+                    <label
+                      htmlFor={field.name}
+                      className={classNames({
+                        'p-error': errors.name,
+                      })}
+                    ></label>
+                    <span className='p-float-label'>
+                      <InputTextarea
+                        id={field.name}
+                        value={field.value}
+                        rows={5}
+                        cols={40}
+                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                          handleObjectiveChange(e.target.value)
+                        }
+                        //onChange={(e) => field.onChange(e.target.value)}
+                        className={classNames({
+                          'p-invalid': fieldState.error,
+                        })}
+                      />
+                      <label htmlFor={field.name}>Fund Objective</label>
+                    </span>
+                    {getFormErrorMessage(field.name)}
+                  </>
+                )}
+              />
+            </div>
+
+            {/* Review date */}
+            <div className='field col-12'>
+              <FloatLabel>
+                <Calendar
+                  id='reviewDate'
+                  dateFormat='dd/M/yy'
+                  value={reviewDate}
+                  minDate={new Date()}
+                  onChange={(
+                    e: FormEvent<Date, React.SyntheticEvent<Element, Event>>,
+                  ) => onReviewDateChange(e.value ? e.value : currDate)}
+                  showIcon
+                />
+                <label htmlFor='reviewDate'>Progress Review Date</label>
+              </FloatLabel>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  const renderFundDetail = (): JSX.Element => {
+    const _currenFund = currentFund;
+
+    if (!_currenFund) {
+      return <div>no fund found</div>;
+    }
+    const validFund = Object.values(FundTypeEnum).includes(
+      _currenFund.fundType,
+    );
+    if (!validFund) {
+      return <div> Invalid fund type</div>;
+    }
+
+    switch (_currenFund.fundType) {
+      case 'General':
+        const fundBal = gbpFormatter.format(
+          _currenFund.generalFund?.balance
+            ? _currenFund.generalFund?.balance
+            : 0,
+        );
+        return (
+          <div className='flex justify-center '>
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='font-medium'>Balance:</div>
+              <div className='font-medium'>{fundBal}</div>
+            </div>
+          </div>
+        );
+        break;
+      case 'Designated':
+        console.log(`Designated fund: ${JSON.stringify(_currenFund, null, 2)}`);
+        const designatedDate = _currenFund.designatedFund?.designatedDate
+          ? _currenFund.designatedFund?.designatedDate
+          : new Date();
+        const releasedDate = _currenFund.designatedFund?.releasedDate;
+
+        return (
+          <>
+            <div className='flex flex-column '>
+              <div className='border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-left align-items-center font-medium'>
+                <div className='formgrid grid align-items-end'>
+                  {/***  Designated meeting row ***/}
+                  <div className='field col-4'>
+                    <Controller
+                      name='designatedMeeting'
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <>
+                          <label
+                            htmlFor={field.name}
+                            className={classNames({
+                              'p-error': errors.name,
+                            })}
+                          ></label>
+                          <span className='p-float-label'>
+                            <InputText
+                              id={field.name}
+                              width={'100%'}
+                              value={field.value}
+                              className={classNames({
+                                'p-invalid': fieldState.error,
+                              })}
+                              onChange={(e) => field.onChange(e.target.value)}
+                            />
+                            <label htmlFor={field.name}>
+                              Designation Meeting
+                            </label>
+                          </span>
+                          {getFormErrorMessage(field.name)}
+                        </>
+                      )}
+                    />
+                  </div>
+
+                  <div className='field col-4'>
+                    <FloatLabel>
+                      <Calendar
+                        id='designatedDate'
+                        dateFormat='dd/M/yy'
+                        value={designatedDate}
+                        onChange={(
+                          e: FormEvent<
+                            Date,
+                            React.SyntheticEvent<Element, Event>
+                          >,
+                        ) => onReviewDateChange(e.value ? e.value : currDate)}
+                        showIcon
+                      />
+                      <label htmlFor='designatedDate'>Designated Date</label>
+                    </FloatLabel>
+                  </div>
+
+                  <div className='field col-4'>
+                    <Controller
+                      name='designatedById'
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <>
+                          <label
+                            htmlFor={field.name}
+                            className={classNames({
+                              'p-error': errors.designatedById,
+                            })}
+                          ></label>
+                          <span className='p-float-label'>
+                            <Dropdown
+                              id={field.name}
+                              value={field.value}
+                              focusInputRef={field.ref}
+                              onBlur={field.onBlur}
+                              options={userList}
+                              disabled
+                              optionLabel='displayName'
+                              optionValue='id'
+                              placeholder='Designated by'
+                              onChange={(e) => field.onChange(e.value)}
+                              className={classNames({
+                                'p-invalid': fieldState.error,
+                              })}
+                              valueTemplate={selectedUserStatusTemplate}
+                              itemTemplate={userStatusOptionTemplate}
+                            />
+                            {getFormErrorMessage(field.name)}
+                            <label htmlFor={field.name}>Designated By</label>
+                          </span>
+                        </>
+                      )}
+                    />
+                  </div>
+
+                  {/***  Undesignated meeting row ***/}
+                  <div className='field col-4'>
+                    <Controller
+                      name='undesignateMeeting'
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <>
+                          <label
+                            htmlFor={field.name}
+                            className={classNames({
+                              'p-error': errors.name,
+                            })}
+                          ></label>
+                          <span className='p-float-label'>
+                            <InputText
+                              id={field.name}
+                              width={'100%'}
+                              value={field.value}
+                              className={classNames({
+                                'p-invalid': fieldState.error,
+                              })}
+                              onChange={(e) => field.onChange(e.target.value)}
+                            />
+                            <label htmlFor={field.name}>
+                              Designation Meeting
+                            </label>
+                          </span>
+                          {getFormErrorMessage(field.name)}
+                        </>
+                      )}
+                    />
+                  </div>
+
+                  <div className='field col-4'>
+                    <FloatLabel>
+                      <Calendar
+                        id='releasedDate'
+                        dateFormat='dd/M/yy'
+                        value={releasedDate}
+                        onChange={(
+                          e: FormEvent<
+                            Date,
+                            React.SyntheticEvent<Element, Event>
+                          >,
+                        ) => onReviewDateChange(e.value ? e.value : currDate)}
+                        showIcon
+                      />
+                      <label htmlFor='releasedDate'>Released Date</label>
+                    </FloatLabel>
+                  </div>
+
+                  <div className='field col-4'>
+                    <Controller
+                      name='designationReleasedById'
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <>
+                          <label
+                            htmlFor={field.name}
+                            className={classNames({
+                              'p-error': errors.designatedById,
+                            })}
+                          ></label>
+                          <span className='p-float-label'>
+                            <Dropdown
+                              id={field.name}
+                              value={field.value}
+                              focusInputRef={field.ref}
+                              onBlur={field.onBlur}
+                              options={userList}
+                              optionLabel='displayName'
+                              optionValue='id'
+                              placeholder='Released by'
+                              onChange={(e) => field.onChange(e.value)}
+                              className={classNames({
+                                'p-invalid': fieldState.error,
+                              })}
+                              valueTemplate={selectedUserStatusTemplate}
+                              itemTemplate={userStatusOptionTemplate}
+                            />
+                            {getFormErrorMessage(field.name)}
+                            <label htmlFor={field.name}>Designated By</label>
+                          </span>
+                        </>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        );
+      case 'Income':
+        return <div> this is an income fund</div>;
+        console.log('Mangoes and papayas are $2.79 a pound.');
+        // Expected output: "Mangoes and papayas are $2.79 a pound."
+        break;
+      case 'Expendable':
+        return <div> this is an Expendable fund</div>;
+        console.log('expendable');
+        break;
+      case 'Permanent':
+        return <div> this is an Permanent fund</div>;
+        console.log('expendable');
+      default:
+        console.log(`Sorry, we are out of ${_currenFund.fundType}.`);
+    }
+    console.log(`validFund ${validFund}`);
+    return <div> fund detail</div>;
+  };
+
   const onFundSubmit = async (formData: FundNewFormValues) => {
     setLoading(true);
     const fundType = formData.fundType;
@@ -250,118 +701,26 @@ export default function EditFund({ userId, orgId, selectList }: FundListProps) {
             <div>
               <Stepper ref={stepperRef} style={{ flexBasis: '50rem' }} linear>
                 <StepperPanel header='Basic Fund information'>
-                  <div className='flex flex-column '>
-                    <div className='border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-left align-items-center font-medium'>
-                      <div className='formgrid grid'>
-                        {/* Name line */}
-                        <div className='field col-12'>
-                          <Controller
-                            name='name'
-                            control={control}
-                            render={({ field, fieldState }) => (
-                              <>
-                                <label
-                                  htmlFor={field.name}
-                                  className={classNames({
-                                    'p-error': errors.name,
-                                  })}
-                                ></label>
-                                <span className='p-float-label'>
-                                  <InputText
-                                    id={field.name}
-                                    width={'100%'}
-                                    value={field.value}
-                                    className={classNames({
-                                      'p-invalid': fieldState.error,
-                                    })}
-                                    onChange={(e) =>
-                                      field.onChange(e.target.value)
-                                    }
-                                  />
-                                  <label htmlFor={field.name}>Fund Name</label>
-                                </span>
-                                {getFormErrorMessage(field.name)}
-                              </>
-                            )}
-                          />
-                        </div>
+                  {renderFundBasic()}
 
-                        {/* Objective */}
-                        <div className='field col-12'>
-                          <Controller
-                            name='objective'
-                            control={control}
-                            render={({ field, fieldState }) => (
-                              <>
-                                <label
-                                  htmlFor={field.name}
-                                  className={classNames({
-                                    'p-error': errors.name,
-                                  })}
-                                ></label>
-                                <span className='p-float-label'>
-                                  <InputTextarea
-                                    id={field.name}
-                                    value={field.value}
-                                    rows={5}
-                                    cols={40}
-                                    onChange={(
-                                      e: React.ChangeEvent<HTMLTextAreaElement>,
-                                    ) => handleObjectiveChange(e.target.value)}
-                                    //onChange={(e) => field.onChange(e.target.value)}
-                                    className={classNames({
-                                      'p-invalid': fieldState.error,
-                                    })}
-                                  />
-                                  <label htmlFor={field.name}>
-                                    Fund Objective
-                                  </label>
-                                </span>
-                                {getFormErrorMessage(field.name)}
-                              </>
-                            )}
-                          />
-                        </div>
-
-                        {/* Review date */}
-                        <div className='field col-12'>
-                          <FloatLabel>
-                            <Calendar
-                              id='reviewDate'
-                              dateFormat='dd/M/yy'
-                              value={reviewDate}
-                              minDate={new Date()}
-                              onChange={(
-                                e: FormEvent<
-                                  Date,
-                                  React.SyntheticEvent<Element, Event>
-                                >,
-                              ) =>
-                                onReviewDateChange(e.value ? e.value : currDate)
-                              }
-                              showIcon
-                            />
-                            <label htmlFor='reviewDate'>
-                              Progress Review Date
-                            </label>
-                          </FloatLabel>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                   <div className='flex pt-4 justify-content-end'>
                     <Button
+                      disabled={!fundLoaded}
+                      loading={isLoading}
                       label='Next'
                       icon='pi pi-arrow-right'
                       iconPos='right'
-                      onClick={() => stepperRef.current?.nextCallback()}
+                      onClick={
+                        getNextStepperStep
+                        // () => stepperRef.current?.nextCallback()
+                      }
                     />
                   </div>
                 </StepperPanel>
                 <StepperPanel header='Fund specific information'>
                   <div className='flex flex-column h-12rem'>
                     <div className='border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium'>
-                      Content II
+                      {renderFundDetail()}
                     </div>
                   </div>
                   <div className='flex pt-4 justify-content-between'>
@@ -369,13 +728,13 @@ export default function EditFund({ userId, orgId, selectList }: FundListProps) {
                       label='Back'
                       severity='secondary'
                       icon='pi pi-arrow-left'
-                      onClick={() => stepperRef.current?.prevCallback()}
+                      onClick={getPreviousStepperStep}
                     />
                     <Button
                       label='Next'
                       icon='pi pi-arrow-right'
                       iconPos='right'
-                      onClick={() => stepperRef.current?.nextCallback()}
+                      onClick={getNextStepperStep}
                     />
                   </div>
                 </StepperPanel>

@@ -18,7 +18,7 @@
     "start": "next start",
     "format": "prettier --write \"{app,demo,layout,types}/**/*.{js,ts,tsx,d.ts}\"",
     "lint": "next lint",
-    "up": "pnpm add @zenstackhq/cli@latest @zenstackhq/orm@latest @zenstackhq/server@latest @zenstackhq/tanstack-query@latest @zenstackhq/plugin-policy@latest"
+    "up": "pnpm add @zenstackhq/cli@latest @zenstackhq/better-auth @zenstackhq/orm@latest @zenstackhq/schema @zenstackhq/server@latest @zenstackhq/tanstack-query@latest @zenstackhq/plugin-policy@latest"
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.1048.0",
@@ -35,12 +35,12 @@
     "@tanstack/react-query": "^5.100.10",
     "@tanstack/react-query-devtools": "^5.100.10",
     "@visualbravo/zenstack-cache": "^1.0.7",
-    "@zenstackhq/better-auth": "^3.7.0",
-    "@zenstackhq/orm": "^3.7.0",
-    "@zenstackhq/plugin-policy": "^3.7.0",
-    "@zenstackhq/schema": "^3.7.0",
-    "@zenstackhq/server": "^3.7.0",
-    "@zenstackhq/tanstack-query": "^3.7.0",
+    "@zenstackhq/better-auth": "~3.7.1",
+    "@zenstackhq/orm": "~3.7.1",
+    "@zenstackhq/plugin-policy": "~3.7.1",
+    "@zenstackhq/schema": "~3.7.1",
+    "@zenstackhq/server": "~3.7.1",
+    "@zenstackhq/tanstack-query": "~3.7.1",
     "aws-sdk": "^2.1693.0",
     "babel-plugin-superjson-next": "^0.4.5",
     "bcryptjs": "^3.0.3",

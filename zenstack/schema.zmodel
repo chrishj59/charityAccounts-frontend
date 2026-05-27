@@ -153,6 +153,7 @@ model User {
   updatedAt              DateTime         @default(now()) @updatedAt
   // role          String?
   role                   Role             @default(user)
+  
   banned                 Boolean?
   banReason              String?
   banExpires             DateTime?
@@ -171,7 +172,12 @@ model User {
   createdDesignatedFund  DesignatedFund[] @relation(name: "designationCreate")
   releasedDesignatedFund DesignatedFund[] @relation(name: 'designationRelease')
   lastLoginMethod        String?
+  organizationId         String?
+  organization           Organization? @relation(fields: [organizationId], references: [id])
+  // @@allow('all', auth().organizationId == organizationId)
 
+  @@allow('read', auth().organizationId == organizationId)
+  @@allow('all', auth().userId == id)
 
 
   @@map("user")
@@ -228,13 +234,16 @@ model Organization {
   accountType    OrgPlanType           @default(Trial)
   members        Member[]
   postingPeriods PostingPeriod[]
-
+  users           User[]
   invitations    Invitation[]
   todoLists      TodoList[]
   funds          Fund[]                @relation(name: 'fund')
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now()) @updatedAt
   @@map('organization')
+  
+  // Only members of this org can read it
+  @@allow('read', auth().organizationId == id)
 }
 
 model Team {
@@ -258,7 +267,8 @@ model Member {
   
   updatedAt       DateTime @updatedAt
   @@map("member")
-  @@allow('all', true)
+  // @@allow('all', true)
+  @@allow('all', auth().organizationRole == 'admin')
 }
 
 model TeamMember {
@@ -445,8 +455,9 @@ model FiscalPeriodRule {
   yearShift     Boolean
   calendarBased Boolean
   companies     Company[] @relation('fiscPeriodRule')
-  @@allow('all', true)
+  // @@allow('all', true)
   @@allow('all', auth().organizationRole == 'admin')
+  
   // deny anonymous users
   // @@deny('all', auth() == null)
 }

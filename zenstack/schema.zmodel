@@ -585,9 +585,9 @@ model EndownmentPermanent extends RestrictedFund {
 
 model EndownmentExpendable extends RestrictedFund {
   initalCapital       Int      @db.Integer @default(0)
-  incomeEarned              Int      @db.Integer @default(0)
-  incomeBalance             Int      @db.Integer @default(0)
-  capitalBalance            Int      @db.Integer @default(0)
+  incomeEarned        Int      @db.Integer @default(0)
+  incomeBalance       Int      @db.Integer @default(0)
+  capitalBalance      Int      @db.Integer @default(0)
   
   expendableIncomeBalances  FundBalance[] @relation('expendableIncomeFundBal')
   expendableCapitalBalances FundBalance[] @relation('expendableCapitalFundBal')

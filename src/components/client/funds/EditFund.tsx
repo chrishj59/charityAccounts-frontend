@@ -127,9 +127,9 @@ export default function EditFund({
   const currDate = new Date();
   const getFormErrorMessage = (name: string) => {
     return (
-      errors[name as keyof FundNewFormValues] && (
+      errors[name as keyof FundEditFormValues] && (
         <small className='p-error'>
-          {errors[name as keyof FundNewFormValues]?.message}
+          {errors[name as keyof FundEditFormValues]?.message}
         </small>
       )
     );
@@ -150,7 +150,7 @@ export default function EditFund({
     trigger,
     handleSubmit,
 
-    formState: { errors },
+    formState: { errors, isDirty },
     control,
   } = useForm<FundEditFormValues>({
     resolver: zodResolver(fundEditSchema), // Integrate Zod for schema-based validation
@@ -198,34 +198,30 @@ export default function EditFund({
   const designatedLoaded = designatedSuccess && !!designatedFundData;
 
   useEffect(() => {
-    console.log(`fundData: ${JSON.stringify(fundData, null, 2)}`);
-    console.log(
-      `designatedLoaded: ${JSON.stringify(designatedLoaded, null, 2)}`,
-    );
-
     if (!fundData) return;
     const _fundType = fundData.fundType;
     const fundUI: FundUI = {
       id: fundData.id,
       fundName: fundData.fundName,
-      objective: fundData.objective ?? undefined,
+      objective: fundData.objective ?? '',
       fundType: fundData.fundType,
       reviewDate: fundData.reviewDate,
       // ...map remaining fields
     };
     switch (_fundType) {
       case 'Designated':
-        console.log(
-          `designated by id ${JSON.stringify(fundData.designatedById, null, 2)}`,
-        );
         const designatedUI: DesignatedFundUI = {
           designatedBal: fundData.designatedBal,
           curcyCode: fundData.curcyCode,
           currentBal: fundData.currentBal,
           designatedDate: fundData.designatedDate,
           releasedDate: fundData.releasedDate,
-          designatedMeeting: fundData.designatedMeeting,
-          undesignateMeeting: fundData.undesignateMeeting,
+          designatedMeeting: fundData.designatedMeeting
+            ? fundData.designatedMeeting
+            : '',
+          undesignateMeeting: fundData.undesignateMeeting
+            ? fundData.undesignateMeeting
+            : '',
           designatedById: fundData.designatedById,
           designationReleasedById: fundData.designationReleasedById,
         };
@@ -233,16 +229,18 @@ export default function EditFund({
         break;
     }
 
-    console.log(`fundUI ${JSON.stringify(fundUI, null, 2)}`);
     setCurrentFund(fundUI);
 
     reset({
+      id: fundData.id,
       name: fundData.fundName,
-      objective: fundData.objective, //fundData.objective ?? '',
+      objective: fundData.objective ?? '',
       fundType: fundData.fundType,
       designatedMeeting: fundData.designatedMeeting,
       designatedDate: fundData.designatedDate,
-      undesignateMeeting: fundData.undesignateMeeting,
+      undesignateMeeting: fundData.undesignateMeeting
+        ? fundData.undesignateMeeting
+        : '',
       designatedById: fundData.designatedById,
       designationReleasedById: fundData.designationReleasedById,
     });
@@ -250,6 +248,7 @@ export default function EditFund({
 
   const onFundChange = (e: { value: fundSelectInterface }) => {
     setSelectedFund(e.value); // { id, name } — triggers useFindFirst
+    setValue('id', e.value.id);
   };
 
   const handleObjectiveChange = async (e: string) => {
@@ -348,9 +347,12 @@ export default function EditFund({
                         value={field.value}
                         rows={5}
                         cols={40}
-                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                          handleObjectiveChange(e.target.value)
-                        }
+                        onChange={(
+                          e: React.ChangeEvent<HTMLTextAreaElement>,
+                        ) => {
+                          field.onChange(e.target.value);
+                          handleObjectiveChange(e.target.value);
+                        }}
                         //onChange={(e) => field.onChange(e.target.value)}
                         className={classNames({
                           'p-invalid': fieldState.error,
@@ -400,7 +402,7 @@ export default function EditFund({
 
     switch (_currenFund.fundType) {
       case 'General':
-        const fundBal = gbpFormatter.format(
+        const generalFundBal = gbpFormatter.format(
           _currenFund.generalFund?.balance
             ? _currenFund.generalFund?.balance
             : 0,
@@ -409,13 +411,12 @@ export default function EditFund({
           <div className='flex justify-center '>
             <div className='grid grid-cols-2 gap-4'>
               <div className='font-medium'>Balance:</div>
-              <div className='font-medium'>{fundBal}</div>
+              <div className='font-medium'>{generalFundBal}</div>
             </div>
           </div>
         );
-        break;
+
       case 'Designated':
-        console.log(`Designated fund: ${JSON.stringify(_currenFund, null, 2)}`);
         const designatedDate = _currenFund.designatedFund?.designatedDate
           ? _currenFund.designatedFund?.designatedDate
           : new Date();
@@ -608,25 +609,109 @@ export default function EditFund({
           </>
         );
       case 'Income':
-        return <div> this is an income fund</div>;
-        console.log('Mangoes and papayas are $2.79 a pound.');
-        // Expected output: "Mangoes and papayas are $2.79 a pound."
-        break;
+        const incomeFundBalStr = gbpFormatter.format(
+          _currenFund.incomeFund?.balance ? _currenFund.incomeFund?.balance : 0,
+        );
+        return (
+          <div className='flex justify-center '>
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='font-medium'>Balance:</div>
+              <div className='font-medium'>{incomeFundBalStr}</div>
+            </div>
+          </div>
+        );
       case 'Expendable':
-        return <div> this is an Expendable fund</div>;
-        console.log('expendable');
-        break;
+        const expendInitCapStr = gbpFormatter.format(
+          _currenFund.endownmentExpendable?.initalCapital
+            ? _currenFund.endownmentExpendable?.initalCapital
+            : 0,
+        );
+        const expendCapBalStr = gbpFormatter.format(
+          _currenFund.endownmentExpendable?.capitalBalance
+            ? _currenFund.endownmentExpendable?.capitalBalance
+            : 0,
+        );
+        const expendIncEarnedStr = gbpFormatter.format(
+          _currenFund.endownmentExpendable?.incomeEarned
+            ? _currenFund.endownmentExpendable?.incomeEarned
+            : 0,
+        );
+        const expendIncBalStr = gbpFormatter.format(
+          _currenFund.endownmentExpendable?.incomeBalance
+            ? _currenFund.endownmentExpendable?.incomeBalance
+            : 0,
+        );
+
+        return (
+          <div className='flex flex-col gap-4'>
+            {/* Row 1 */}
+            <div className='grid grid-cols-4 gap-4'>
+              <div className='font-medium w-[8rem]'>Initial Capital:</div>
+              <div className='font-medium'>{expendInitCapStr}</div>
+              <div className='font-medium'>Initial Capital:</div>
+              <div className='font-medium'>{expendCapBalStr}</div>
+            </div>
+
+            {/* Row 2 */}
+            <div className='grid grid-cols-4 gap-4'>
+              <div className='font-medium'>Income Earned:</div>
+              <div className='font-medium'>{expendIncEarnedStr}</div>
+              <div className='font-medium'>Initial Balance:</div>
+              <div className='font-medium'>{expendIncBalStr}</div>
+            </div>
+          </div>
+        );
+
       case 'Permanent':
-        return <div> this is an Permanent fund</div>;
-        console.log('expendable');
+        const permInitCapStr = gbpFormatter.format(
+          _currenFund.endownmentPermanent?.initalCapital
+            ? _currenFund.endownmentPermanent?.initalCapital
+            : 0,
+        );
+        const permCapBalStr = gbpFormatter.format(
+          _currenFund.endownmentPermanent?.capitalBalance
+            ? _currenFund.endownmentPermanent?.capitalBalance
+            : 0,
+        );
+        const permIncEarnedStr = gbpFormatter.format(
+          _currenFund.endownmentPermanent?.incomeEarned
+            ? _currenFund.endownmentPermanent.incomeEarned
+            : 0,
+        );
+        const permIncBalStr = gbpFormatter.format(
+          _currenFund.endownmentPermanent?.incomeBalance
+            ? _currenFund.endownmentPermanent?.incomeBalance
+            : 0,
+        );
+
+        return (
+          <div className='flex flex-col gap-4'>
+            {/* Row 1 */}
+            <div className='grid grid-cols-4 gap-4'>
+              <div className='font-medium w-[8rem]'>Initial Capital:</div>
+              <div className='font-medium'>{permInitCapStr}</div>
+              <div className='font-medium'>Initial Capital:</div>
+              <div className='font-medium'>{permCapBalStr}</div>
+            </div>
+
+            {/* Row 2 */}
+            <div className='grid grid-cols-4 gap-4'>
+              <div className='font-medium'>Income Earned:</div>
+              <div className='font-medium'>{permIncEarnedStr}</div>
+              <div className='font-medium'>Initial Balance:</div>
+              <div className='font-medium'>{permIncBalStr}</div>
+            </div>
+          </div>
+        );
+
       default:
-        console.log(`Sorry, we are out of ${_currenFund.fundType}.`);
+        console.error(`Should not be here. Please contact support}.`);
     }
-    console.log(`validFund ${validFund}`);
+
     return <div> fund detail</div>;
   };
 
-  const onFundSubmit = async (formData: FundNewFormValues) => {
+  const onFundSubmit = async (formData: FundEditFormValues) => {
     setLoading(true);
     const fundType = formData.fundType;
 
@@ -699,46 +784,49 @@ export default function EditFund({
               </div>
             </div>
             <div>
-              <Stepper ref={stepperRef} style={{ flexBasis: '50rem' }} linear>
-                <StepperPanel header='Basic Fund information'>
-                  {renderFundBasic()}
+              <form onSubmit={handleSubmit(onFundSubmit)}>
+                <Stepper ref={stepperRef} style={{ flexBasis: '50rem' }} linear>
+                  <StepperPanel header='Basic Fund information'>
+                    {renderFundBasic()}
 
-                  <div className='flex pt-4 justify-content-end'>
-                    <Button
-                      disabled={!fundLoaded}
-                      loading={isLoading}
-                      label='Next'
-                      icon='pi pi-arrow-right'
-                      iconPos='right'
-                      onClick={
-                        getNextStepperStep
-                        // () => stepperRef.current?.nextCallback()
-                      }
-                    />
-                  </div>
-                </StepperPanel>
-                <StepperPanel header='Fund specific information'>
-                  <div className='flex flex-column h-12rem'>
-                    <div className='border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium'>
-                      {renderFundDetail()}
+                    <div className='flex pt-4 justify-content-end'>
+                      <Button
+                        disabled={!fundLoaded}
+                        loading={isLoading}
+                        label='Next'
+                        icon='pi pi-arrow-right'
+                        iconPos='right'
+                        onClick={
+                          getNextStepperStep
+                          // () => stepperRef.current?.nextCallback()
+                        }
+                      />
                     </div>
-                  </div>
-                  <div className='flex pt-4 justify-content-between'>
-                    <Button
-                      label='Back'
-                      severity='secondary'
-                      icon='pi pi-arrow-left'
-                      onClick={getPreviousStepperStep}
-                    />
-                    <Button
-                      label='Next'
-                      icon='pi pi-arrow-right'
-                      iconPos='right'
-                      onClick={getNextStepperStep}
-                    />
-                  </div>
-                </StepperPanel>
-              </Stepper>
+                  </StepperPanel>
+                  <StepperPanel header='Fund specific information'>
+                    <div className='flex flex-column h-12rem'>
+                      <div className='border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium'>
+                        {renderFundDetail()}
+                      </div>
+                    </div>
+                    <div className='flex pt-4 justify-content-between'>
+                      <Button
+                        label='Back'
+                        severity='secondary'
+                        icon='pi pi-arrow-left'
+                        onClick={getPreviousStepperStep}
+                      />
+                      <Button
+                        type='submit'
+                        disabled={!isDirty}
+                        severity='success'
+                      >
+                        Save Fund
+                      </Button>
+                    </div>
+                  </StepperPanel>
+                </Stepper>
+              </form>
             </div>
           </Card>
         </div>

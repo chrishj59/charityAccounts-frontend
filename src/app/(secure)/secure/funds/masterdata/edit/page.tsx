@@ -26,7 +26,9 @@ export default async function EditFundPage() {
   const userOrgId = orgs[0].id;
 
   const userDb = await getUserDb(usr.id, userOrgId);
-  const funds: Fund[] = await userDb.fund.findMany();
+  const funds: Fund[] = await userDb.fund.findMany({
+    orderBy: { fundName: 'asc' },
+  });
 
   const selectOptions: fundSelectInterface[] = [];
   funds.forEach((fnd) => {
@@ -47,7 +49,6 @@ export default async function EditFundPage() {
     };
     userList.push(_user);
   });
-  console.log(`EditFundPage has users ${JSON.stringify(userList, null, 2)}`);
 
   return (
     <EditFund

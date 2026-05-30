@@ -73,6 +73,7 @@ export type FundUI = {
   designatedFund?: DesignatedFundUI;
   restrictedFund?: RestrictedFundUI;
   generalFund?: GeneralFundUI;
+  incomeFund?: IncomeFundUI;
   endownmentExpendable?: EndownmentExpendableUI;
   endownmentPermanent?: EndownmentPermanentUI;
 };

@@ -8,6 +8,7 @@ import { responseType, statusEnum } from '~/src/types/helper';
 import { ORMError, ORMErrorReason } from '@zenstackhq/orm';
 import { Fund, ISO4217Currency } from '~/zenstack/models';
 import { FundUI } from '~/src/types/ui-types/fund';
+import { FundEditFormValues } from '~/src/zodSchema/fund-edit-schema';
 // TODO: Add currencyb param from UI when other currencies support
 const getCurrency = async (
   currcode: string,
@@ -37,14 +38,64 @@ const getCurrency = async (
     throw Error(`No Currency found other error `);
   }
 };
-const addGeneralFund = async (
+
+const generalFundUpdate = async (
+  fundType: string,
+  fund: FundEditFormValues,
+
+  userId: string,
+  orgId: string,
+): Promise<responseType> => {
+  const userDb = await getUserDb(userId, orgId);
+  const _currency = await getCurrency('GBP', userId, orgId);
+
+  const payload = {
+    where: { id: fund.id },
+    data: {
+      fundName: fund.name,
+
+      donarName: fund.donar,
+      fundType: fundType,
+      objective: fund.objective,
+      reviewDate: fund.reviewDate,
+      managedById: userId,
+      organizationId: orgId,
+
+      curcyCode: _currency.alphabeticCode,
+      currencyId: _currency.id,
+    },
+  };
+  try {
+    await userDb.generalFund.update(payload);
+
+    return {
+      status: statusEnum.SUCCESS,
+      message: `Updated General fund ${payload.data.fundName}`,
+    };
+  } catch (error) {
+    if (error instanceof ORMError) {
+      console.log(
+        `Permission error ${JSON.stringify(error.rejectedByPolicyReason)}`,
+      );
+      console.log(`error cause ${JSON.stringify(error.cause)}`);
+    }
+    console.error(`Error from create General Fund ${JSON.stringify(error)}`);
+    return {
+      status: statusEnum.ERROR,
+      message: `Could not update General Fund ${payload.data.fundName}`,
+      errMessage: `Update error ${JSON.stringify(error)}`,
+    };
+  }
+};
+
+const generalFundNew = async (
   fundType: string,
   fund: FundNewFormValues,
 
   userId: string,
   orgId: string,
 ): Promise<responseType> => {
-  const userDb = getUserDb(userId, orgId);
+  const userDb = await getUserDb(userId, orgId);
   const _currency = await getCurrency('GBP', userId, orgId);
   const payload = {
     data: {
@@ -63,11 +114,11 @@ const addGeneralFund = async (
   };
   try {
     console.log(`payload ${JSON.stringify(payload, null, 2)}`);
-    const funds = await (await userDb).generalFund.findMany();
+    const funds = await userDb.generalFund.findMany();
 
     console.log(`funds in add ${JSON.stringify(funds, null, 2)}`);
     try {
-      await (await userDb).generalFund.create(payload);
+      await userDb.generalFund.create(payload);
     } catch (err) {
       if (err instanceof ORMError) {
         console.log(`Error reason ${err.reason}`);
@@ -97,7 +148,7 @@ const addGeneralFund = async (
   }
 };
 
-const designatedFund = async (
+const designatedFundNew = async (
   fundType: string,
   fund: FundNewFormValues,
 
@@ -127,7 +178,7 @@ const designatedFund = async (
     },
   };
   try {
-    await (await userDb).designatedFund.create(payload);
+    await userDb.designatedFund.create(payload);
     return {
       status: statusEnum.SUCCESS,
       message: `Created Designated fund ${payload.data.fundName}`,
@@ -148,7 +199,61 @@ const designatedFund = async (
   }
 };
 
-const incomeFund = async (
+const designatedFundUpdate = async (
+  fundType: string,
+  fund: FundEditFormValues,
+
+  userId: string,
+  orgId: string,
+): Promise<responseType> => {
+  const userDb = await getUserDb(userId, orgId);
+  const _currency = await getCurrency('GBP', userId, orgId);
+
+  const payload = {
+    where: {
+      id: fund.id,
+    },
+    data: {
+      fundName: fund.name,
+
+      donarName: fund.donar,
+      fundType: fund.fundType,
+      objective: fund.objective,
+      reviewDate: fund.reviewDate,
+      managedById: userId,
+      organizationId: orgId,
+      designatedDate: fund.designatedDate ? fund.designatedDate : new Date(),
+      designatedMeeting: fund.designatedMeeting,
+      projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
+      designationCreatedById: userId,
+      designatedById: userId,
+      curcyCode: _currency.alphabeticCode,
+      currencyId: _currency.id,
+    },
+  };
+  try {
+    await userDb.designatedFund.update(payload);
+    return {
+      status: statusEnum.SUCCESS,
+      message: `Updated Designated fund ${payload.data.fundName}`,
+    };
+  } catch (error) {
+    if (error instanceof ORMError) {
+      console.log(
+        `Permission error ${JSON.stringify(error.rejectedByPolicyReason)}`,
+      );
+      console.log(`error cause ${JSON.stringify(error.cause)}`);
+    }
+
+    return {
+      status: statusEnum.ERROR,
+      message: `Could not update Designated Fund ${payload.data.fundName}`,
+      errMessage: `Update error ${JSON.stringify(error)}`,
+    };
+  }
+};
+
+const incomeFundNew = async (
   fundType: string,
   fund: FundNewFormValues,
 
@@ -197,7 +302,59 @@ const incomeFund = async (
   }
 };
 
-const expendableFund = async (
+const incomeFundUpdate = async (
+  fundType: string,
+  fund: FundEditFormValues,
+
+  userId: string,
+  orgId: string,
+): Promise<responseType> => {
+  const userDb = await getUserDb(userId, orgId);
+  const _currency = await getCurrency('GBP', userId, orgId);
+  const payload = {
+    where: {
+      id: fund.id,
+    },
+    data: {
+      fundName: fund.name,
+
+      donarName: fund.donar,
+      fundType: fund.fundType,
+      objective: fund.objective,
+      reviewDate: fund.reviewDate,
+      managedById: userId,
+      organizationId: orgId,
+      projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
+
+      nextDonarReviewDate: fund.nextDonarReviewDate,
+
+      returnSurplus: fund.returnSurplus,
+      curcyCode: _currency.alphabeticCode,
+      currencyId: _currency.id,
+    },
+  };
+  try {
+    await userDb.incomeFund.update(payload);
+    return {
+      status: statusEnum.SUCCESS,
+      message: `Updated Income fund ${payload.data.fundName}`,
+    };
+  } catch (error) {
+    if (error instanceof ORMError) {
+      console.log(
+        `Permission error ${JSON.stringify(error.rejectedByPolicyReason)}`,
+      );
+      console.log(`error cause ${JSON.stringify(error.cause)}`);
+    }
+    return {
+      status: statusEnum.ERROR,
+      message: `Could not create Designated Fund ${payload.data.fundName}`,
+      errMessage: `Update error ${JSON.stringify(error)}`,
+    };
+  }
+};
+
+const expendableFundNew = async (
   fundType: string,
   fund: FundNewFormValues,
 
@@ -246,7 +403,59 @@ const expendableFund = async (
   }
 };
 
-const permanentFund = async (
+const expendableFundUpdate = async (
+  fundType: string,
+  fund: FundEditFormValues,
+
+  userId: string,
+  orgId: string,
+): Promise<responseType> => {
+  const userDb = await getUserDb(userId, orgId);
+  const _currency = await getCurrency('GBP', userId, orgId);
+  const payload = {
+    where: {
+      id: fund.id,
+    },
+    data: {
+      fundName: fund.name,
+
+      donarName: fund.donar,
+      fundType: fund.fundType,
+      objective: fund.objective,
+      reviewDate: fund.reviewDate,
+      managedById: userId,
+      organizationId: orgId,
+      nextDonarReviewDate: fund.nextDonarReviewDate
+        ? fund.nextDonarReviewDate
+        : new Date(),
+      projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
+      // returnSurplus: fund.returnSurplus,
+      curcyCode: _currency.alphabeticCode,
+      currencyId: _currency.id,
+    },
+  };
+  try {
+    await userDb.endownmentExpendable.update(payload);
+    return {
+      status: statusEnum.SUCCESS,
+      message: `Updated Expendable Endownmentfund: ${payload.data.fundName}`,
+    };
+  } catch (error) {
+    if (error instanceof ORMError) {
+      console.log(
+        `Permission error ${JSON.stringify(error.rejectedByPolicyReason)}`,
+      );
+      console.log(`error cause ${JSON.stringify(error.cause)}`);
+    }
+    return {
+      status: statusEnum.ERROR,
+      message: `Could not update  Designated Fund ${payload.data.fundName}`,
+      errMessage: `Update error ${JSON.stringify(error)}`,
+    };
+  }
+};
+
+const permanentFundNew = async (
   fundType: string,
   fund: FundNewFormValues,
 
@@ -299,6 +508,59 @@ const permanentFund = async (
   }
 };
 
+const permanentFundUpdate = async (
+  fundType: string,
+  fund: FundEditFormValues,
+
+  userId: string,
+  orgId: string,
+): Promise<responseType> => {
+  const userDb = await getUserDb(userId, orgId);
+  const _currency = await getCurrency('GBP', userId, orgId);
+  const payload = {
+    where: {
+      id: fund.id,
+    },
+    data: {
+      fundName: fund.name,
+
+      donarName: fund.donar,
+      fundType: fund.fundType,
+      objective: fund.objective,
+      reviewDate: fund.reviewDate,
+      managedById: userId,
+      organizationId: orgId,
+      nextDonarReviewDate: fund.nextDonarReviewDate
+        ? fund.nextDonarReviewDate
+        : new Date(),
+      projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
+      returnSurplus: fund.returnSurplus,
+      curcyCode: _currency.alphabeticCode,
+      currencyId: _currency.id,
+    },
+  };
+  try {
+    const res = await userDb.endownmentPermanent.update(payload);
+
+    return {
+      status: statusEnum.SUCCESS,
+      message: `Updated Permanent Endownment fund:  ${payload.data.fundName}`,
+    };
+  } catch (error) {
+    if (error instanceof ORMError) {
+      console.log(
+        `Permission error ${JSON.stringify(error.rejectedByPolicyReason)}`,
+      );
+      console.log(`error cause ${JSON.stringify(error.cause)}`);
+    }
+    return {
+      status: statusEnum.ERROR,
+      message: `Could not update  Permanent Fund ${payload.data.fundName}`,
+      errMessage: `Update error ${JSON.stringify(error)}`,
+    };
+  }
+};
+
 export async function getFundById(
   fundId: string,
   userId: string,
@@ -325,7 +587,7 @@ export async function getFundById(
       _fund.fundName = fund.fundName;
       return _fund;
     }
-    designatedFund;
+    // designatedFund;
   } catch (error) {
     if (error instanceof ORMError) {
       return {
@@ -342,23 +604,23 @@ export async function getFundById(
   };
 }
 export async function fundUpdateAction(
-  fund: FundNewFormValues,
+  fund: FundEditFormValues,
   userId: string,
   orgId: string,
 ): Promise<responseType> {
   const fundType = fund.fundType;
   switch (fundType) {
     case 'General':
-      return addGeneralFund(fundType, fund, userId, orgId);
+      return generalFundUpdate(fundType, fund, userId, orgId);
 
     case 'Designated':
-      return designatedFund(fundType, fund, userId, orgId);
+      return designatedFundUpdate(fundType, fund, userId, orgId);
     case 'Income':
-      return incomeFund(fundType, fund, userId, orgId);
+      return incomeFundUpdate(fundType, fund, userId, orgId);
     case 'Expendable':
-      return expendableFund(fundType, fund, userId, orgId);
+      return expendableFundUpdate(fundType, fund, userId, orgId);
     case 'Permanent':
-      return permanentFund(fundType, fund, userId, orgId);
+      return permanentFundUpdate(fundType, fund, userId, orgId);
   }
   return {
     status: statusEnum.ERROR,
@@ -374,16 +636,16 @@ export async function fundAddAction(
   const fundType = fund.fundType;
   switch (fundType) {
     case 'General':
-      return addGeneralFund(fundType, fund, userId, orgId);
+      return generalFundNew(fundType, fund, userId, orgId);
 
     case 'Designated':
-      return designatedFund(fundType, fund, userId, orgId);
+      return designatedFundNew(fundType, fund, userId, orgId);
     case 'Income':
-      return incomeFund(fundType, fund, userId, orgId);
+      return incomeFundNew(fundType, fund, userId, orgId);
     case 'Expendable':
-      return expendableFund(fundType, fund, userId, orgId);
+      return expendableFundNew(fundType, fund, userId, orgId);
     case 'Permanent':
-      return permanentFund(fundType, fund, userId, orgId);
+      return permanentFundNew(fundType, fund, userId, orgId);
   }
   return {
     status: statusEnum.ERROR,

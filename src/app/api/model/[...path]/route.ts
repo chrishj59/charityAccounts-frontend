@@ -38,18 +38,22 @@ async function getClient() {
   let organizationRole: string | undefined = undefined;
   const { session } = sessionResult;
 
-  if (session.organizationId) {
-    // if there's an active orgId, get the role of the user in the org
-    const rawOrgId = session.organizationId;
-    organizationId =
-      typeof rawOrgId === 'string' ? rawOrgId : rawOrgId?.organizationId;
+  console.log(
+    `api/model/route session is ${JSON.stringify(session, null, 2)} `,
+  );
 
-    const org = await auth.api.getFullOrganization({ headers: reqHeaders });
-    if (org?.members) {
-      const myMember = org.members.find((m) => m.userId === session.userId);
-      organizationRole = myMember?.role;
-    }
-  }
+  // if (session.) {
+  //   // if there's an active orgId, get the role of the user in the org
+  //   // const rawOrgId = session.organizationId;
+  //   // organizationId =
+  //   //   typeof rawOrgId === 'string' ? rawOrgId : rawOrgId?.organizationId;
+
+  //   const org = await auth.api.getFullOrganization({ headers: reqHeaders });
+  //   if (org?.members) {
+  //     const myMember = org.members.find((m) => m.userId === session.userId);
+  //     organizationRole = myMember?.role;
+  //   }
+  // }
 
   // create enhanced client with user context
 

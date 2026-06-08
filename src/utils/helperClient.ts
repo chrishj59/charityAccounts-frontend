@@ -23,3 +23,9 @@ export function getRelativeFormatter(locale: string): Intl.RelativeTimeFormat {
 
   //ex: formatter.format(1, "day")
 }
+
+export function nullToUndefined<T extends Record<string, unknown>>(obj: T) {
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => [k, v === null ? undefined : v]),
+  ) as { [K in keyof T]: Exclude<T[K], null> | undefined };
+}

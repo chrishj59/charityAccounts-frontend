@@ -37,7 +37,7 @@ export default async function SecureLayout({ children }: MainLayoutProps) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-
+  console.log(`session is now 2 ${JSON.stringify(session, null, 2)}`);
   if (!session) {
     redirect('/sign-in', RedirectType.replace);
   }

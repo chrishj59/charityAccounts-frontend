@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   // experimental: {
   //   authInterrupts: true,
   // },
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 module.exports = nextConfig;

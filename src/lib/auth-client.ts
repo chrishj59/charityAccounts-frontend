@@ -8,7 +8,7 @@ import {
 
 // import { createAuthClient } from 'better-auth/react';
 import { createAuthClient } from 'better-auth/client';
-
+import { customSessionClient } from 'better-auth/client/plugins';
 import type { auth } from './auth';
 import { toast } from 'sonner';
 import { Dialog } from 'primereact/dialog';
@@ -21,6 +21,7 @@ export const client = createAuthClient({
         enabled: true,
       },
     }),
+    customSessionClient<typeof auth>(),
     adminClient(),
     inferAdditionalFields<typeof auth>(),
     lastLoginMethodClient(),
@@ -39,6 +40,7 @@ export const {
   signIn,
   signOut,
   useSession,
+  getSession,
   organization,
   useListOrganizations,
   useActiveOrganization,

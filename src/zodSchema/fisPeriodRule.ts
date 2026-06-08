@@ -4,10 +4,11 @@ export const fiscalPeriodRuleSchema = z
   .object({
     id: z.int(),
     name: z.string(),
-    monthNum: z.int(),
-    day: z.int(),
-    fiscPeriod: z.int(),
-    yearShift: z.boolean(),
+    monthNum: z.int().optional(),
+    day: z.int().optional(),
+    fiscPeriod: z.int().optional(),
+    yearShift: z.boolean().optional(),
+    organizationId: z.string(),
     calendarBased: z.boolean(),
   })
   .superRefine((values, context) => {

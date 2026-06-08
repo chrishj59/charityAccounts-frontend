@@ -178,19 +178,19 @@ export default function EditFund({
       createdBy: true,
       organization: true,
       // ZenStack v3 chained delegate — nest through each level
-      RestrictedFund: {
-        include: {
-          DesignatedFund: {
-            include: {
-              designationCreatedBy: true,
-              designationReleasedBy: true,
-              designatedBy: true,
-              currency: true,
-              balances: true,
-            },
-          },
-        },
-      },
+      // RestrictedFund: {
+      //   include: {
+      //     DesignatedFund: {
+      //       include: {
+      //         designationCreatedBy: true,
+      //         designationReleasedBy: true,
+      //         designatedBy: true,
+      //         currency: true,
+      //         balances: true,
+      //       },
+      //     },
+      //   },
+      // },
     },
   });
 

@@ -5,7 +5,7 @@ import { Toast, ToastMessage } from 'primereact/toast';
 import { useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useSession } from '~/src/lib/auth-client';
+
 import {
   orgInputSchema,
   orgInputValues,

@@ -36,7 +36,7 @@ const getOrgId = async (userId: string) => {
     where: { userId: userId },
   });
   console.log(`orgId used in custom Session ${JSON.stringify(orgId)}`);
-  return orgId; // '7MB5idvLxFQ9UfZVckSrcki1rKxnz6vT';
+  return orgId?.organizationId; // '7MB5idvLxFQ9UfZVckSrcki1rKxnz6vT';
 };
 
 const getOrganizationRole = async (userId: string) => {
@@ -271,22 +271,18 @@ export const auth = betterAuth({
       storeInDatabase: true,
     }),
     customSession(async ({ user, session }) => {
-      // const roles = findUserRoles(session.session.userId);
+      const roles = await getOrganizationRole(user.id);
       const organizationId = await getOrgId(user.id);
-      const organizationRole = await getOrganizationRole(user.id);
+
       return {
-        // roles,
-        // user: {
-        //   ...user,
-        //   // newField: "newField",
-        // }
         user: {
           ...user,
         },
         session: {
           ...session,
           organizationId,
-          organizationRole,
+          organizationRoles: roles,
+          activeOrganizationId: organizationId,
         },
       };
     }),
@@ -294,4 +290,23 @@ export const auth = betterAuth({
     admin(),
     nextCookies(),
   ],
+  // databaseHooks: {
+  //   session: {
+  //     create: {
+  //       before: async (session) => {
+  //         //User assigned to only 1 organisation
+  //         const orgId = await getOrgId(session.userId);
+  //         const organizationRole = await getOrganizationRole(session.userId);
+  //         return {
+  //           data: {
+  //             ...session,
+  //             // organizationId: orgId,
+  //             // organizationRole,
+  //             activeOrganizationId: orgId,
+  //           },
+  //         };
+  //       },
+  //     },
+  //   },
+  // },
 });

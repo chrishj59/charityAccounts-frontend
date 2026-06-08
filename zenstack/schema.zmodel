@@ -29,12 +29,8 @@ plugin policy {
   provider = '@zenstackhq/plugin-policy'
 }
 
-// plugin hooks {
-//   provider = '@zenstackhq/tanstack-query'
-//   target   = 'react'
-//   version  = 'v5'
-//   output   = "./src/lib/hooks"
-// }
+
+
 
 
 /// Shape of the `auth()` function
@@ -238,6 +234,8 @@ model Organization {
   invitations    Invitation[]
   todoLists      TodoList[]
   funds          Fund[]                @relation(name: 'fund')
+  companies      Company[]             @relation(name: 'companyOrganisation')
+  periodRules    FiscalPeriodRule[]     @relation( 'orgFiscalPerionRule')
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now()) @updatedAt
   @@map('organization')
@@ -449,14 +447,17 @@ model ArAPPartner extends Partner {
 model FiscalPeriodRule {
   id            Int       @id @default(autoincrement())
   name          String
-  monthNum      Int
-  day           Int
-  fiscPeriod    Int
+  monthNum      Int?     
+  day           Int?
+  fiscPeriod    Int?
+  organizationId  String  
+  organization  Organization? @relation('orgFiscalPerionRule',fields: [organizationId], references: [id])
   yearShift     Boolean
   calendarBased Boolean
   companies     Company[] @relation('fiscPeriodRule')
   // @@allow('all', true)
   @@allow('all', auth().organizationRole == 'admin')
+  @@allow('all', auth().organizationId == organizationId)
   
   // deny anonymous users
   // @@deny('all', auth() == null)
@@ -482,6 +483,8 @@ model Company {
   fiscalPeriodRuleId        Int
   fiscPeriodRule            FiscalPeriodRule       @relation('fiscPeriodRule', fields: [fiscalPeriodRuleId], references: [id])
   postPeriod                CompanyPostingPeriod []
+  organsationId             String
+  organisation              Organization            @relation('companyOrganisation', fields:[organsationId], references: [id])
 }
 
 
@@ -492,6 +495,7 @@ model CompanyPostingPeriod {
   company         Company       @relation(fields: [companyId], references: [id])
   postPeriod      PostingPeriod @relation(fields: [postingPeriodId], references: [id])
   @@id([companyId,postingPeriodId ])
+
 }
 
 model Fund {

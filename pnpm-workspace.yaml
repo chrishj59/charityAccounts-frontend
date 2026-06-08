@@ -1,9 +1,19 @@
 allowBuilds:
-  '@prisma/client': set this to true or false
-  '@prisma/engines': set this to true or false
+  '@parcel/watcher': true
+  '@prisma/client': true
+  '@prisma/engines': true
+  '@scarf/scarf': true
   '@tree-sitter-grammars/tree-sitter-yaml': true
+  aws-sdk: true
+  better-sqlite3: false
   core-js-pure: true
-  prisma: set this to true or false
-  sharp: set this to true or false
+  esbuild: true
+  prisma: true
+  sharp: true
   tree-sitter: true
   tree-sitter-json: true
+  unrs-resolver: true
+
+overrides:
+  kysely: '0.28.17'
+  better-auth: '=1.6.13'

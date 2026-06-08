@@ -8,7 +8,7 @@ import { Button } from 'primereact/button';
 import { Toast, ToastMessage } from 'primereact/toast';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useClientQueries } from '@zenstackhq/tanstack-query/react';
-
+import { schema } from '~/zenstack/schema';
 import { Dialog } from 'primereact/dialog';
 import { classNames } from 'primereact/utils';
 import { InputText } from 'primereact/inputtext';
@@ -19,9 +19,12 @@ import {
   FiscPeriodRuleFormValues,
 } from '~/src/zodSchema/fisPeriodRule';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useSession } from '~/src/lib/auth-client';
+// import{ useCreateFiscalPeriodRule} from '~/src/lib/hooks'
 
 interface FiscalYearVarProps {
   fiscRules: FiscalPeriodRule[];
+  orgId: string;
 }
 
 import { FiscalPeriodRule } from '~/zenstack/models';
@@ -35,10 +38,18 @@ import {
   fiscalRuleAddAction,
   fiscalRuleUpdateAction,
 } from '~/src/actions/setup/fiscalRuleAction';
+import { nullToUndefined } from '~/src/utils/helperClient';
+import { getLoggedInSession } from '~/src/utils/helper';
 
-export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
+export default function FiscPeriodRule({
+  fiscRules,
+  orgId,
+}: FiscalYearVarProps) {
+  const client = useClientQueries(schema);
+
   const toast = useRef<Toast | null>(null);
-  const emptyFiscRule: FiscalPeriodRule = {
+
+  const emptyFiscRule = {
     id: 0,
     name: '',
     monthNum: 0,
@@ -46,6 +57,7 @@ export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
     fiscPeriod: 0,
     yearShift: false,
     calendarBased: false,
+    organizationId: '',
   };
 
   const [fiscRulesList, setFiscRulesList] =
@@ -56,6 +68,8 @@ export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
   const [editFiscRuleDialog, setEditFiscRuleDialog] = useState<boolean>(false);
   const [fiscYrAddDialog, setFiscYrAddDialog] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(false);
+  const { mutate: createRule } = client.fiscalPeriodRule.useCreate();
+  const { mutate: updateRule } = client.fiscalPeriodRule.useUpdate();
 
   const {
     control,
@@ -83,7 +97,7 @@ export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
 
     setFiscRule(_fiscYrVar);
     setFiscYrAddDialog(true);
-    reset(fiscYrVar);
+    // TODO: correct reset // reset(fiscYrVar);
   };
   const editFiscRuleAction = (fiscPerRule: FiscalPeriodRule) => {
     // const _fiscPerRule: FiscalPeriodRule = {
@@ -101,7 +115,8 @@ export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
     // setFiscRule(_fiscPerRule);
     setEditFiscRule(_fiscPerRule);
     setEditFiscRuleDialog(true);
-    reset(fiscPerRule);
+
+    reset(nullToUndefined(fiscPerRule));
   };
 
   const hideEditFiscRuleDialog = () => {
@@ -190,39 +205,58 @@ export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
       />
     </div>
   );
-  const onSubmitAdd = async (updated: FiscalPeriodRule) => {
+  const onSubmitAdd = async (data: FiscPeriodRuleFormValues) => {
+    const updated: FiscalPeriodRule = {
+      ...data,
+      monthNum: data.monthNum ?? null,
+      day: data.day ?? null,
+      fiscPeriod: data.fiscPeriod ?? null,
+      yearShift: data.yearShift ?? false,
+    };
+
+    createRule({
+      data: {
+        name: data.name,
+        calendarBased: data.calendarBased ?? false,
+        yearShift: data.yearShift ?? false,
+        monthNum: data.monthNum ?? null,
+        day: data.day ?? null,
+        fiscPeriod: data.fiscPeriod ?? null,
+        organizationId: orgId,
+      },
+    });
     // const client = useClientQueries(schema);
     // const { mutateAsync: create, isPending } =
     //   client.FiscalYearPeriod.useCreate(); //client.todoList.useCreate();
 
     // const resp = await create({ data: updated });
 
-    const payload = {
-      data: {
-        type: 'FiscalYearPeriod',
-        attributes: {
-          name: updated.name,
-          monthNum: updated.monthNum,
-          day: updated.day,
-          fiscPeriod: updated.fiscPeriod,
-          yearShift: updated.yearShift,
-        },
-      },
-    };
-    const updatedRule = await fiscalRuleAddAction(updated);
+    // const payload = {
+    //   data: {
+    //     type: 'FiscalYearPeriod',
+    //     attributes: {
+    //       name: updated.name,
+    //       monthNum: updated.monthNum,
+    //       day: updated.day,
+    //       fiscPeriod: updated.fiscPeriod,
+    //       yearShift: updated.yearShift,
+    //     },
+    //   },
+    // };
+    // const updatedRule = await fiscalRuleAddAction(updated);
 
-    const _fiscVarList = fiscRulesList;
-    _fiscVarList.push(updated);
-    setFiscRulesList(_fiscVarList);
+    // const _fiscVarList = fiscRulesList;
+    // _fiscVarList.push(updated);
+    // setFiscRulesList(_fiscVarList);
 
-    setFiscYrAddDialog(false);
+    // setFiscYrAddDialog(false);
   };
 
   const getFormErrorMessage = (name: string) => {
     return (
-      errors[name as keyof FiscalPeriodRule] && (
+      errors[name as keyof FiscPeriodRuleFormValues] && (
         <small className='p-error'>
-          {errors[name as keyof FiscalPeriodRule]?.message}
+          {errors[name as keyof FiscPeriodRuleFormValues]?.message}
         </small>
       )
     );
@@ -532,7 +566,7 @@ export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
                       {/* <span className='p-float-label mr-5'> */}
                       <InputSwitch
                         id={field.name}
-                        checked={field.value}
+                        checked={field.value ?? false}
                         disabled={watchedCalendarBased}
                         onChange={(e) => field.onChange(e.value)}
                         className={classNames({

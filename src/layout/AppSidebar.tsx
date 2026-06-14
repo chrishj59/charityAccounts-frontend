@@ -1,30 +1,31 @@
-import Link from "next/link";
-import { useContext } from "react";
-import AppMenu from "./AppMenu";
-import { LayoutContext } from "./context/layoutcontext";
-import { MenuProvider } from "./context/menucontext";
-import { LayoutState } from "../types/layout";
-import Image from "next/image";
+import Link from 'next/link';
+import { useContext } from 'react';
+import AppMenu from './AppMenu';
+import { LayoutContext } from './context/layoutcontext';
+import { MenuProvider } from './context/menucontext';
+import { LayoutState } from '../types/layout';
+import Image from 'next/image';
 
 const AppSidebar = () => {
-    const { setLayoutState } = useContext(LayoutContext);
-    const anchor = () => {
-        setLayoutState((prevLayoutState: LayoutState) => ({
-            ...prevLayoutState,
-            anchored: !prevLayoutState.anchored,
-        }));
-    };
-    return (
-        <>
-            <div className="sidebar-header">
-                <Link href="/" className="app-logo">
-                <Image
-      src="/images/economy.svg"
-      width={124}
-      height={50}
-      alt="logo"
-    />
-                    {/* <svg
+  const { setLayoutState } = useContext(LayoutContext);
+  const anchor = () => {
+    setLayoutState((prevLayoutState: LayoutState) => ({
+      ...prevLayoutState,
+      anchored: !prevLayoutState.anchored,
+    }));
+  };
+  return (
+    <>
+      <div className='sidebar-header'>
+        <Link href='/' className='app-logo'>
+          <Image
+            src='/images/economy.svg'
+            width={124}
+            height={50}
+            alt='logo'
+            loading='eager'
+          />
+          {/* <svg
                         width="124"
                         height="22"
                         viewBox="0 0 124 22"
@@ -90,21 +91,21 @@ const AppSidebar = () => {
                             fill="var(--logo-color)"
                         />
                     </svg> */}
-                </Link>
-                <button
-                    className="layout-sidebar-anchor p-link z-2 mb-2"
-                    type="button"
-                    onClick={anchor}
-                ></button>
-            </div>
+        </Link>
+        <button
+          className='layout-sidebar-anchor p-link z-2 mb-2'
+          type='button'
+          onClick={anchor}
+        ></button>
+      </div>
 
-            <div className="layout-menu-container">
-                <MenuProvider>
-                    <AppMenu />
-                </MenuProvider>
-            </div>
-        </>
-    );
+      <div className='layout-menu-container'>
+        <MenuProvider>
+          <AppMenu />
+        </MenuProvider>
+      </div>
+    </>
+  );
 };
 
 export default AppSidebar;

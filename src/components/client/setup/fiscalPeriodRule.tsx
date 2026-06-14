@@ -19,12 +19,14 @@ import {
   FiscPeriodRuleFormValues,
 } from '~/src/zodSchema/fisPeriodRule';
 import { zodResolver } from '@hookform/resolvers/zod';
+
 import { useSession } from '~/src/lib/auth-client';
 // import{ useCreateFiscalPeriodRule} from '~/src/lib/hooks'
 
 interface FiscalYearVarProps {
   fiscRules: FiscalPeriodRule[];
   orgId: string;
+  userId: string;
 }
 
 import { FiscalPeriodRule } from '~/zenstack/models';
@@ -39,25 +41,33 @@ import {
   fiscalRuleUpdateAction,
 } from '~/src/actions/setup/fiscalRuleAction';
 import { nullToUndefined } from '~/src/utils/helperClient';
-import { getLoggedInSession } from '~/src/utils/helper';
 
-export default function FiscPeriodRule({
+export default function FiscPeriodRuleUI({
   fiscRules,
   orgId,
+  userId,
 }: FiscalYearVarProps) {
   const client = useClientQueries(schema);
+
+  const createPeriodRule = client.fiscalPeriodRule.useCreate({
+    optimisticUpdate: true,
+  });
 
   const toast = useRef<Toast | null>(null);
 
   const emptyFiscRule = {
     id: 0,
-    name: '',
-    monthNum: 0,
+    title: '',
+    periodName: '',
+    periodNum: 0,
     day: 0,
     fiscPeriod: 0,
     yearShift: false,
     calendarBased: false,
     organizationId: '',
+    createdAt: new Date(),
+    createdById: userId,
+    updatedAt: new Date(),
   };
 
   const [fiscRulesList, setFiscRulesList] =
@@ -206,31 +216,57 @@ export default function FiscPeriodRule({
     </div>
   );
   const onSubmitAdd = async (data: FiscPeriodRuleFormValues) => {
-    const updated: FiscalPeriodRule = {
-      ...data,
-      monthNum: data.monthNum ?? null,
-      day: data.day ?? null,
-      fiscPeriod: data.fiscPeriod ?? null,
-      yearShift: data.yearShift ?? false,
-    };
+    try {
+      const createdPeriodRule = await createPeriodRule.mutateAsync({
+        data: {
+          title: data.title,
+          periodName: data.periodName ?? '',
+          yearShift: data.yearShift ?? false,
+          calendarBased: data.calendarBased,
+          organization: {
+            connect: { id: orgId }, // relation connect
+          },
+          createdBy: {
+            connect: { id: userId }, // you need the authed user's id here
+          },
+          // optional fields — only include if present
+          ...(data.periodNum !== undefined && { periodNum: data.periodNum }),
+          ...(data.day !== undefined && { day: data.day }),
+          ...(data.fiscPeriod !== undefined && { fiscPeriod: data.fiscPeriod }),
+        },
+      });
+      console.log(`created id ${JSON.stringify(createdPeriodRule)}`);
+      const _fiscVarList = fiscRulesList;
 
-    createRule({
-      data: {
-        name: data.name,
-        calendarBased: data.calendarBased ?? false,
-        yearShift: data.yearShift ?? false,
-        monthNum: data.monthNum ?? null,
-        day: data.day ?? null,
-        fiscPeriod: data.fiscPeriod ?? null,
-        organizationId: orgId,
-      },
-    });
+      _fiscVarList.push(createdPeriodRule);
+      setFiscRulesList(_fiscVarList);
+      setFiscYrAddDialog(false);
+    } catch (error) {
+      alert(`error ${JSON.stringify(error)}`);
+      console.error(error);
+    }
+    // const updated: FiscalPeriodRule = {
+    //   ...data,
+    //   monthNum: data.monthNum ?? null,
+    //   day: data.day ?? null,
+    //   fiscPeriod: data.fiscPeriod ?? null,
+    //   yearShift: data.yearShift ?? false,
+    // };
+    // createRule({
+    //   data: {
+    //     name: data.name,
+    //     calendarBased: data.calendarBased ?? false,
+    //     yearShift: data.yearShift ?? false,
+    //     monthNum: data.monthNum ?? null,
+    //     day: data.day ?? null,
+    //     fiscPeriod: data.fiscPeriod ?? null,
+    //     organizationId: orgId,
+    //   },
+    // });
     // const client = useClientQueries(schema);
     // const { mutateAsync: create, isPending } =
     //   client.FiscalYearPeriod.useCreate(); //client.todoList.useCreate();
-
     // const resp = await create({ data: updated });
-
     // const payload = {
     //   data: {
     //     type: 'FiscalYearPeriod',
@@ -244,11 +280,9 @@ export default function FiscPeriodRule({
     //   },
     // };
     // const updatedRule = await fiscalRuleAddAction(updated);
-
     // const _fiscVarList = fiscRulesList;
     // _fiscVarList.push(updated);
     // setFiscRulesList(_fiscVarList);
-
     // setFiscYrAddDialog(false);
   };
 
@@ -268,7 +302,8 @@ export default function FiscPeriodRule({
   });
 
   useEffect(() => {
-    trigger(['name', 'monthNum', 'day', 'fiscPeriod', 'yearShift']);
+    // trigger(['monthName', 'monthNum', 'day', 'fiscPeriod', 'yearShift']);
+    trigger(['periodName', 'periodNum', 'day', 'fiscPeriod', 'yearShift']);
   }, [watchedCalendarBased]);
 
   const yearShiftTemplate = (rowData: FiscalPeriodRule) => {
@@ -324,7 +359,7 @@ export default function FiscPeriodRule({
       <Card
         title={
           <div className='flex justify-content-center align-items-center'>
-            Fiscal Year Variant
+            Fiscal Period Rule
           </div>
         }
         // title='Fiscal Year Variant'
@@ -344,8 +379,9 @@ export default function FiscPeriodRule({
         >
           <Column field='id' header='id' />
           <Column field='calendarBased' header='Cal based' />
-          <Column field='name' header='Name' />
-          <Column field='monthNum' header='Month ' />
+          <Column field='title' header='Rule name' />
+          <Column field='periodName' header='Period Name' />
+          <Column field='periodNum' header='Period Number ' />
           <Column field='day' header='Day of Month' />
           <Column field='fiscPeriod' header='Fiscal Period' />
           <Column
@@ -376,7 +412,7 @@ export default function FiscPeriodRule({
             {/* Calendar Year */}
             <div className='flex flex-row'>
               <div className='mr-2'>
-                <label htmlFor='calendarBased'>Previous Calendar year</label>
+                <label htmlFor='calendarBased'>Calendar Based</label>
               </div>
               <div>
                 <Controller
@@ -409,18 +445,51 @@ export default function FiscPeriodRule({
               </div>
             </div>
 
-            {/* Name field  */}
+            {/* Rule Title field  */}
 
             <div className='field'>
               <Controller
-                name='name'
+                name='title'
                 control={control}
                 render={({ field, fieldState }) => (
                   <>
                     <label
                       htmlFor={field.name}
                       className={classNames({
-                        'p-error': errors.name,
+                        'p-error': errors.title,
+                      })}
+                    />
+                    <span className='p-float-label'>
+                      <InputText
+                        id={field.name}
+                        value={field.value}
+                        // disabled={watchedCalendarBased}
+                        autoFocus
+                        onChange={(e) => field.onChange(e.target.value)}
+                        className={classNames({
+                          'p-invalid': fieldState.error,
+                        })}
+                      />
+                      <label htmlFor={field.name}>Period rule title</label>
+                    </span>
+                    {getFormErrorMessage(field.name)}
+                  </>
+                )}
+              />
+            </div>
+
+            {/* Month Name field  */}
+
+            <div className='field'>
+              <Controller
+                name='periodName'
+                control={control}
+                render={({ field, fieldState }) => (
+                  <>
+                    <label
+                      htmlFor={field.name}
+                      className={classNames({
+                        'p-error': errors.periodName,
                       })}
                     />
                     <span className='p-float-label'>
@@ -434,7 +503,7 @@ export default function FiscPeriodRule({
                           'p-invalid': fieldState.error,
                         })}
                       />
-                      <label htmlFor={field.name}>Month Name</label>
+                      <label htmlFor={field.name}>Period Name</label>
                     </span>
                     {getFormErrorMessage(field.name)}
                   </>
@@ -445,14 +514,14 @@ export default function FiscPeriodRule({
             {/* Month number field */}
             <div className='field'>
               <Controller
-                name='monthNum'
+                name='periodNum'
                 control={control}
                 render={({ field, fieldState }) => (
                   <>
                     <label
                       htmlFor={field.name}
                       className={classNames({
-                        'p-error': errors.monthNum,
+                        'p-error': errors.periodNum,
                       })}
                     />
                     <span className='p-float-label'>
@@ -469,7 +538,7 @@ export default function FiscPeriodRule({
                           'p-invalid': fieldState.error,
                         })}
                       />
-                      <label htmlFor={field.name}>Month Number</label>
+                      <label htmlFor={field.name}>Period Number</label>
                     </span>
                     {getFormErrorMessage(field.name)}
                   </>
@@ -629,17 +698,17 @@ export default function FiscPeriodRule({
               },
             }}
             id='name'
-            value={editFiscRule && editFiscRule.name}
+            value={editFiscRule && editFiscRule.periodName}
             onChange={(e) => onInputChange(e, 'name')}
             size={20}
             required
             // disabled={editFiscRule.calendarBased}
             autoFocus
             className={classNames({
-              'p-invalid': submitted && !editFiscRule?.name,
+              'p-invalid': submitted && !editFiscRule?.periodName,
             })}
           />
-          {submitted && !editFiscRule?.name && (
+          {submitted && !editFiscRule?.periodName && (
             <small className='p-error'>Name is required.</small>
           )}
         </div>
@@ -657,7 +726,7 @@ export default function FiscPeriodRule({
               },
             }}
             id={'monthNum'}
-            value={editFiscRule.monthNum}
+            value={editFiscRule.periodNum}
             min={0}
             max={12}
             disabled={editFiscRule.calendarBased}
@@ -666,7 +735,7 @@ export default function FiscPeriodRule({
               onNumberChange(e, 'monthNum')
             }
             className={classNames({
-              'p-invalid': submitted && !editFiscRule?.monthNum,
+              'p-invalid': submitted && !editFiscRule?.periodNum,
             })}
           />
           {/* </span> */}

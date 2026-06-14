@@ -1,21 +1,3 @@
-// import { enhance } from '@zenstackhq/orm';
-// import { NextRequestHandler } from '@zenstackhq/server/next';
-
-// // create an enhanced Prisma client with user context
-// async function getPrisma() {
-//   // const authObj = await auth();
-//   // return enhance(db, { user: authObj?.user });
-// }
-
-// const handler = NextRequestHandler({ getPrisma, useAppDir: true });
-
-// export {
-//   handler as DELETE,
-//   handler as GET,
-//   handler as PATCH,
-//   handler as POST,
-//   handler as PUT,
-// };
 import { auth } from '~/src/lib/auth';
 import { authDb } from '~/src/lib/db';
 import { schema } from '~/zenstack/schema';
@@ -35,7 +17,7 @@ async function getClient() {
   }
 
   let organizationId: string = '';
-  let organizationRole: string | undefined = undefined;
+  let organizationRoles: string | undefined = undefined;
   const { session } = sessionResult;
 
   console.log(
@@ -59,10 +41,10 @@ async function getClient() {
 
   const userContext = {
     userId: session.userId,
-    organizationId,
-    organizationRole,
+    organizationId: session.activeOrganizationId ?? '',
+    organizationRole: session.organizationRoles ?? '',
   };
-
+  console.log('userContext:', userContext); // verify before removing
   return authDb.$setAuth(userContext as any);
 }
 

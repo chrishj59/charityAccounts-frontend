@@ -23,7 +23,7 @@ export const companyNewSchema = z.object({
     .string()
     .min(1, 'Identification is required')
     .max(50, 'Identification length max length 50'),
-  accountType: z.enum(accountType),
+  // accountType: z.enum(accountType),
   coa: z.string().min(1, 'Chart of Accounts required').max(10),
   fiscYear: z.string().min(1, 'Fiscal year is required').max(10),
   postPeriod: z.string().min(1, 'Posting periods ').max(10),

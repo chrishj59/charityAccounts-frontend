@@ -30,12 +30,11 @@ const from = process.env.BETTER_AUTH_EMAIL || 'delivered@resend.dev';
 const to = process.env.TEST_EMAIL || '';
 
 const getOrgId = async (userId: string) => {
-  console.log(`getOrgId called with ${userId}`);
   const orgId = await db.member.findFirst({
     select: { organizationId: true },
     where: { userId: userId },
   });
-  console.log(`orgId used in custom Session ${JSON.stringify(orgId)}`);
+
   return orgId?.organizationId; // '7MB5idvLxFQ9UfZVckSrcki1rKxnz6vT';
 };
 
@@ -59,10 +58,10 @@ const getDisplayName = async (userId: string) => {
     return displayName;
   } catch (err) {
     if (err instanceof ORMError) {
-      console.log(
+      console.error(
         `Permission Error ${JSON.stringify(err.rejectedByPolicyReason)}`,
       );
-      console.log(
+      console.error(
         `sql ${JSON.stringify(err.sql)} params ${JSON.stringify(err.sqlParams)}`,
       );
     }

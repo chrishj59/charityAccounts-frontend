@@ -25,7 +25,7 @@ interface FiscalYearVarProps {
 }
 
 import { FiscalPeriodRule } from '~/zenstack/models';
-import { truncate } from 'node:fs/promises';
+
 import {
   DB_ERROR,
   fiscPeriodRuleResponse,

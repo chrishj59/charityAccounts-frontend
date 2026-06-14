@@ -338,11 +338,19 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "createdBy" }
                 },
-                funds: {
-                    name: "funds",
+                fundsCreated: {
+                    name: "fundsCreated",
                     type: "Fund",
                     array: true,
-                    relation: { opposite: "createdBy" }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundCreatedBy") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "createdBy", name: "fundCreatedBy" }
+                },
+                fundsManaged: {
+                    name: "fundsManaged",
+                    type: "Fund",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundManagedBy") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "managedBy", name: "fundManagedBy" }
                 },
                 designatedFund: {
                     name: "designatedFund",
@@ -364,6 +372,48 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("designationRelease") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "designationReleasedBy", name: "designationRelease" }
+                },
+                fiscPeriodRule: {
+                    name: "fiscPeriodRule",
+                    type: "FiscalPeriodRule",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "createdBy", name: "fiscPeriodRule" }
+                },
+                coa: {
+                    name: "coa",
+                    type: "ChartOfAccounts",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("coa") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "createdBy", name: "coa" }
+                },
+                companiesCreated: {
+                    name: "companiesCreated",
+                    type: "Company",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyCreatedBy") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "createdBy", name: "companyCreatedBy" }
+                },
+                companiesUpdated: {
+                    name: "companiesUpdated",
+                    type: "Company",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyUpdatedBy") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "updatedBy", name: "companyUpdatedBy" }
+                },
+                companyGroupsCreated: {
+                    name: "companyGroupsCreated",
+                    type: "CompanyGroup",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyGroupCreatedBy") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "createdBy", name: "companyGroupCreatedBy" }
+                },
+                companyGroupsUpdated: {
+                    name: "companyGroupsUpdated",
+                    type: "CompanyGroup",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyGroupUpdatedBy") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "updatedBy", name: "companyGroupUpdatedBy" }
                 },
                 lastLoginMethod: {
                     name: "lastLoginMethod",
@@ -652,7 +702,14 @@ export class SchemaType implements SchemaDef {
                     type: "Company",
                     array: true,
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyOrganisation") }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "organisation", name: "companyOrganisation" }
+                    relation: { opposite: "organization", name: "companyOrganisation" }
+                },
+                companyGroups: {
+                    name: "companyGroups",
+                    type: "CompanyGroup",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyGroupOrg") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "organization", name: "companyGroupOrg" }
                 },
                 periodRules: {
                     name: "periodRules",
@@ -660,6 +717,13 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("orgFiscalPerionRule") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "organization", name: "orgFiscalPerionRule" }
+                },
+                coaList: {
+                    name: "coaList",
+                    type: "ChartOfAccounts",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("coaOrganisation") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "organization", name: "coaOrganisation" }
                 },
                 createdAt: {
                     name: "createdAt",
@@ -1646,12 +1710,16 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
                     default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
-                name: {
-                    name: "name",
+                title: {
+                    name: "title",
                     type: "String"
                 },
-                monthNum: {
-                    name: "monthNum",
+                periodName: {
+                    name: "periodName",
+                    type: "String"
+                },
+                periodNum: {
+                    name: "periodNum",
                     type: "Int",
                     optional: true
                 },
@@ -1687,16 +1755,42 @@ export class SchemaType implements SchemaDef {
                     name: "calendarBased",
                     type: "Boolean"
                 },
-                companies: {
-                    name: "companies",
-                    type: "Company",
+                coa: {
+                    name: "coa",
+                    type: "ChartOfAccounts",
                     array: true,
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "fiscPeriodRule", name: "fiscPeriodRule" }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    optional: true,
+                    updatedAt: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fiscPeriodRule", name: "fiscPeriodRule", fields: ["createdById"], references: ["id"] }
                 }
             },
             attributes: [
-                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationRole"]), "==", ExpressionUtils.literal("admin")) }] },
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "==", ExpressionUtils.field("organizationId")) }] }
             ] as readonly AttributeApplication[],
             idFields: ["id"],
@@ -1725,6 +1819,176 @@ export class SchemaType implements SchemaDef {
             },
             attributes: [
                 { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("create,read") }, { name: "condition", value: ExpressionUtils.literal(true) }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" }
+            }
+        },
+        ChartOfAccounts: {
+            name: "ChartOfAccounts",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
+                },
+                name: {
+                    name: "name",
+                    type: "String",
+                    unique: true,
+                    attributes: [{ name: "@unique" }] as readonly AttributeApplication[]
+                },
+                companies: {
+                    name: "companies",
+                    type: "Company",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("chartOfAccounts") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "ChartOfAccounts", name: "chartOfAccounts" }
+                },
+                organizationId: {
+                    name: "organizationId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "organization"
+                    ] as readonly string[]
+                },
+                organization: {
+                    name: "organization",
+                    type: "Organization",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("coaOrganisation") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "coaList", name: "coaOrganisation", fields: ["organizationId"], references: ["id"] }
+                },
+                fiscalPeriodRuleId: {
+                    name: "fiscalPeriodRuleId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "fiscPeriodRule"
+                    ] as readonly string[]
+                },
+                fiscPeriodRule: {
+                    name: "fiscPeriodRule",
+                    type: "FiscalPeriodRule",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("fiscalPeriodRuleId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "coa", name: "fiscPeriodRule", fields: ["fiscalPeriodRuleId"], references: ["id"] }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("coa") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "coa", name: "coa", fields: ["createdById"], references: ["id"] }
+                }
+            },
+            attributes: [
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "==", ExpressionUtils.field("organizationId")) }] },
+                { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("Coa") }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" },
+                name: { type: "String" }
+            }
+        },
+        CompanyGroup: {
+            name: "CompanyGroup",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
+                },
+                name: {
+                    name: "name",
+                    type: "String"
+                },
+                companies: {
+                    name: "companies",
+                    type: "Company",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyGroup") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "companyGroup", name: "companyGroup" }
+                },
+                organizationId: {
+                    name: "organizationId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "organization"
+                    ] as readonly string[]
+                },
+                organization: {
+                    name: "organization",
+                    type: "Organization",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyGroupOrg") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "companyGroups", name: "companyGroupOrg", fields: ["organizationId"], references: ["id"] }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyGroupCreatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "companyGroupsCreated", name: "companyGroupCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                updatedById: {
+                    name: "updatedById",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "updatedBy"
+                    ] as readonly string[]
+                },
+                updatedBy: {
+                    name: "updatedBy",
+                    type: "User",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyGroupUpdatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("updatedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "companyGroupsUpdated", name: "companyGroupUpdatedBy", fields: ["updatedById"], references: ["id"] }
+                }
+            },
+            attributes: [
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "==", ExpressionUtils.field("organizationId")) }] }
             ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
@@ -1769,39 +2033,96 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     optional: true
                 },
-                fiscalPeriodRuleId: {
-                    name: "fiscalPeriodRuleId",
-                    type: "Int",
-                    foreignKeyFor: [
-                        "fiscPeriodRule"
-                    ] as readonly string[]
-                },
-                fiscPeriodRule: {
-                    name: "fiscPeriodRule",
-                    type: "FiscalPeriodRule",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("fiscalPeriodRuleId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "companies", name: "fiscPeriodRule", fields: ["fiscalPeriodRuleId"], references: ["id"] }
-                },
                 postPeriod: {
                     name: "postPeriod",
                     type: "CompanyPostingPeriod",
                     array: true,
                     relation: { opposite: "company" }
                 },
-                organsationId: {
-                    name: "organsationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     foreignKeyFor: [
-                        "organisation"
+                        "organization"
                     ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                organization: {
+                    name: "organization",
                     type: "Organization",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyOrganisation") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organsationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "companies", name: "companyOrganisation", fields: ["organsationId"], references: ["id"] }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyOrganisation") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "companies", name: "companyOrganisation", fields: ["organizationId"], references: ["id"] }
+                },
+                chartOfAccountsId: {
+                    name: "chartOfAccountsId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "ChartOfAccounts"
+                    ] as readonly string[]
+                },
+                ChartOfAccounts: {
+                    name: "ChartOfAccounts",
+                    type: "ChartOfAccounts",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("chartOfAccounts") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("chartOfAccountsId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "companies", name: "chartOfAccounts", fields: ["chartOfAccountsId"], references: ["id"] }
+                },
+                companyGroupId: {
+                    name: "companyGroupId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "companyGroup"
+                    ] as readonly string[]
+                },
+                companyGroup: {
+                    name: "companyGroup",
+                    type: "CompanyGroup",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyGroup") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("companyGroupId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "companies", name: "companyGroup", fields: ["companyGroupId"], references: ["id"] }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }, { name: "@updatedAt" }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyCreatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "companiesCreated", name: "companyCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                updatedById: {
+                    name: "updatedById",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "updatedBy"
+                    ] as readonly string[]
+                },
+                updatedBy: {
+                    name: "updatedBy",
+                    type: "User",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyUpdatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("updatedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "companiesUpdated", name: "companyUpdatedBy", fields: ["updatedById"], references: ["id"] }
                 }
             },
+            attributes: [
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["organizationId"]), "==", ExpressionUtils.field("organizationId")) }] }
+            ] as readonly AttributeApplication[],
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "Int" },
@@ -1885,12 +2206,9 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     optional: true
                 },
-                managedById: {
-                    name: "managedById",
-                    type: "String",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                imanagedById: {
+                    name: "imanagedById",
+                    type: "String"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -1913,11 +2231,31 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundCreatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundManagedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -1990,13 +2328,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -2022,12 +2357,35 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundCreatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundManagedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -2133,13 +2491,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -2165,12 +2520,35 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundCreatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundManagedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -2266,13 +2644,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -2298,12 +2673,35 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundCreatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundManagedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -2501,13 +2899,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -2533,12 +2928,35 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundCreatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundManagedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -2668,13 +3086,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -2700,12 +3115,35 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundCreatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundManagedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -2860,13 +3298,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -2892,12 +3327,35 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fund") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundCreatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("createdById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fundManagedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("managedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",

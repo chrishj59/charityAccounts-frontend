@@ -298,11 +298,17 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "createdBy" }
                 },
-                funds: {
-                    name: "funds",
+                fundsCreated: {
+                    name: "fundsCreated",
                     type: "Fund",
                     array: true,
-                    relation: { opposite: "createdBy" }
+                    relation: { opposite: "createdBy", name: "fundCreatedBy" }
+                },
+                fundsManaged: {
+                    name: "fundsManaged",
+                    type: "Fund",
+                    array: true,
+                    relation: { opposite: "managedBy", name: "fundManagedBy" }
                 },
                 designatedFund: {
                     name: "designatedFund",
@@ -321,6 +327,42 @@ export class SchemaType implements SchemaDef {
                     type: "DesignatedFund",
                     array: true,
                     relation: { opposite: "designationReleasedBy", name: "designationRelease" }
+                },
+                fiscPeriodRule: {
+                    name: "fiscPeriodRule",
+                    type: "FiscalPeriodRule",
+                    array: true,
+                    relation: { opposite: "createdBy", name: "fiscPeriodRule" }
+                },
+                coa: {
+                    name: "coa",
+                    type: "ChartOfAccounts",
+                    array: true,
+                    relation: { opposite: "createdBy", name: "coa" }
+                },
+                companiesCreated: {
+                    name: "companiesCreated",
+                    type: "Company",
+                    array: true,
+                    relation: { opposite: "createdBy", name: "companyCreatedBy" }
+                },
+                companiesUpdated: {
+                    name: "companiesUpdated",
+                    type: "Company",
+                    array: true,
+                    relation: { opposite: "updatedBy", name: "companyUpdatedBy" }
+                },
+                companyGroupsCreated: {
+                    name: "companyGroupsCreated",
+                    type: "CompanyGroup",
+                    array: true,
+                    relation: { opposite: "createdBy", name: "companyGroupCreatedBy" }
+                },
+                companyGroupsUpdated: {
+                    name: "companyGroupsUpdated",
+                    type: "CompanyGroup",
+                    array: true,
+                    relation: { opposite: "updatedBy", name: "companyGroupUpdatedBy" }
                 },
                 lastLoginMethod: {
                     name: "lastLoginMethod",
@@ -580,13 +622,25 @@ export class SchemaType implements SchemaDef {
                     name: "companies",
                     type: "Company",
                     array: true,
-                    relation: { opposite: "organisation", name: "companyOrganisation" }
+                    relation: { opposite: "organization", name: "companyOrganisation" }
+                },
+                companyGroups: {
+                    name: "companyGroups",
+                    type: "CompanyGroup",
+                    array: true,
+                    relation: { opposite: "organization", name: "companyGroupOrg" }
                 },
                 periodRules: {
                     name: "periodRules",
                     type: "FiscalPeriodRule",
                     array: true,
                     relation: { opposite: "organization", name: "orgFiscalPerionRule" }
+                },
+                coaList: {
+                    name: "coaList",
+                    type: "ChartOfAccounts",
+                    array: true,
+                    relation: { opposite: "organization", name: "coaOrganisation" }
                 },
                 createdAt: {
                     name: "createdAt",
@@ -1475,12 +1529,16 @@ export class SchemaType implements SchemaDef {
                     id: true,
                     default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
-                name: {
-                    name: "name",
+                title: {
+                    name: "title",
                     type: "String"
                 },
-                monthNum: {
-                    name: "monthNum",
+                periodName: {
+                    name: "periodName",
+                    type: "String"
+                },
+                periodNum: {
+                    name: "periodNum",
                     type: "Int",
                     optional: true
                 },
@@ -1515,11 +1573,35 @@ export class SchemaType implements SchemaDef {
                     name: "calendarBased",
                     type: "Boolean"
                 },
-                companies: {
-                    name: "companies",
-                    type: "Company",
+                coa: {
+                    name: "coa",
+                    type: "ChartOfAccounts",
                     array: true,
                     relation: { opposite: "fiscPeriodRule", name: "fiscPeriodRule" }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    optional: true,
+                    updatedAt: true,
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    relation: { opposite: "fiscPeriodRule", name: "fiscPeriodRule", fields: ["createdById"], references: ["id"] }
                 }
             },
             idFields: ["id"],
@@ -1543,6 +1625,154 @@ export class SchemaType implements SchemaDef {
                 value: {
                     name: "value",
                     type: "String"
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" }
+            }
+        },
+        ChartOfAccounts: {
+            name: "ChartOfAccounts",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
+                },
+                name: {
+                    name: "name",
+                    type: "String",
+                    unique: true
+                },
+                companies: {
+                    name: "companies",
+                    type: "Company",
+                    array: true,
+                    relation: { opposite: "ChartOfAccounts", name: "chartOfAccounts" }
+                },
+                organizationId: {
+                    name: "organizationId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "organization"
+                    ] as readonly string[]
+                },
+                organization: {
+                    name: "organization",
+                    type: "Organization",
+                    relation: { opposite: "coaList", name: "coaOrganisation", fields: ["organizationId"], references: ["id"] }
+                },
+                fiscalPeriodRuleId: {
+                    name: "fiscalPeriodRuleId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "fiscPeriodRule"
+                    ] as readonly string[]
+                },
+                fiscPeriodRule: {
+                    name: "fiscPeriodRule",
+                    type: "FiscalPeriodRule",
+                    relation: { opposite: "coa", name: "fiscPeriodRule", fields: ["fiscalPeriodRuleId"], references: ["id"] }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    relation: { opposite: "coa", name: "coa", fields: ["createdById"], references: ["id"] }
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" },
+                name: { type: "String" }
+            }
+        },
+        CompanyGroup: {
+            name: "CompanyGroup",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
+                },
+                name: {
+                    name: "name",
+                    type: "String"
+                },
+                companies: {
+                    name: "companies",
+                    type: "Company",
+                    array: true,
+                    relation: { opposite: "companyGroup", name: "companyGroup" }
+                },
+                organizationId: {
+                    name: "organizationId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "organization"
+                    ] as readonly string[]
+                },
+                organization: {
+                    name: "organization",
+                    type: "Organization",
+                    relation: { opposite: "companyGroups", name: "companyGroupOrg", fields: ["organizationId"], references: ["id"] }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    relation: { opposite: "companyGroupsCreated", name: "companyGroupCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                updatedById: {
+                    name: "updatedById",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "updatedBy"
+                    ] as readonly string[]
+                },
+                updatedBy: {
+                    name: "updatedBy",
+                    type: "User",
+                    optional: true,
+                    relation: { opposite: "companyGroupsUpdated", name: "companyGroupUpdatedBy", fields: ["updatedById"], references: ["id"] }
                 }
             },
             idFields: ["id"],
@@ -1585,35 +1815,84 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     optional: true
                 },
-                fiscalPeriodRuleId: {
-                    name: "fiscalPeriodRuleId",
-                    type: "Int",
-                    foreignKeyFor: [
-                        "fiscPeriodRule"
-                    ] as readonly string[]
-                },
-                fiscPeriodRule: {
-                    name: "fiscPeriodRule",
-                    type: "FiscalPeriodRule",
-                    relation: { opposite: "companies", name: "fiscPeriodRule", fields: ["fiscalPeriodRuleId"], references: ["id"] }
-                },
                 postPeriod: {
                     name: "postPeriod",
                     type: "CompanyPostingPeriod",
                     array: true,
                     relation: { opposite: "company" }
                 },
-                organsationId: {
-                    name: "organsationId",
+                organizationId: {
+                    name: "organizationId",
                     type: "String",
                     foreignKeyFor: [
-                        "organisation"
+                        "organization"
                     ] as readonly string[]
                 },
-                organisation: {
-                    name: "organisation",
+                organization: {
+                    name: "organization",
                     type: "Organization",
-                    relation: { opposite: "companies", name: "companyOrganisation", fields: ["organsationId"], references: ["id"] }
+                    relation: { opposite: "companies", name: "companyOrganisation", fields: ["organizationId"], references: ["id"] }
+                },
+                chartOfAccountsId: {
+                    name: "chartOfAccountsId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "ChartOfAccounts"
+                    ] as readonly string[]
+                },
+                ChartOfAccounts: {
+                    name: "ChartOfAccounts",
+                    type: "ChartOfAccounts",
+                    relation: { opposite: "companies", name: "chartOfAccounts", fields: ["chartOfAccountsId"], references: ["id"] }
+                },
+                companyGroupId: {
+                    name: "companyGroupId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "companyGroup"
+                    ] as readonly string[]
+                },
+                companyGroup: {
+                    name: "companyGroup",
+                    type: "CompanyGroup",
+                    relation: { opposite: "companies", name: "companyGroup", fields: ["companyGroupId"], references: ["id"] }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    relation: { opposite: "companiesCreated", name: "companyCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                updatedById: {
+                    name: "updatedById",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "updatedBy"
+                    ] as readonly string[]
+                },
+                updatedBy: {
+                    name: "updatedBy",
+                    type: "User",
+                    optional: true,
+                    relation: { opposite: "companiesUpdated", name: "companyUpdatedBy", fields: ["updatedById"], references: ["id"] }
                 }
             },
             idFields: ["id"],
@@ -1691,12 +1970,9 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     optional: true
                 },
-                managedById: {
-                    name: "managedById",
-                    type: "String",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                imanagedById: {
+                    name: "imanagedById",
+                    type: "String"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -1716,10 +1992,29 @@ export class SchemaType implements SchemaDef {
                     type: "Organization",
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -1784,13 +2079,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -1813,11 +2105,33 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -1911,13 +2225,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -1940,11 +2251,33 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -2031,13 +2364,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -2060,11 +2390,33 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -2244,13 +2596,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -2273,11 +2622,33 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -2394,13 +2765,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -2423,11 +2791,33 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",
@@ -2565,13 +2955,10 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                managedById: {
-                    name: "managedById",
+                imanagedById: {
+                    name: "imanagedById",
                     type: "String",
-                    originModel: "Fund",
-                    foreignKeyFor: [
-                        "createdBy"
-                    ] as readonly string[]
+                    originModel: "Fund"
                 },
                 organizationId: {
                     name: "organizationId",
@@ -2594,11 +2981,33 @@ export class SchemaType implements SchemaDef {
                     originModel: "Fund",
                     relation: { opposite: "funds", name: "fund", fields: ["organizationId"], references: ["id"], onDelete: "Cascade", hasDefault: true }
                 },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
                 createdBy: {
                     name: "createdBy",
                     type: "User",
                     originModel: "Fund",
-                    relation: { opposite: "funds", fields: ["managedById"], references: ["id"] }
+                    relation: { opposite: "fundsCreated", name: "fundCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                managedById: {
+                    name: "managedById",
+                    type: "String",
+                    originModel: "Fund",
+                    foreignKeyFor: [
+                        "managedBy"
+                    ] as readonly string[]
+                },
+                managedBy: {
+                    name: "managedBy",
+                    type: "User",
+                    originModel: "Fund",
+                    relation: { opposite: "fundsManaged", name: "fundManagedBy", fields: ["managedById"], references: ["id"] }
                 },
                 fundType: {
                     name: "fundType",

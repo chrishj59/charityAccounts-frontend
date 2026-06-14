@@ -66,19 +66,17 @@ export async function signinUserAction(
     session = await auth.api.getSession({
       headers: await headers(),
     });
-    console.log(`session is now ${JSON.stringify(session, null, 2)}`);
 
     const fullOrg = await auth.api.getFullOrganization({
       headers: await headers(),
     });
-    console.log(`fullOrg ${JSON.stringify(fullOrg)}`);
+
     if (fullOrg?.members) {
       const myMember = fullOrg.members.find(
         (m) => m.userId === currentSessionUser.id,
       );
       organizationRole = myMember?.role;
     }
-    console.log(`organizationRole ${organizationRole}`);
 
     //   const fund = await authDb.generalFund.create({
     //     data: {

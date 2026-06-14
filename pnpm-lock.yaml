@@ -69,6 +69,9 @@ importers:
       '@zenstackhq/server':
         specifier: ~3.7.2
         version: 3.7.2(better-sqlite3@12.10.0)(express@5.2.1)(next@16.2.7(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.100.0))(pg@8.21.0)(zod@4.4.3)
+      '@zenstackhq/tanstack-query':
+        specifier: ~3.7.2
+        version: 3.7.2(@tanstack/react-query@5.101.0(react@19.2.0))(better-sqlite3@12.10.0)(pg@8.21.0)(zod@4.4.3)
       aws-sdk:
         specifier: ^2.1693.0
         version: 2.1693.0
@@ -244,9 +247,6 @@ importers:
       '@zenstackhq/cli':
         specifier: ^3.7.2
         version: 3.7.2(better-sqlite3@12.10.0)(next@16.2.7(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.100.0))(pg@8.21.0)(typescript@5.9.3)
-      '@zenstackhq/tanstack-query':
-        specifier: ~3.7.2
-        version: 3.7.2(@tanstack/react-query@5.101.0(react@19.2.0))(better-sqlite3@12.10.0)(pg@8.21.0)(zod@4.4.3)
       baseline-browser-mapping:
         specifier: ^2.10.32
         version: 2.10.34

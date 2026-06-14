@@ -12,7 +12,7 @@ export default async function CreateCompany() {
     headers: await headers(),
   });
 
-  console.log(`session ${JSON.stringify(session)}`);
+  
   if (!session) {
     redirect('/unauthorised');
   }
@@ -25,18 +25,20 @@ export default async function CreateCompany() {
   const userId = session.user.id;
   // const orgId = session.session.id;
 
-  const orgs = await auth.api.listOrganizations({
-    //await auth.api.listSessions({
-    // This endpoint requires session cookies.
-    headers: await headers(),
-  });
-  console.log(`Orgs ${JSON.stringify(orgs, null, 2)}`);
-  const sessions = await auth.api.listSessions({ headers: await headers() });
-  console.log(`session ${JSON.stringify(sessions, null, 2)}`);
-  const orgId: String = orgs[0].id;
+  // const orgs = await auth.api.listOrganizations({
+  //   //await auth.api.listSessions({
+  //   // This endpoint requires session cookies.
+  //   headers: await headers(),
+  // });
+  
+  // const sessions = await auth.api.listSessions({ headers: await headers() });
+  
+  //const orgId: String = orgs[0].id;
+
+  const orgId = session.session.activeOrganizationId ?? ''
 
   const userDb = await getUserDb(userId, orgId);
-  console.log(`orgId ${JSON.stringify(orgId)}`);
+  
 
   const fiscPeriodRules = await userDb.fiscalPeriodRule.findMany({
     orderBy: { name: 'asc' },
@@ -51,12 +53,13 @@ export default async function CreateCompany() {
         calendarBased: true,
         organizationId: orgId,
         yearShift: false,
+        createdById: userId
       },
     };
     const _perRule = await userDb.fiscalPeriodRule.create(payload);
     fiscPeriodRules.push(_perRule);
   }
-  console.log(`fiscPeriodRules ${JSON.stringify(fiscPeriodRules, null, 2)}`);
+  
 
   const fisPerRuleList: FiscalPeriodRuleUI[] = [];
   fiscPeriodRules.forEach((per) => {
@@ -73,8 +76,6 @@ export default async function CreateCompany() {
     };
     fisPerRuleList.push(_perRule);
   });
-  console.log(
-    `CreateCompanyUI called with ${JSON.stringify(userId)} orgId: ${JSON.stringify(orgId)} fisPerRuleList: ${JSON.stringify(fisPerRuleList, null, 2)} `,
-  );
-  return <NewCompanyUI />;
+
+  return <NewCompanyUI fiscRuleList={fisPerRuleList} orgId={orgId}/>;
 }

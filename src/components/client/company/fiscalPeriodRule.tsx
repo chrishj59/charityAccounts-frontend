@@ -31,10 +31,6 @@ import {
   fiscPeriodRuleResponse,
   statusEnum,
 } from '~/src/types/helper';
-import {
-  fiscalRuleAddAction,
-  fiscalRuleUpdateAction,
-} from '~/src/actions/setup/fiscalRuleAction';
 
 export default function FiscPeriodRule({ fiscRules }: FiscalYearVarProps) {
   return <div> manage FiscPeriodRule</div>;

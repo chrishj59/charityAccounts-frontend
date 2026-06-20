@@ -1,5 +1,6 @@
 import { ZenStackClient } from '@zenstackhq/orm';
 import { schema } from '~/zenstack/schema';
+import { SoftDeletePlugin } from '@zenstackhq/plugin-soft-delete';
 import { PostgresDialect } from 'kysely';
 import { PolicyPlugin } from '@zenstackhq/plugin-policy';
 import { Pool } from 'pg';
@@ -17,7 +18,7 @@ export const db = new ZenStackClient(schema, {
     }),
   }),
   log: ['query', 'error'],
-});
+}).$use(new SoftDeletePlugin());
 // .$use(defineCachePlugin({ provider: new MemoryCacheProvider() }));
 
 export const allDb = db;

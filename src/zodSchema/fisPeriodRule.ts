@@ -3,38 +3,37 @@ import z from 'zod';
 export const fiscalPeriodRuleSchema = z
   .object({
     id: z.int(),
-    title: z.string(),
-    periodName: z.string().optional(),
-    periodNum: z.int().optional(),
-    day: z.int().optional(),
-    fiscPeriod: z.int().optional(),
+
+    periodName: z.string(),
+    periodNum: z.int(),
+    day: z.int(),
+    fiscPeriod: z.int(),
     yearShift: z.boolean().optional(),
     organizationId: z.string(),
-    calendarBased: z.boolean(),
   })
   .superRefine((values, context) => {
-    if (!values.calendarBased && !values.periodName) {
+    if (!values.periodName) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Please enter Period Name',
         path: ['monthNum'],
       });
     }
-    if (!values.calendarBased && !values.periodNum) {
+    if (!values.periodNum) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Please add Period number',
         path: ['monthNum'],
       });
     }
-    if (!values.calendarBased && !values.day) {
+    if (!values.day) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Please add period day of the month',
         path: ['monthNum'],
       });
     }
-    if (!values.calendarBased && !values.fiscPeriod) {
+    if (!values.fiscPeriod) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Please add Fiscal Period number',
@@ -44,3 +43,13 @@ export const fiscalPeriodRuleSchema = z
   });
 
 export type FiscPeriodRuleFormValues = z.infer<typeof fiscalPeriodRuleSchema>;
+
+export const fiscalPeriodRuleHeaderSchema = z.object({
+  title: z.string().min(5, 'Title is required'),
+  calendarBased: z.boolean(),
+  fiscalPeriodRules: z.array(fiscalPeriodRuleSchema).optional(),
+});
+
+export type FiscalPeriodRuleHeaderFormValues = z.infer<
+  typeof fiscalPeriodRuleHeaderSchema
+>;

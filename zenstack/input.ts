@@ -5,7 +5,7 @@
 
 /* eslint-disable */
 
-import { type SchemaType as $Schema } from "./schema-lite";
+import { type SchemaType as $Schema } from "./schema-lite.js";
 import type { FindManyArgs as $FindManyArgs, FindUniqueArgs as $FindUniqueArgs, FindFirstArgs as $FindFirstArgs, ExistsArgs as $ExistsArgs, CreateArgs as $CreateArgs, CreateManyArgs as $CreateManyArgs, CreateManyAndReturnArgs as $CreateManyAndReturnArgs, UpdateArgs as $UpdateArgs, UpdateManyArgs as $UpdateManyArgs, UpdateManyAndReturnArgs as $UpdateManyAndReturnArgs, UpsertArgs as $UpsertArgs, DeleteArgs as $DeleteArgs, DeleteManyArgs as $DeleteManyArgs, CountArgs as $CountArgs, AggregateArgs as $AggregateArgs, GroupByArgs as $GroupByArgs, WhereInput as $WhereInput, SelectInput as $SelectInput, IncludeInput as $IncludeInput, OmitInput as $OmitInput, UncheckedCreateInput as $UncheckedCreateInput, CheckedCreateInput as $CheckedCreateInput, UncheckedUpdateInput as $UncheckedUpdateInput, CheckedUpdateInput as $CheckedUpdateInput, QueryOptions as $QueryOptions } from "@zenstackhq/orm";
 import type { SimplifiedPlainResult as $Result, SelectIncludeOmit as $SelectIncludeOmit } from "@zenstackhq/orm";
 export type TodoListFindManyArgs = $FindManyArgs<$Schema, "TodoList">;
@@ -508,6 +508,31 @@ export type ArAPPartnerCheckedCreateInput = $CheckedCreateInput<$Schema, "ArAPPa
 export type ArAPPartnerUncheckedUpdateInput = $UncheckedUpdateInput<$Schema, "ArAPPartner">;
 export type ArAPPartnerCheckedUpdateInput = $CheckedUpdateInput<$Schema, "ArAPPartner">;
 export type ArAPPartnerGetPayload<Args extends $SelectIncludeOmit<$Schema, "ArAPPartner", true>, Options extends $QueryOptions<$Schema> = $QueryOptions<$Schema>> = $Result<$Schema, "ArAPPartner", Args, Options>;
+export type FiscalPeriodRuleHeaderFindManyArgs = $FindManyArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderFindUniqueArgs = $FindUniqueArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderFindFirstArgs = $FindFirstArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderExistsArgs = $ExistsArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderCreateArgs = $CreateArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderCreateManyArgs = $CreateManyArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderCreateManyAndReturnArgs = $CreateManyAndReturnArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderUpdateArgs = $UpdateArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderUpdateManyArgs = $UpdateManyArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderUpdateManyAndReturnArgs = $UpdateManyAndReturnArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderUpsertArgs = $UpsertArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderDeleteArgs = $DeleteArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderDeleteManyArgs = $DeleteManyArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderCountArgs = $CountArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderAggregateArgs = $AggregateArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderGroupByArgs = $GroupByArgs<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderWhereInput = $WhereInput<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderSelect = $SelectInput<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderInclude = $IncludeInput<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderOmit = $OmitInput<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderUncheckedCreateInput = $UncheckedCreateInput<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderCheckedCreateInput = $CheckedCreateInput<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderUncheckedUpdateInput = $UncheckedUpdateInput<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderCheckedUpdateInput = $CheckedUpdateInput<$Schema, "FiscalPeriodRuleHeader">;
+export type FiscalPeriodRuleHeaderGetPayload<Args extends $SelectIncludeOmit<$Schema, "FiscalPeriodRuleHeader", true>, Options extends $QueryOptions<$Schema> = $QueryOptions<$Schema>> = $Result<$Schema, "FiscalPeriodRuleHeader", Args, Options>;
 export type FiscalPeriodRuleFindManyArgs = $FindManyArgs<$Schema, "FiscalPeriodRule">;
 export type FiscalPeriodRuleFindUniqueArgs = $FindUniqueArgs<$Schema, "FiscalPeriodRule">;
 export type FiscalPeriodRuleFindFirstArgs = $FindFirstArgs<$Schema, "FiscalPeriodRule">;

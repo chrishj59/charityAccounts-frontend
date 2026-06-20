@@ -23,6 +23,10 @@ plugin policy {
   provider = '@zenstackhq/plugin-policy'
 }
 
+plugin softDelete {
+  provider = '@zenstackhq/plugin-soft-delete'
+}
+
 
 
 
@@ -131,45 +135,49 @@ model Todo {
 }
 
 model User {
-  id                     String           @id @default(cuid())
-  name                   String           @default('')
-  displayName            String           @length(1,  40, 'Display name is required up to 40 characters') @default('')
-  firstName              String           @length(1,  40, 'First name is required up to 40 characters') @default('')
-  familyName             String           @length(1,  40, 'Family name is required up to 40 characters') @default('')
-  email                  String           @unique
-  emailVerified          Boolean          @default(false)
-  image                  String?
-  createdAt              DateTime         @default(now())
-  updatedAt              DateTime         @default(now()) @updatedAt
+  id                          String           @id @default(cuid())
+  name                        String           @default('')
+  displayName                 String           @length(1,  40, 'Display name is required up to 40 characters') @default('')
+  firstName                   String           @length(1,  40, 'First name is required up to 40 characters') @default('')
+  familyName                  String           @length(1,  40, 'Family name is required up to 40 characters') @default('')
+  email                       String           @unique
+  emailVerified               Boolean          @default(false)
+  image                       String?
+  createdAt                   DateTime         @default(now())
+  updatedAt                   DateTime         @default(now()) @updatedAt
   // role          String?
-  role                   Role             @default(user)
+  role                        Role             @default(user)
   
-  banned                 Boolean?
-  banReason              String?
-  banExpires             DateTime?
-  sessions               Session[]
-  accounts               Account[]
-  members                Member[]
-  teamMembers            TeamMember[]
-  invitations            Invitation[]
-  todoLists              TodoList[]
-  apiKey                 Apikey?
-  glaccounts             GlAccount[]
-  partners               Partner[]
-  fundsCreated           Fund[] @relation(name:'fundCreatedBy')
-  fundsManaged           Fund[] @relation(name: 'fundManagedBy')
-  designatedFund         DesignatedFund[] @relation(name: 'designatedBy')
-  createdDesignatedFund  DesignatedFund[] @relation(name: "designationCreate")
-  releasedDesignatedFund DesignatedFund[] @relation(name: 'designationRelease')
-  fiscPeriodRule         FiscalPeriodRule[] @relation(name:'fiscPeriodRule')
-  coa                    ChartOfAccounts[] @relation(name:'coa')
-  companiesCreated         Company[]         @relation(name:'companyCreatedBy')
-  companiesUpdated         Company[]         @relation(name:'companyUpdatedBy')
-  companyGroupsCreated    CompanyGroup[]  @relation(name: 'companyGroupCreatedBy')
-  companyGroupsUpdated     CompanyGroup[] @relation(name: 'companyGroupUpdatedBy')
-  lastLoginMethod        String?
-  organizationId         String?
-  organization           Organization? @relation(fields: [organizationId], references: [id])
+  banned                      Boolean?
+  banReason                   String?
+  banExpires                  DateTime?
+  sessions                    Session[]
+  accounts                    Account[]
+  members                     Member[]
+  teamMembers                 TeamMember[]
+  invitations                 Invitation[]
+  todoLists                   TodoList[]
+  apiKey                      Apikey?
+  glaccounts                  GlAccount[]
+  partners                    Partner[]
+  fundsCreated                Fund[]                   @relation(name:'fundCreatedBy')
+  fundsManaged                Fund[]                   @relation(name: 'fundManagedBy')
+  designatedFund              DesignatedFund[]         @relation(name: 'designatedBy')
+  createdDesignatedFund       DesignatedFund[]         @relation(name: "designationCreate")
+  releasedDesignatedFund      DesignatedFund[]         @relation(name: 'designationRelease')
+  fiscPeriodRuleCreated       FiscalPeriodRuleHeader[] @relation(name:'fiscPeriodRuleCreated')
+  fiscPeriodRuleUpdated       FiscalPeriodRuleHeader[] @relation(name:'fiscPeriodRuleUpdated')
+  fiscPeriodRuleLineCreated   FiscalPeriodRule[]   @relation(name:'fiscPeriodRuleLineCreated')
+  fiscPeriodRuleLineUpdated   FiscalPeriodRule[]       @relation(name:'fiscPeriodRuleLineUpdated')
+  coaCreated                  ChartOfAccounts[]        @relation(name:'coa_create')
+  coaUpdate                   ChartOfAccounts[]        @relation(name:'coa_update')
+  companiesCreated            Company[]              @relation(name:'companyCreatedBy')
+  companiesUpdated            Company[]              @relation(name:'companyUpdatedBy')
+  companyGroupsCreated        CompanyGroup[]          @relation(name: 'companyGroupCreatedBy')
+  companyGroupsUpdated        CompanyGroup[]         @relation(name: 'companyGroupUpdatedBy')
+  lastLoginMethod             String?
+  organizationId              String?
+  organization                Organization?            @relation(fields: [organizationId], references: [id])
   // @@allow('all', auth().organizationId == organizationId)
 
   @@allow('read', auth().organizationId == organizationId)
@@ -236,7 +244,8 @@ model Organization {
   funds          Fund[]                @relation(name: 'fund')
   companies      Company[]             @relation(name: 'companyOrganisation')
   companyGroups   CompanyGroup[]      @relation(name: 'companyGroupOrg')
-  periodRules    FiscalPeriodRule[]     @relation( 'orgFiscalPerionRule')
+  periodRules    FiscalPeriodRuleHeader[]     @relation( 'orgPerionRuleHeader')
+  fiscRulePeriods    FiscalPeriodRule[]        @relation('orgPerionRule')
   coaList        ChartOfAccounts[]     @relation('coaOrganisation')
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now()) @updatedAt
@@ -446,28 +455,51 @@ model ArAPPartner extends Partner {
   //  company          Team      @relation(fields: [companyId], references: [id])
 }
 
+model FiscalPeriodRuleHeader {
+  id              Int @id @default(autoincrement())
+  title           String
+  calendarBased   Boolean @default(false)
+  rulePeriods     FiscalPeriodRule[] @relation(name:'period-rule-header')
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime?   @default(now()) @updatedAt
+  createdById     String    
+  createdBy       User       @relation('fiscPeriodRuleCreated',fields: [createdById], references: [id])
+  updatedById     String?
+  updatedBy       User?       @relation('fiscPeriodRuleUpdated',fields: [updatedById], references: [id])
+  organizationId  String
+  organization    Organization? @relation('orgPerionRuleHeader',fields: [organizationId], references: [id])
+  deletedAt       DateTime?     @deletedAt
+  @@allow('all', auth().organizationId == organizationId)
+}
 model FiscalPeriodRule {
-  id            Int       @id @default(autoincrement())
-  title         String
-  periodName     String
-  periodNum      Int?     
-  day           Int?
-  fiscPeriod    Int?
-  organizationId  String  
-  organization  Organization? @relation('orgFiscalPerionRule',fields: [organizationId], references: [id])
-  yearShift     Boolean
-  calendarBased Boolean
-  coa         ChartOfAccounts[] @relation('fiscPeriodRule')
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime?   @default(now()) @updatedAt
-  createdById String    
-  createdBy   User       @relation('fiscPeriodRule',fields: [createdById], references: [id])
-  // @@allow('all', true)
-  // @@allow('all', auth().organizationRole == 'admin')
+  id              Int       @id @default(autoincrement())
+  
+  periodName      String
+  periodNum       Int     
+  day             Int
+  fiscPeriod      Int
+  headerId        Int
+  header          FiscalPeriodRuleHeader @relation('period-rule-header',fields: [headerId], references: [id])
+  
+  yearShift       Boolean
+  
+  coa             ChartOfAccounts[] @relation('fiscPeriodRule')
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime?   @default(now()) @updatedAt
+  createdById     String    
+  createdBy       User       @relation('fiscPeriodRuleLineCreated',fields: [createdById], references: [id])
+  updatedById     String?
+  updatedBy       User?       @relation('fiscPeriodRuleLineUpdated',fields: [updatedById], references: [id])
+  deletedAt       DateTime?   @deletedAt
+  organizationId  String
+  organization    Organization? @relation('orgPerionRule',fields: [organizationId], references: [id])
+  
+
   @@allow('all', auth().organizationId == organizationId)
   
+  
   // deny anonymous users
-  // @@deny('all', auth() == null)
+  //  @@deny('all', auth() == null)
 }
 
 
@@ -488,10 +520,12 @@ model ChartOfAccounts {
   organization              Organization  @relation('coaOrganisation', fields:[organizationId], references: [id])
   fiscalPeriodRuleId        Int
   fiscPeriodRule            FiscalPeriodRule       @relation('fiscPeriodRule', fields: [fiscalPeriodRuleId], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @default(now()) @updatedAt
-  createdById String
-  createdBy   User       @relation('coa',fields: [createdById], references: [id])
+  createdAt                 DateTime   @default(now())
+  updatedAt                 DateTime   @default(now()) @updatedAt
+  createdById               String
+  createdBy                 User       @relation('coa_create',fields: [createdById], references: [id])
+  updatedById               String
+  updatedBy                 User       @relation('coa_update',fields: [updatedById], references: [id])        
   @@allow('all', auth().organizationId == organizationId)
 @@map('Coa')
 }
@@ -555,7 +589,7 @@ model Fund {
   fundName       String
   donarName      String?
   objective      String?
-  imanagedById    String
+  
   organizationId String       @default('')
   teamId         String       @default('') 
   organization   Organization @relation(name: 'fund',  fields: [organizationId], references: [id], onDelete: Cascade)

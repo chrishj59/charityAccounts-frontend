@@ -1,9 +1,8 @@
-import { int } from 'aws-sdk/clients/datapipeline';
-
 export type FiscalPeriodRuleUI = {
   id: number;
-  name: string;
-  monthNum: number | null;
+  title: string;
+  periodName: string | null;
+  periodNum: number | null;
   day: number | null | undefined;
   fiscPeriod: number | null;
   organizationId: string;

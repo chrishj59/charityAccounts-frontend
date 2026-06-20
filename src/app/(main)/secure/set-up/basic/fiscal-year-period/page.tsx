@@ -13,8 +13,9 @@ export default async function FisPeriod() {
   rules.forEach((rule) => {
     const _rule: fiscalPeriodRuleIF = {
       id: rule.id,
-      name: rule.name,
-      monthNum: rule.monthNum,
+      title: rule.title,
+      periodName: rule.periodName,
+      periodNum: rule.periodNum,
       day: rule.day,
       fiscPeriod: rule.fiscPeriod,
       organisationId: rule.organizationId,

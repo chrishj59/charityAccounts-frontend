@@ -52,7 +52,6 @@ export function SignUpOrg({ user, setActiveTabAction }: Props) {
   const [planSelected, setPlanSelected] = useState<number>(1);
   const toast = useRef<Toast>(null);
 
-  const userId = useSession.get().data?.user.id;
   const orgDefaultValues = {
     tradingName: '',
     identification: '',

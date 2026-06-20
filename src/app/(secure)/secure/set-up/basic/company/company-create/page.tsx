@@ -12,7 +12,6 @@ export default async function CreateCompany() {
     headers: await headers(),
   });
 
-  
   if (!session) {
     redirect('/unauthorised');
   }
@@ -30,18 +29,17 @@ export default async function CreateCompany() {
   //   // This endpoint requires session cookies.
   //   headers: await headers(),
   // });
-  
+
   // const sessions = await auth.api.listSessions({ headers: await headers() });
-  
+
   //const orgId: String = orgs[0].id;
 
-  const orgId = session.session.activeOrganizationId ?? ''
+  const orgId = session.session.activeOrganizationId ?? '';
 
   const userDb = await getUserDb(userId, orgId);
-  
 
   const fiscPeriodRules = await userDb.fiscalPeriodRule.findMany({
-    orderBy: { name: 'asc' },
+    orderBy: { periodName: 'asc' },
   });
 
   if (fiscPeriodRules.length === 0) {
@@ -49,24 +47,25 @@ export default async function CreateCompany() {
 
     const payload = {
       data: {
-        name: 'Calendar based',
+        title: 'Calendar based',
+
         calendarBased: true,
         organizationId: orgId,
         yearShift: false,
-        createdById: userId
+        createdById: userId,
       },
     };
     const _perRule = await userDb.fiscalPeriodRule.create(payload);
     fiscPeriodRules.push(_perRule);
   }
-  
 
   const fisPerRuleList: FiscalPeriodRuleUI[] = [];
   fiscPeriodRules.forEach((per) => {
     const _perRule = {
       id: per.id,
-      name: per.name,
-      monthNum: per.monthNum,
+      title: per.title,
+      periodName: per.periodName,
+      periodNum: per.periodNum,
       day: per.day,
       fiscPeriod: per.fiscPeriod,
       organizationId: per.organizationId,
@@ -77,5 +76,5 @@ export default async function CreateCompany() {
     fisPerRuleList.push(_perRule);
   });
 
-  return <NewCompanyUI fiscRuleList={fisPerRuleList} orgId={orgId}/>;
+  return <NewCompanyUI fiscRuleList={fisPerRuleList} orgId={orgId} />;
 }

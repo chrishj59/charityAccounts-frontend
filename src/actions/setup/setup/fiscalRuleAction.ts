@@ -14,12 +14,15 @@ export async function fiscalRuleAddAction(
 
   const payload = {
     data: {
-      name: rule.name,
-      monthNum: rule.monthNum,
+      title: rule.title,
+      periodName: rule.periodName,
+      periodNum: rule.periodNum,
       day: rule.day,
       fiscPeriod: rule.fiscPeriod,
       yearShift: rule.yearShift,
       calendarBased: rule.calendarBased,
+      createdById: rule.createdById,
+      organizationId: rule.organizationId,
     },
   };
 
@@ -36,8 +39,9 @@ export async function fiscalRuleUpdateAction(
   const payload = {
     where: { id: rule.id },
     data: {
-      name: rule.name,
-      monthNum: rule.monthNum,
+      title: rule.title,
+      name: rule.periodName,
+      monthNum: rule.periodNum,
       day: rule.day,
       fiscPeriod: rule.fiscPeriod,
       yearShift: rule.yearShift,
@@ -46,8 +50,9 @@ export async function fiscalRuleUpdateAction(
   };
 
   const data = {
-    name: rule.name,
-    monthNum: rule.monthNum,
+    title: rule.title,
+    periodName: rule.periodName,
+    periodNum: rule.periodNum,
     day: rule.day,
     fiscPeriod: rule.fiscPeriod,
     yearShift: rule.yearShift,

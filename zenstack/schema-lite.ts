@@ -328,17 +328,41 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "designationReleasedBy", name: "designationRelease" }
                 },
-                fiscPeriodRule: {
-                    name: "fiscPeriodRule",
+                fiscPeriodRuleCreated: {
+                    name: "fiscPeriodRuleCreated",
+                    type: "FiscalPeriodRuleHeader",
+                    array: true,
+                    relation: { opposite: "createdBy", name: "fiscPeriodRuleCreated" }
+                },
+                fiscPeriodRuleUpdated: {
+                    name: "fiscPeriodRuleUpdated",
+                    type: "FiscalPeriodRuleHeader",
+                    array: true,
+                    relation: { opposite: "updatedBy", name: "fiscPeriodRuleUpdated" }
+                },
+                fiscPeriodRuleLineCreated: {
+                    name: "fiscPeriodRuleLineCreated",
                     type: "FiscalPeriodRule",
                     array: true,
-                    relation: { opposite: "createdBy", name: "fiscPeriodRule" }
+                    relation: { opposite: "createdBy", name: "fiscPeriodRuleLineCreated" }
                 },
-                coa: {
-                    name: "coa",
+                fiscPeriodRuleLineUpdated: {
+                    name: "fiscPeriodRuleLineUpdated",
+                    type: "FiscalPeriodRule",
+                    array: true,
+                    relation: { opposite: "updatedBy", name: "fiscPeriodRuleLineUpdated" }
+                },
+                coaCreated: {
+                    name: "coaCreated",
                     type: "ChartOfAccounts",
                     array: true,
-                    relation: { opposite: "createdBy", name: "coa" }
+                    relation: { opposite: "createdBy", name: "coa_create" }
+                },
+                coaUpdate: {
+                    name: "coaUpdate",
+                    type: "ChartOfAccounts",
+                    array: true,
+                    relation: { opposite: "updatedBy", name: "coa_update" }
                 },
                 companiesCreated: {
                     name: "companiesCreated",
@@ -632,9 +656,15 @@ export class SchemaType implements SchemaDef {
                 },
                 periodRules: {
                     name: "periodRules",
+                    type: "FiscalPeriodRuleHeader",
+                    array: true,
+                    relation: { opposite: "organization", name: "orgPerionRuleHeader" }
+                },
+                fiscRulePeriods: {
+                    name: "fiscRulePeriods",
                     type: "FiscalPeriodRule",
                     array: true,
-                    relation: { opposite: "organization", name: "orgFiscalPerionRule" }
+                    relation: { opposite: "organization", name: "orgPerionRule" }
                 },
                 coaList: {
                     name: "coaList",
@@ -1520,8 +1550,8 @@ export class SchemaType implements SchemaDef {
                 id: { type: "String" }
             }
         },
-        FiscalPeriodRule: {
-            name: "FiscalPeriodRule",
+        FiscalPeriodRuleHeader: {
+            name: "FiscalPeriodRuleHeader",
             fields: {
                 id: {
                     name: "id",
@@ -1533,24 +1563,54 @@ export class SchemaType implements SchemaDef {
                     name: "title",
                     type: "String"
                 },
-                periodName: {
-                    name: "periodName",
-                    type: "String"
+                calendarBased: {
+                    name: "calendarBased",
+                    type: "Boolean",
+                    default: false as FieldDefault
                 },
-                periodNum: {
-                    name: "periodNum",
-                    type: "Int",
-                    optional: true
+                rulePeriods: {
+                    name: "rulePeriods",
+                    type: "FiscalPeriodRule",
+                    array: true,
+                    relation: { opposite: "header", name: "period-rule-header" }
                 },
-                day: {
-                    name: "day",
-                    type: "Int",
-                    optional: true
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
-                fiscPeriod: {
-                    name: "fiscPeriod",
-                    type: "Int",
-                    optional: true
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    optional: true,
+                    updatedAt: true,
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    relation: { opposite: "fiscPeriodRuleCreated", name: "fiscPeriodRuleCreated", fields: ["createdById"], references: ["id"] }
+                },
+                updatedById: {
+                    name: "updatedById",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "updatedBy"
+                    ] as readonly string[]
+                },
+                updatedBy: {
+                    name: "updatedBy",
+                    type: "User",
+                    optional: true,
+                    relation: { opposite: "fiscPeriodRuleUpdated", name: "fiscPeriodRuleUpdated", fields: ["updatedById"], references: ["id"] }
                 },
                 organizationId: {
                     name: "organizationId",
@@ -1563,14 +1623,58 @@ export class SchemaType implements SchemaDef {
                     name: "organization",
                     type: "Organization",
                     optional: true,
-                    relation: { opposite: "periodRules", name: "orgFiscalPerionRule", fields: ["organizationId"], references: ["id"] }
+                    relation: { opposite: "periodRules", name: "orgPerionRuleHeader", fields: ["organizationId"], references: ["id"] }
+                },
+                deletedAt: {
+                    name: "deletedAt",
+                    type: "DateTime",
+                    optional: true
+                }
+            },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "Int" }
+            }
+        },
+        FiscalPeriodRule: {
+            name: "FiscalPeriodRule",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    id: true,
+                    default: ExpressionUtils.call("autoincrement") as FieldDefault
+                },
+                periodName: {
+                    name: "periodName",
+                    type: "String"
+                },
+                periodNum: {
+                    name: "periodNum",
+                    type: "Int"
+                },
+                day: {
+                    name: "day",
+                    type: "Int"
+                },
+                fiscPeriod: {
+                    name: "fiscPeriod",
+                    type: "Int"
+                },
+                headerId: {
+                    name: "headerId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "header"
+                    ] as readonly string[]
+                },
+                header: {
+                    name: "header",
+                    type: "FiscalPeriodRuleHeader",
+                    relation: { opposite: "rulePeriods", name: "period-rule-header", fields: ["headerId"], references: ["id"] }
                 },
                 yearShift: {
                     name: "yearShift",
-                    type: "Boolean"
-                },
-                calendarBased: {
-                    name: "calendarBased",
                     type: "Boolean"
                 },
                 coa: {
@@ -1601,7 +1705,39 @@ export class SchemaType implements SchemaDef {
                 createdBy: {
                     name: "createdBy",
                     type: "User",
-                    relation: { opposite: "fiscPeriodRule", name: "fiscPeriodRule", fields: ["createdById"], references: ["id"] }
+                    relation: { opposite: "fiscPeriodRuleLineCreated", name: "fiscPeriodRuleLineCreated", fields: ["createdById"], references: ["id"] }
+                },
+                updatedById: {
+                    name: "updatedById",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "updatedBy"
+                    ] as readonly string[]
+                },
+                updatedBy: {
+                    name: "updatedBy",
+                    type: "User",
+                    optional: true,
+                    relation: { opposite: "fiscPeriodRuleLineUpdated", name: "fiscPeriodRuleLineUpdated", fields: ["updatedById"], references: ["id"] }
+                },
+                deletedAt: {
+                    name: "deletedAt",
+                    type: "DateTime",
+                    optional: true
+                },
+                organizationId: {
+                    name: "organizationId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "organization"
+                    ] as readonly string[]
+                },
+                organization: {
+                    name: "organization",
+                    type: "Organization",
+                    optional: true,
+                    relation: { opposite: "fiscRulePeriods", name: "orgPerionRule", fields: ["organizationId"], references: ["id"] }
                 }
             },
             idFields: ["id"],
@@ -1697,7 +1833,19 @@ export class SchemaType implements SchemaDef {
                 createdBy: {
                     name: "createdBy",
                     type: "User",
-                    relation: { opposite: "coa", name: "coa", fields: ["createdById"], references: ["id"] }
+                    relation: { opposite: "coaCreated", name: "coa_create", fields: ["createdById"], references: ["id"] }
+                },
+                updatedById: {
+                    name: "updatedById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "updatedBy"
+                    ] as readonly string[]
+                },
+                updatedBy: {
+                    name: "updatedBy",
+                    type: "User",
+                    relation: { opposite: "coaUpdate", name: "coa_update", fields: ["updatedById"], references: ["id"] }
                 }
             },
             idFields: ["id"],
@@ -1970,10 +2118,6 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     optional: true
                 },
-                imanagedById: {
-                    name: "imanagedById",
-                    type: "String"
-                },
                 organizationId: {
                     name: "organizationId",
                     type: "String",
@@ -2077,11 +2221,6 @@ export class SchemaType implements SchemaDef {
                     name: "objective",
                     type: "String",
                     optional: true,
-                    originModel: "Fund"
-                },
-                imanagedById: {
-                    name: "imanagedById",
-                    type: "String",
                     originModel: "Fund"
                 },
                 organizationId: {
@@ -2225,11 +2364,6 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                imanagedById: {
-                    name: "imanagedById",
-                    type: "String",
-                    originModel: "Fund"
-                },
                 organizationId: {
                     name: "organizationId",
                     type: "String",
@@ -2362,11 +2496,6 @@ export class SchemaType implements SchemaDef {
                     name: "objective",
                     type: "String",
                     optional: true,
-                    originModel: "Fund"
-                },
-                imanagedById: {
-                    name: "imanagedById",
-                    type: "String",
                     originModel: "Fund"
                 },
                 organizationId: {
@@ -2596,11 +2725,6 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     originModel: "Fund"
                 },
-                imanagedById: {
-                    name: "imanagedById",
-                    type: "String",
-                    originModel: "Fund"
-                },
                 organizationId: {
                     name: "organizationId",
                     type: "String",
@@ -2763,11 +2887,6 @@ export class SchemaType implements SchemaDef {
                     name: "objective",
                     type: "String",
                     optional: true,
-                    originModel: "Fund"
-                },
-                imanagedById: {
-                    name: "imanagedById",
-                    type: "String",
                     originModel: "Fund"
                 },
                 organizationId: {
@@ -2953,11 +3072,6 @@ export class SchemaType implements SchemaDef {
                     name: "objective",
                     type: "String",
                     optional: true,
-                    originModel: "Fund"
-                },
-                imanagedById: {
-                    name: "imanagedById",
-                    type: "String",
                     originModel: "Fund"
                 },
                 organizationId: {
@@ -3303,8 +3417,8 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     optional: true
                 },
-                organizationRole: {
-                    name: "organizationRole",
+                organizationRoles: {
+                    name: "organizationRoles",
                     type: "String",
                     optional: true
                 },

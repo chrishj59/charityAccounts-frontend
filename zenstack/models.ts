@@ -5,7 +5,7 @@
 
 /* eslint-disable */
 
-import { schema as $schema, type SchemaType as $Schema } from "./schema-lite";
+import { schema as $schema, type SchemaType as $Schema } from "./schema-lite.js";
 import type { ModelResult as $ModelResult, TypeDefResult as $TypeDefResult } from "@zenstackhq/orm";
 export type TodoList = $ModelResult<$Schema, "TodoList">;
 export type PostingPeriod = $ModelResult<$Schema, "PostingPeriod">;
@@ -27,6 +27,7 @@ export type Apikey = $ModelResult<$Schema, "Apikey">;
 export type GlAccount = $ModelResult<$Schema, "GlAccount">;
 export type Partner = $ModelResult<$Schema, "Partner">;
 export type ArAPPartner = $ModelResult<$Schema, "ArAPPartner">;
+export type FiscalPeriodRuleHeader = $ModelResult<$Schema, "FiscalPeriodRuleHeader">;
 export type FiscalPeriodRule = $ModelResult<$Schema, "FiscalPeriodRule">;
 export type Parameter = $ModelResult<$Schema, "Parameter">;
 export type ChartOfAccounts = $ModelResult<$Schema, "ChartOfAccounts">;

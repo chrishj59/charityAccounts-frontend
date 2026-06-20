@@ -103,8 +103,9 @@ const generalFundNew = async (
 
       donarName: fund.donar,
       fundType: fundType,
-      objective: fund.objective,
+      objective: fund.objective ?? '',
       reviewDate: fund.reviewDate,
+      createdById: userId,
       managedById: userId,
       organizationId: orgId,
       balance: 0,
@@ -166,6 +167,7 @@ const designatedFundNew = async (
       fundType: fund.fundType,
       objective: fund.objective,
       reviewDate: fund.reviewDate,
+      createdById: userId,
       managedById: userId,
       organizationId: orgId,
       designatedDate: fund.designatedDate ? fund.designatedDate : new Date(),
@@ -270,6 +272,7 @@ const incomeFundNew = async (
       fundType: fund.fundType,
       objective: fund.objective,
       reviewDate: fund.reviewDate,
+      createdById: userId,
       managedById: userId,
       organizationId: orgId,
       projectEndDate: fund.projectEndDate ? fund.projectEndDate : new Date(),
@@ -371,6 +374,7 @@ const expendableFundNew = async (
       fundType: fund.fundType,
       objective: fund.objective,
       reviewDate: fund.reviewDate,
+      createdById: userId,
       managedById: userId,
       organizationId: orgId,
       nextDonarReviewDate: fund.nextDonarReviewDate
@@ -472,6 +476,7 @@ const permanentFundNew = async (
       fundType: fund.fundType,
       objective: fund.objective,
       reviewDate: fund.reviewDate,
+      createdById: userId,
       managedById: userId,
       organizationId: orgId,
       nextDonarReviewDate: fund.nextDonarReviewDate

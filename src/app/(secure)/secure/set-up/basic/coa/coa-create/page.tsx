@@ -16,7 +16,7 @@ export default async function CoaCreatePage() {
   const orgId = session.session.activeOrganizationId ?? '';
   const userDB = await getUserDb(userId, orgId);
 
-  const fiscalPeriods = await userDB.fiscalPeriodRule.findMany();
+  const fiscalPeriods = await userDB.fiscalPeriodRuleHeader.findMany();
 
   return (
     <CoaCreateUI userId={userId} orgId={orgId} fiscalPeriods={fiscalPeriods} />

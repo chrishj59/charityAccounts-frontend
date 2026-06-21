@@ -467,6 +467,7 @@ model FiscalPeriodRuleHeader {
   updatedById     String?
   updatedBy       User?       @relation('fiscPeriodRuleUpdated',fields: [updatedById], references: [id])
   organizationId  String
+  coa             ChartOfAccounts[] @relation('fiscPeriodRuleHeader')
   organization    Organization? @relation('orgPerionRuleHeader',fields: [organizationId], references: [id])
   deletedAt       DateTime?     @deletedAt
   @@allow('all', auth().organizationId == organizationId)
@@ -483,7 +484,7 @@ model FiscalPeriodRule {
   
   yearShift       Boolean
   
-  coa             ChartOfAccounts[] @relation('fiscPeriodRule')
+  
   createdAt       DateTime   @default(now())
   updatedAt       DateTime?   @default(now()) @updatedAt
   createdById     String    
@@ -519,13 +520,13 @@ model ChartOfAccounts {
   organizationId             String
   organization              Organization  @relation('coaOrganisation', fields:[organizationId], references: [id])
   fiscalPeriodRuleId        Int
-  fiscPeriodRule            FiscalPeriodRule       @relation('fiscPeriodRule', fields: [fiscalPeriodRuleId], references: [id])
+  fiscPeriodRule            FiscalPeriodRuleHeader @relation('fiscPeriodRuleHeader', fields: [fiscalPeriodRuleId], references: [id])
   createdAt                 DateTime   @default(now())
   updatedAt                 DateTime   @default(now()) @updatedAt
   createdById               String
   createdBy                 User       @relation('coa_create',fields: [createdById], references: [id])
-  updatedById               String
-  updatedBy                 User       @relation('coa_update',fields: [updatedById], references: [id])        
+  updatedById               String?
+  updatedBy                 User?       @relation('coa_update',fields: [updatedById], references: [id])        
   @@allow('all', auth().organizationId == organizationId)
 @@map('Coa')
 }

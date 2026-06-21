@@ -1811,6 +1811,13 @@ export class SchemaType implements SchemaDef {
                         "organization"
                     ] as readonly string[]
                 },
+                coa: {
+                    name: "coa",
+                    type: "ChartOfAccounts",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRuleHeader") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fiscPeriodRule", name: "fiscPeriodRuleHeader" }
+                },
                 organization: {
                     name: "organization",
                     type: "Organization",
@@ -1875,13 +1882,6 @@ export class SchemaType implements SchemaDef {
                 yearShift: {
                     name: "yearShift",
                     type: "Boolean"
-                },
-                coa: {
-                    name: "coa",
-                    type: "ChartOfAccounts",
-                    array: true,
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "fiscPeriodRule", name: "fiscPeriodRule" }
                 },
                 createdAt: {
                     name: "createdAt",
@@ -2026,9 +2026,9 @@ export class SchemaType implements SchemaDef {
                 },
                 fiscPeriodRule: {
                     name: "fiscPeriodRule",
-                    type: "FiscalPeriodRule",
-                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRule") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("fiscalPeriodRuleId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "coa", name: "fiscPeriodRule", fields: ["fiscalPeriodRuleId"], references: ["id"] }
+                    type: "FiscalPeriodRuleHeader",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPeriodRuleHeader") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("fiscalPeriodRuleId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "coa", name: "fiscPeriodRuleHeader", fields: ["fiscalPeriodRuleId"], references: ["id"] }
                 },
                 createdAt: {
                     name: "createdAt",
@@ -2059,6 +2059,7 @@ export class SchemaType implements SchemaDef {
                 updatedById: {
                     name: "updatedById",
                     type: "String",
+                    optional: true,
                     foreignKeyFor: [
                         "updatedBy"
                     ] as readonly string[]
@@ -2066,6 +2067,7 @@ export class SchemaType implements SchemaDef {
                 updatedBy: {
                     name: "updatedBy",
                     type: "User",
+                    optional: true,
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("coa_update") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("updatedById")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "coaUpdate", name: "coa_update", fields: ["updatedById"], references: ["id"] }
                 }

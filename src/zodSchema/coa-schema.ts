@@ -10,7 +10,7 @@ export const coaSchema = z.object({
       message: 'Fiscal Period Rule is required',
     }),
   organizationId: z.string(),
-  createdById: z.number(),
+  createdById: z.string(),
 });
 
 export type CoaFormValues = z.infer<typeof coaSchema>;

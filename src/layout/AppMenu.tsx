@@ -73,15 +73,21 @@ const AppMenu = () => {
             },
           ],
         },
-        {label: 'Chart of Accoounts',
+        {
+          label: 'Chart of Accoounts',
           items: [
             {
               icon: 'pi pi-file-plus',
               label: 'Create',
               to: '/secure/set-up/basic/coa/coa-create',
             },
+            {
+              icon: 'pi pi-pencil',
+              label: 'Manage',
+              to: '/secure/set-up/basic/coa/coa-manage',
+            },
           ],
-        }
+        },
       ],
     },
   ];

@@ -354,6 +354,7 @@ export default function FiscPeriodRuleUI({
       console.error(error);
     }
   };
+
   const onSubmitPeriodAdd = async (data: FiscPeriodRuleFormValues) => {
     try {
       if (!selectedRuleHeaderId) {

@@ -38,8 +38,8 @@ export default async function CreateCompany() {
 
   const userDb = await getUserDb(userId, orgId);
 
-  const fiscPeriodRules = await userDb.fiscalPeriodRule.findMany({
-    orderBy: { periodName: 'asc' },
+  const fiscPeriodRules = await userDb.fiscalPeriodRuleHeader.findMany({
+    orderBy: { title: 'asc' },
   });
 
   if (fiscPeriodRules.length === 0) {
@@ -55,7 +55,7 @@ export default async function CreateCompany() {
         createdById: userId,
       },
     };
-    const _perRule = await userDb.fiscalPeriodRule.create(payload);
+    const _perRule = await userDb.fiscalPeriodRuleHeader.create(payload);
     fiscPeriodRules.push(_perRule);
   }
 
@@ -64,13 +64,9 @@ export default async function CreateCompany() {
     const _perRule = {
       id: per.id,
       title: per.title,
-      periodName: per.periodName,
-      periodNum: per.periodNum,
-      day: per.day,
-      fiscPeriod: per.fiscPeriod,
+
       organizationId: per.organizationId,
 
-      yearShift: per.yearShift,
       calendarBased: per.calendarBased,
     };
     fisPerRuleList.push(_perRule);

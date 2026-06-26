@@ -456,20 +456,21 @@ model ArAPPartner extends Partner {
 }
 
 model FiscalPeriodRuleHeader {
-  id              Int @id @default(autoincrement())
+  id              Int                 @id @default(autoincrement())
   title           String
-  calendarBased   Boolean @default(false)
-  rulePeriods     FiscalPeriodRule[] @relation(name:'period-rule-header')
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime?   @default(now()) @updatedAt
+  calendarBased   Boolean             @default(false)
+  rulePeriods     FiscalPeriodRule[]  @relation(name:'period-rule-header')
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime?           @default(now()) @updatedAt
   createdById     String    
-  createdBy       User       @relation('fiscPeriodRuleCreated',fields: [createdById], references: [id])
+  createdBy       User                @relation('fiscPeriodRuleCreated',fields: [createdById], references: [id])
   updatedById     String?
-  updatedBy       User?       @relation('fiscPeriodRuleUpdated',fields: [updatedById], references: [id])
+  updatedBy       User?               @relation('fiscPeriodRuleUpdated',fields: [updatedById], references: [id])
   organizationId  String
-  coa             ChartOfAccounts[] @relation('fiscPeriodRuleHeader')
-  organization    Organization? @relation('orgPerionRuleHeader',fields: [organizationId], references: [id])
-  deletedAt       DateTime?     @deletedAt
+  groupCompanies  CompanyGroup[]      @relation('fiscPerRuleCompGroup')
+  coa             ChartOfAccounts[]   @relation('fiscPeriodRuleHeader')
+  organization    Organization?       @relation('orgPerionRuleHeader',fields: [organizationId], references: [id])
+  deletedAt       DateTime?           @deletedAt
   @@allow('all', auth().organizationId == organizationId)
 }
 model FiscalPeriodRule {
@@ -534,6 +535,8 @@ model ChartOfAccounts {
 model CompanyGroup {
   id                Int       @id @default(autoincrement())
   name              String
+  fiscalPeriodRuleId        Int
+  fiscPeriodRule            FiscalPeriodRuleHeader @relation('fiscPerRuleCompGroup', fields: [fiscalPeriodRuleId], references: [id])
   companies         Company[] @relation('companyGroup')
   organizationId             String
   organization              Organization            @relation('companyGroupOrg', fields:[organizationId], references: [id])
@@ -543,6 +546,7 @@ model CompanyGroup {
   createdBy                 User       @relation('companyGroupCreatedBy',fields: [createdById], references: [id])
   updatedById               String?
   updatedBy                 User?   @relation('companyGroupUpdatedBy',fields: [updatedById], references: [id])
+  // @@allow('all',true)
   @@allow('all', auth().organizationId == organizationId)
 
 }

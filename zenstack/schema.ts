@@ -1811,6 +1811,13 @@ export class SchemaType implements SchemaDef {
                         "organization"
                     ] as readonly string[]
                 },
+                groupCompanies: {
+                    name: "groupCompanies",
+                    type: "CompanyGroup",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPerRuleCompGroup") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fiscPeriodRule", name: "fiscPerRuleCompGroup" }
+                },
                 coa: {
                     name: "coa",
                     type: "ChartOfAccounts",
@@ -2095,6 +2102,19 @@ export class SchemaType implements SchemaDef {
                 name: {
                     name: "name",
                     type: "String"
+                },
+                fiscalPeriodRuleId: {
+                    name: "fiscalPeriodRuleId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "fiscPeriodRule"
+                    ] as readonly string[]
+                },
+                fiscPeriodRule: {
+                    name: "fiscPeriodRule",
+                    type: "FiscalPeriodRuleHeader",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPerRuleCompGroup") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("fiscalPeriodRuleId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "groupCompanies", name: "fiscPerRuleCompGroup", fields: ["fiscalPeriodRuleId"], references: ["id"] }
                 },
                 companies: {
                     name: "companies",

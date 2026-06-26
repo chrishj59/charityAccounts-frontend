@@ -1619,6 +1619,12 @@ export class SchemaType implements SchemaDef {
                         "organization"
                     ] as readonly string[]
                 },
+                groupCompanies: {
+                    name: "groupCompanies",
+                    type: "CompanyGroup",
+                    array: true,
+                    relation: { opposite: "fiscPeriodRule", name: "fiscPerRuleCompGroup" }
+                },
                 coa: {
                     name: "coa",
                     type: "ChartOfAccounts",
@@ -1868,6 +1874,18 @@ export class SchemaType implements SchemaDef {
                 name: {
                     name: "name",
                     type: "String"
+                },
+                fiscalPeriodRuleId: {
+                    name: "fiscalPeriodRuleId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "fiscPeriodRule"
+                    ] as readonly string[]
+                },
+                fiscPeriodRule: {
+                    name: "fiscPeriodRule",
+                    type: "FiscalPeriodRuleHeader",
+                    relation: { opposite: "groupCompanies", name: "fiscPerRuleCompGroup", fields: ["fiscalPeriodRuleId"], references: ["id"] }
                 },
                 companies: {
                     name: "companies",

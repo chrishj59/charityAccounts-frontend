@@ -66,10 +66,21 @@ const AppMenu = () => {
               label: 'Create',
               to: '/secure/set-up/basic/company-create',
             },
+
             {
               label: 'Update',
-              icon: 'pi-pencil',
+              icon: 'pi pi-pencil',
               to: '/secure/set-up/basic/company-update',
+            },
+            {
+              label: 'Company Group',
+              icon: 'pi pi-chevron-down',
+              items: [
+                {
+                  label: 'Create',
+                  to: '/secure/set-up/basic/company/company-group/comp-group-create',
+                },
+              ],
             },
           ],
         },

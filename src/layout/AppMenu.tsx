@@ -80,6 +80,10 @@ const AppMenu = () => {
                   label: 'Create',
                   to: '/secure/set-up/basic/company/company-group/comp-group-create',
                 },
+                {
+                  label: 'Manage',
+                  to: '/secure/set-up/basic/company/company-group/comp-group-manage',
+                },
               ],
             },
           ],

@@ -65,18 +65,6 @@ export default function CoaManageUI({
   const header = (
     <div className='flex flex-wrap gap-2 align-items-center justify-content-between'>
       <h4 className='m-0'>Manage Chart of accounts</h4>
-      {/* <span className="p-input-icon-left">
-				<i className="pi pi-search" />
-				<InputText
-					type="search"
-					placeholder="Search..."
-					onInput={(e) => {
-						const target = e.target as HTMLInputElement;
-
-						setGlobalFilter(target.value);
-					}}
-				/>
-			</span> */}
     </div>
   );
   const hideEditCoaDialog = () => {
@@ -155,10 +143,6 @@ export default function CoaManageUI({
   });
 
   const onSubmitCoa = async (data: CoaFormValues) => {
-    console.log(
-      `getValues in  onSubmitCoa ${JSON.stringify(getValuesCoa(), null, 2)}`,
-    );
-
     try {
       const updatedCoa: ChartOfAccounts = await updateCoa.mutateAsync({
         where: { id: data.id },
@@ -168,7 +152,7 @@ export default function CoaManageUI({
           updatedById: userId,
         },
       });
-      console.log(`uodatedCoa ${JSON.stringify(updatedCoa, null, 2)}`);
+
       showToast(
         'info',
         'Success',
@@ -194,17 +178,13 @@ export default function CoaManageUI({
         setEditCoaDlg(false);
       }
     } catch (err) {
-      showToast(
-        'error',
-        'Error',
-        'Could not find update chart of accounts',
-        false,
-      );
+      showToast('error', 'Error', 'Could not update Chart of Accounts', false);
     }
   };
 
   return (
     <>
+      <Toast ref={toast} position='top-right' />
       <DataTable
         ref={dt}
         value={coaList}

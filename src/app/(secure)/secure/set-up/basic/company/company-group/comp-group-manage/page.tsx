@@ -38,9 +38,6 @@ export default async function CompanyGroupManagePage() {
     return _comp;
   });
 
-  console.log(`groupCompList ${JSON.stringify(groupCompList, null, 2)}`);
-  console.log(`fiscPeriodsList ${JSON.stringify(fiscPeriodsList, null, 2)}`);
-
   return (
     <CompanyGroupManageUI
       userId={userId}

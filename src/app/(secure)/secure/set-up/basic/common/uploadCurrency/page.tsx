@@ -7,10 +7,6 @@ import {
   currency4217RowIF,
   currencyCSVRowIF,
 } from '~/src/interface/currency4217.interface';
-import {
-  EndownmentExpendableExistsArgs,
-  AccountFindFirstArgs,
-} from '../../../../../../../zenstack/input';
 
 export default function CurrencyUpload() {
   const [loading, setLoading] = useState(false);

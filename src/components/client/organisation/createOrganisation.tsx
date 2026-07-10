@@ -16,7 +16,6 @@ import {
   //orgCreateAction,
   signUpUserOrgAction,
 } from '~/src/actions/auth/signup-organisation';
-import { getSession } from 'better-auth/api';
 
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';

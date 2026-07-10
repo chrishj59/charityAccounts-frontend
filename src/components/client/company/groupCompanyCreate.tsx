@@ -6,7 +6,7 @@ import { useClientQueries } from '@zenstackhq/tanstack-query/react';
 import { schema } from '~/zenstack/schema';
 import { useRef } from 'react';
 import { Toast, ToastMessage } from 'primereact/toast';
-import { CompanyGroup } from '~/zenstack/models';
+
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {

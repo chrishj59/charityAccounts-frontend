@@ -54,7 +54,12 @@ const AppMenu = () => {
             {
               icon: 'pi-pencil',
               label: 'Load currencies',
-              to: '/secure/set-up/basic/uploadCurrency',
+              to: '/secure/set-up/basic/common/uploadCurrency',
+            },
+            {
+              icon: 'pi-pencil',
+              label: 'Load countries',
+              to: '/secure/set-up/basic/common/uploadCountryIso3166',
             },
           ],
         },
@@ -64,13 +69,13 @@ const AppMenu = () => {
             {
               icon: 'pi pi-file-plus',
               label: 'Create',
-              to: '/secure/set-up/basic/company-create',
+              to: '/secure/set-up/basic/company/company-create',
             },
 
             {
               label: 'Update',
               icon: 'pi pi-pencil',
-              to: '/secure/set-up/basic/company-update',
+              to: '/secure/set-up/basic/company/company-update',
             },
             {
               label: 'Company Group',

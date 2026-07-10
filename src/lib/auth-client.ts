@@ -7,20 +7,21 @@ import {
 } from 'better-auth/client/plugins';
 
 import { createAuthClient } from 'better-auth/react';
-// import { createAuthClient } from 'better-auth/client';
+
 import { customSessionClient } from 'better-auth/client/plugins';
 import type { auth } from './auth';
 import { toast } from 'sonner';
 
 export const client = createAuthClient({
   plugins: [
+    customSessionClient<typeof auth>(),
     organizationClient({
       schema: inferOrgAdditionalFields<typeof auth>(),
       teams: {
         enabled: true,
       },
     }),
-    customSessionClient<typeof auth>(),
+
     adminClient(),
     inferAdditionalFields<typeof auth>(),
     lastLoginMethodClient(),
@@ -34,6 +35,8 @@ export const client = createAuthClient({
   },
 });
 
+export type ActiveOrganization = typeof client.$Infer.ActiveOrganization;
+export type Organization = typeof client.$Infer.Organization;
 export const {
   signUp,
   signIn,

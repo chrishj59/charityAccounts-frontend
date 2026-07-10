@@ -178,6 +178,7 @@ model User {
   lastLoginMethod             String?
   organizationId              String?
   organization                Organization?            @relation(fields: [organizationId], references: [id])
+  countriesCreated            ISO3166Country[]          @relation(name: 'countryCreatedBy')
   // @@allow('all', auth().organizationId == organizationId)
 
   @@allow('read', auth().organizationId == organizationId)
@@ -329,15 +330,22 @@ model Session {
 
 
 
-model ISOCountry {
-  countryId   Int             @id @default(autoincrement())
-  code2       String          @unique @length(1,  2, "Code must be length 2 char")
-  code3       String          @unique @length(1,  3, "ISO address code3 must be 3 char length ")
-  number      Int
-  name        String
-  description String
+model ISO3166Country {
+  countryId               Int             @id @default(autoincrement())
+  name                    String
+  alpha2                  String          @unique @length(1,  2, "Code must be length 2 char")
+  alpha3                   String          @unique @length(1,  3, "ISO address code3 must be 3 char length ")
+  countryCode             String          @length(1,3, '3 digit country code')
+  iso3166                 String          @length(1,15, "ISO 1366 coa_update")
+  region                  String
+  subRegion               String
+  intermediateRegion      String
+  intermediateRegionCode  String
+  
   addresses   Address[]
   regions     AddressRegion[]
+  userId      String
+  createdBy   User            @relation("countryCreatedBy",fields: [userId], references: [id])
   // global data
   @@allow('all', true)
 }
@@ -362,30 +370,36 @@ model ISO4217Currency {
 }
 
 model AddressRegion {
-  regionId     Int        @id @default(autoincrement())
-  isoCountryId Int
-  country      ISOCountry @relation(fields: [isoCountryId], references: [countryId])
-  name         String
+  regionId            Int        @id @default(autoincrement())
+  isoCountryId        Int
+  country             ISO3166Country @relation(fields: [isoCountryId], references: [countryId])
+  region              String
+  subRegion           String
+  intermediateRegion  String
+  regionCode          String    @length(3)
+  subRegionCode       String    @length(3)
+        
 }
 
 model Address {
-  addressID    Int        @id @default(autoincrement())
-  buildingCode String?    @length(0,  10, 'building code can be up 10 characters')
-  room         String?    @length(0,  10, 'room can be up 10 characters')
-  careOf       String?    @length(0,  50, 'Care of be up 10 characters')
-  street2      String?    @length(0,  50, 'Street2 can be up 10 characters')
-  street3      String?    @length(0,  50, 'Street3 can be up 10 characters')
-  houseNumber  Int?
-  street       String     @length(1, 50, 'Street must be upto 50 char')
-  town         String?    @length(0,  50, 'Town can be up 10 characters')
-  county       String?    @length(0,  50, 'County can be up 10 characters')
-  postCode     String?    @length(1,  10, 'Post code must be up 10 characters')
-  isoCountryId Int
-  country      ISOCountry @relation(fields: [isoCountryId], references: [countryId])
-  partnerId    String
-  partners     Partner[]
+  addressID     Int        @id @default(autoincrement())
+  buildingCode  String?    @length(0,  10, 'building code can be up 10 characters')
+  room          String?    @length(0,  10, 'room can be up 10 characters')
+  careOf        String?    @length(0,  50, 'Care of be up 10 characters')
+  street2       String?    @length(0,  50, 'Street2 can be up 10 characters')
+  street3       String?    @length(0,  50, 'Street3 can be up 10 characters')
+  houseName     String?    @length(0,  50, 'House name  can be up 10 characters')
+  houseNumber   Int?
+  street        String     @length(1, 50, 'Street must be upto 50 char')
+  town          String?    @length(0,  50, 'Town can be up 10 characters')
+  county        String?    @length(0,  50, 'County can be up 10 characters')
+  postCode      String    @length(1,  10, 'Post code must be up 10 characters')
+  isoCountryId  Int
+  country       ISO3166Country @relation(fields: [isoCountryId], references: [countryId])
+  partnerId     String
+  partners      Partner[]
   // companyId String
-  companys     Company?   @relation('registereOfficeAddress')
+  companyRegAddr Company?   @relation('registereOfficeAddress')
 }
 
 
@@ -468,6 +482,7 @@ model FiscalPeriodRuleHeader {
   updatedBy       User?               @relation('fiscPeriodRuleUpdated',fields: [updatedById], references: [id])
   organizationId  String
   groupCompanies  CompanyGroup[]      @relation('fiscPerRuleCompGroup')
+  companies       Company[]           @relation('companyPeriodRule')
   coa             ChartOfAccounts[]   @relation('fiscPeriodRuleHeader')
   organization    Organization?       @relation('orgPerionRuleHeader',fields: [organizationId], references: [id])
   deletedAt       DateTime?           @deletedAt
@@ -560,6 +575,8 @@ model Company {
   vatNumber                 String?
   
   postPeriod                CompanyPostingPeriod []
+  fiscalPeriodRuleId        Int
+  fiscalPeriodRule          FiscalPeriodRuleHeader @relation('companyPeriodRule', fields: [fiscalPeriodRuleId], references: [id])
   organizationId             String
   organization              Organization            @relation('companyOrganisation', fields:[organizationId], references: [id])
   chartOfAccountsId         Int

@@ -406,6 +406,12 @@ export class SchemaType implements SchemaDef {
                     type: "Organization",
                     optional: true,
                     relation: { opposite: "users", fields: ["organizationId"], references: ["id"] }
+                },
+                countriesCreated: {
+                    name: "countriesCreated",
+                    type: "ISO3166Country",
+                    array: true,
+                    relation: { opposite: "createdBy", name: "countryCreatedBy" }
                 }
             },
             idFields: ["id"],
@@ -950,8 +956,8 @@ export class SchemaType implements SchemaDef {
                 token: { type: "String" }
             }
         },
-        ISOCountry: {
-            name: "ISOCountry",
+        ISO3166Country: {
+            name: "ISO3166Country",
             fields: {
                 countryId: {
                     name: "countryId",
@@ -959,26 +965,42 @@ export class SchemaType implements SchemaDef {
                     id: true,
                     default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
-                code2: {
-                    name: "code2",
-                    type: "String",
-                    unique: true
-                },
-                code3: {
-                    name: "code3",
-                    type: "String",
-                    unique: true
-                },
-                number: {
-                    name: "number",
-                    type: "Int"
-                },
                 name: {
                     name: "name",
                     type: "String"
                 },
-                description: {
-                    name: "description",
+                alpha2: {
+                    name: "alpha2",
+                    type: "String",
+                    unique: true
+                },
+                alpha3: {
+                    name: "alpha3",
+                    type: "String",
+                    unique: true
+                },
+                countryCode: {
+                    name: "countryCode",
+                    type: "String"
+                },
+                iso3166: {
+                    name: "iso3166",
+                    type: "String"
+                },
+                region: {
+                    name: "region",
+                    type: "String"
+                },
+                subRegion: {
+                    name: "subRegion",
+                    type: "String"
+                },
+                intermediateRegion: {
+                    name: "intermediateRegion",
+                    type: "String"
+                },
+                intermediateRegionCode: {
+                    name: "intermediateRegionCode",
                     type: "String"
                 },
                 addresses: {
@@ -992,13 +1014,25 @@ export class SchemaType implements SchemaDef {
                     type: "AddressRegion",
                     array: true,
                     relation: { opposite: "country" }
+                },
+                userId: {
+                    name: "userId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    relation: { opposite: "countriesCreated", name: "countryCreatedBy", fields: ["userId"], references: ["id"] }
                 }
             },
             idFields: ["countryId"],
             uniqueFields: {
                 countryId: { type: "Int" },
-                code2: { type: "String" },
-                code3: { type: "String" }
+                alpha2: { type: "String" },
+                alpha3: { type: "String" }
             }
         },
         ISO4217Currency: {
@@ -1095,11 +1129,27 @@ export class SchemaType implements SchemaDef {
                 },
                 country: {
                     name: "country",
-                    type: "ISOCountry",
+                    type: "ISO3166Country",
                     relation: { opposite: "regions", fields: ["isoCountryId"], references: ["countryId"] }
                 },
-                name: {
-                    name: "name",
+                region: {
+                    name: "region",
+                    type: "String"
+                },
+                subRegion: {
+                    name: "subRegion",
+                    type: "String"
+                },
+                intermediateRegion: {
+                    name: "intermediateRegion",
+                    type: "String"
+                },
+                regionCode: {
+                    name: "regionCode",
+                    type: "String"
+                },
+                subRegionCode: {
+                    name: "subRegionCode",
                     type: "String"
                 }
             },
@@ -1142,6 +1192,11 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     optional: true
                 },
+                houseName: {
+                    name: "houseName",
+                    type: "String",
+                    optional: true
+                },
                 houseNumber: {
                     name: "houseNumber",
                     type: "Int",
@@ -1163,8 +1218,7 @@ export class SchemaType implements SchemaDef {
                 },
                 postCode: {
                     name: "postCode",
-                    type: "String",
-                    optional: true
+                    type: "String"
                 },
                 isoCountryId: {
                     name: "isoCountryId",
@@ -1175,7 +1229,7 @@ export class SchemaType implements SchemaDef {
                 },
                 country: {
                     name: "country",
-                    type: "ISOCountry",
+                    type: "ISO3166Country",
                     relation: { opposite: "addresses", fields: ["isoCountryId"], references: ["countryId"] }
                 },
                 partnerId: {
@@ -1188,8 +1242,8 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "address" }
                 },
-                companys: {
-                    name: "companys",
+                companyRegAddr: {
+                    name: "companyRegAddr",
                     type: "Company",
                     optional: true,
                     relation: { opposite: "regsisteredAddress", name: "registereOfficeAddress" }
@@ -1625,6 +1679,12 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "fiscPeriodRule", name: "fiscPerRuleCompGroup" }
                 },
+                companies: {
+                    name: "companies",
+                    type: "Company",
+                    array: true,
+                    relation: { opposite: "fiscalPeriodRule", name: "companyPeriodRule" }
+                },
                 coa: {
                     name: "coa",
                     type: "ChartOfAccounts",
@@ -1976,7 +2036,7 @@ export class SchemaType implements SchemaDef {
                 regsisteredAddress: {
                     name: "regsisteredAddress",
                     type: "Address",
-                    relation: { opposite: "companys", name: "registereOfficeAddress", fields: ["registeredOfficeAddressId"], references: ["addressID"] }
+                    relation: { opposite: "companyRegAddr", name: "registereOfficeAddress", fields: ["registeredOfficeAddressId"], references: ["addressID"] }
                 },
                 vatNumber: {
                     name: "vatNumber",
@@ -1988,6 +2048,18 @@ export class SchemaType implements SchemaDef {
                     type: "CompanyPostingPeriod",
                     array: true,
                     relation: { opposite: "company" }
+                },
+                fiscalPeriodRuleId: {
+                    name: "fiscalPeriodRuleId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "fiscalPeriodRule"
+                    ] as readonly string[]
+                },
+                fiscalPeriodRule: {
+                    name: "fiscalPeriodRule",
+                    type: "FiscalPeriodRuleHeader",
+                    relation: { opposite: "companies", name: "companyPeriodRule", fields: ["fiscalPeriodRuleId"], references: ["id"] }
                 },
                 organizationId: {
                     name: "organizationId",

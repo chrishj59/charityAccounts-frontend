@@ -462,6 +462,13 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("organizationId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "users", fields: ["organizationId"], references: ["id"] }
+                },
+                countriesCreated: {
+                    name: "countriesCreated",
+                    type: "ISO3166Country",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("countryCreatedBy") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "createdBy", name: "countryCreatedBy" }
                 }
             },
             attributes: [
@@ -1074,8 +1081,8 @@ export class SchemaType implements SchemaDef {
                 token: { type: "String" }
             }
         },
-        ISOCountry: {
-            name: "ISOCountry",
+        ISO3166Country: {
+            name: "ISO3166Country",
             fields: {
                 countryId: {
                     name: "countryId",
@@ -1084,28 +1091,46 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("autoincrement") }] }] as readonly AttributeApplication[],
                     default: ExpressionUtils.call("autoincrement") as FieldDefault
                 },
-                code2: {
-                    name: "code2",
-                    type: "String",
-                    unique: true,
-                    attributes: [{ name: "@unique" }, { name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(2) }, { name: "message", value: ExpressionUtils.literal("Code must be length 2 char") }] }] as readonly AttributeApplication[]
-                },
-                code3: {
-                    name: "code3",
-                    type: "String",
-                    unique: true,
-                    attributes: [{ name: "@unique" }, { name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(3) }, { name: "message", value: ExpressionUtils.literal("ISO address code3 must be 3 char length ") }] }] as readonly AttributeApplication[]
-                },
-                number: {
-                    name: "number",
-                    type: "Int"
-                },
                 name: {
                     name: "name",
                     type: "String"
                 },
-                description: {
-                    name: "description",
+                alpha2: {
+                    name: "alpha2",
+                    type: "String",
+                    unique: true,
+                    attributes: [{ name: "@unique" }, { name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(2) }, { name: "message", value: ExpressionUtils.literal("Code must be length 2 char") }] }] as readonly AttributeApplication[]
+                },
+                alpha3: {
+                    name: "alpha3",
+                    type: "String",
+                    unique: true,
+                    attributes: [{ name: "@unique" }, { name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(3) }, { name: "message", value: ExpressionUtils.literal("ISO address code3 must be 3 char length ") }] }] as readonly AttributeApplication[]
+                },
+                countryCode: {
+                    name: "countryCode",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(3) }, { name: "message", value: ExpressionUtils.literal("3 digit country code") }] }] as readonly AttributeApplication[]
+                },
+                iso3166: {
+                    name: "iso3166",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(15) }, { name: "message", value: ExpressionUtils.literal("ISO 1366 coa_update") }] }] as readonly AttributeApplication[]
+                },
+                region: {
+                    name: "region",
+                    type: "String"
+                },
+                subRegion: {
+                    name: "subRegion",
+                    type: "String"
+                },
+                intermediateRegion: {
+                    name: "intermediateRegion",
+                    type: "String"
+                },
+                intermediateRegionCode: {
+                    name: "intermediateRegionCode",
                     type: "String"
                 },
                 addresses: {
@@ -1119,6 +1144,19 @@ export class SchemaType implements SchemaDef {
                     type: "AddressRegion",
                     array: true,
                     relation: { opposite: "country" }
+                },
+                userId: {
+                    name: "userId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("countryCreatedBy") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "countriesCreated", name: "countryCreatedBy", fields: ["userId"], references: ["id"] }
                 }
             },
             attributes: [
@@ -1127,8 +1165,8 @@ export class SchemaType implements SchemaDef {
             idFields: ["countryId"],
             uniqueFields: {
                 countryId: { type: "Int" },
-                code2: { type: "String" },
-                code3: { type: "String" }
+                alpha2: { type: "String" },
+                alpha3: { type: "String" }
             }
         },
         ISO4217Currency: {
@@ -1237,13 +1275,31 @@ export class SchemaType implements SchemaDef {
                 },
                 country: {
                     name: "country",
-                    type: "ISOCountry",
+                    type: "ISO3166Country",
                     attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("isoCountryId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("countryId")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "regions", fields: ["isoCountryId"], references: ["countryId"] }
                 },
-                name: {
-                    name: "name",
+                region: {
+                    name: "region",
                     type: "String"
+                },
+                subRegion: {
+                    name: "subRegion",
+                    type: "String"
+                },
+                intermediateRegion: {
+                    name: "intermediateRegion",
+                    type: "String"
+                },
+                regionCode: {
+                    name: "regionCode",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(3) }] }] as readonly AttributeApplication[]
+                },
+                subRegionCode: {
+                    name: "subRegionCode",
+                    type: "String",
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(3) }] }] as readonly AttributeApplication[]
                 }
             },
             idFields: ["regionId"],
@@ -1291,6 +1347,12 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("Street3 can be up 10 characters") }] }] as readonly AttributeApplication[]
                 },
+                houseName: {
+                    name: "houseName",
+                    type: "String",
+                    optional: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(50) }, { name: "message", value: ExpressionUtils.literal("House name  can be up 10 characters") }] }] as readonly AttributeApplication[]
+                },
                 houseNumber: {
                     name: "houseNumber",
                     type: "Int",
@@ -1316,7 +1378,6 @@ export class SchemaType implements SchemaDef {
                 postCode: {
                     name: "postCode",
                     type: "String",
-                    optional: true,
                     attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(1) }, { name: "max", value: ExpressionUtils.literal(10) }, { name: "message", value: ExpressionUtils.literal("Post code must be up 10 characters") }] }] as readonly AttributeApplication[]
                 },
                 isoCountryId: {
@@ -1328,7 +1389,7 @@ export class SchemaType implements SchemaDef {
                 },
                 country: {
                     name: "country",
-                    type: "ISOCountry",
+                    type: "ISO3166Country",
                     attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("isoCountryId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("countryId")]) }] }] as readonly AttributeApplication[],
                     relation: { opposite: "addresses", fields: ["isoCountryId"], references: ["countryId"] }
                 },
@@ -1342,8 +1403,8 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "address" }
                 },
-                companys: {
-                    name: "companys",
+                companyRegAddr: {
+                    name: "companyRegAddr",
                     type: "Company",
                     optional: true,
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("registereOfficeAddress") }] }] as readonly AttributeApplication[],
@@ -1818,6 +1879,13 @@ export class SchemaType implements SchemaDef {
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("fiscPerRuleCompGroup") }] }] as readonly AttributeApplication[],
                     relation: { opposite: "fiscPeriodRule", name: "fiscPerRuleCompGroup" }
                 },
+                companies: {
+                    name: "companies",
+                    type: "Company",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyPeriodRule") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fiscalPeriodRule", name: "companyPeriodRule" }
+                },
                 coa: {
                     name: "coa",
                     type: "ChartOfAccounts",
@@ -2217,7 +2285,7 @@ export class SchemaType implements SchemaDef {
                     name: "regsisteredAddress",
                     type: "Address",
                     attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("registereOfficeAddress") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("registeredOfficeAddressId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("addressID")]) }] }] as readonly AttributeApplication[],
-                    relation: { opposite: "companys", name: "registereOfficeAddress", fields: ["registeredOfficeAddressId"], references: ["addressID"] }
+                    relation: { opposite: "companyRegAddr", name: "registereOfficeAddress", fields: ["registeredOfficeAddressId"], references: ["addressID"] }
                 },
                 vatNumber: {
                     name: "vatNumber",
@@ -2229,6 +2297,19 @@ export class SchemaType implements SchemaDef {
                     type: "CompanyPostingPeriod",
                     array: true,
                     relation: { opposite: "company" }
+                },
+                fiscalPeriodRuleId: {
+                    name: "fiscalPeriodRuleId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "fiscalPeriodRule"
+                    ] as readonly string[]
+                },
+                fiscalPeriodRule: {
+                    name: "fiscalPeriodRule",
+                    type: "FiscalPeriodRuleHeader",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("companyPeriodRule") }, { name: "fields", value: ExpressionUtils.array("Int", [ExpressionUtils.field("fiscalPeriodRuleId")]) }, { name: "references", value: ExpressionUtils.array("Int", [ExpressionUtils.field("id")]) }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "companies", name: "companyPeriodRule", fields: ["fiscalPeriodRuleId"], references: ["id"] }
                 },
                 organizationId: {
                     name: "organizationId",

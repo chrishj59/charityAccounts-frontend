@@ -7,6 +7,7 @@ import {
 } from '~/src/app/constants/constants';
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { Address } from '~/src/types/user';
+import { OrgIdentificationType } from '~/zenstack/models';
 
 const address: Address = {
   houseNumber: 0,
@@ -37,7 +38,7 @@ const defaultUser = {
 
 const defaultOrg = {
   organisationCategory: organisationCategoryEnum.Company,
-  organisationIdType: organisationIdTypeEnum.CompanyNum,
+  organisationIdType: OrgIdentificationType.Company_Number,
   displayName: '',
   organizationId: '',
   address: address,

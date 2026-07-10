@@ -10,5 +10,5 @@ export type CoaType = {
   fiscalPeriodRuleId: number | null;
   organizationId: string;
   createdById: string;
-  ruleTitle: string | null;
+  ruleTitle?: string | null;
 };

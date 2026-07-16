@@ -31,6 +31,7 @@ import {
   OrgLegalForm,
   OrgIdentificationType,
   Address,
+  ISO3166Country,
 } from '~/zenstack/models';
 
 import { CoaType } from '~/src/types/ui-types/coa';
@@ -41,9 +42,11 @@ import {
 } from '~/src/zodSchema/address-schema';
 import { AddressUI } from '~/src/types/ui-types/address';
 import { InputNumber } from 'primereact/inputnumber';
+import { ISO3166CountryUI } from '~/src/types/ui-types/country';
 
 interface NewCompanyProps {
   fiscRuleList: FiscalPeriodRuleUI[];
+  countries: ISO3166CountryUI[];
   coaList: CoaType[];
   userId: string;
   orgUI: OrganisationUI;
@@ -52,23 +55,23 @@ export default function NewCompanyUI({
   fiscRuleList,
   coaList,
   orgUI,
+  countries,
   userId,
 }: NewCompanyProps) {
-  console.log(
-    `NewCompanyUI  called with ${JSON.stringify(fiscRuleList, null, 2)} and org ${JSON.stringify(orgUI, null, 2)}`,
-  );
-
   const client = useClientQueries(schema);
   const createCompany = client.company.useCreate({
     optimisticUpdate: true,
   });
 
-  const [addressLine, setAddressLine] = useState<string | undefined>(undefined);
+  const createAddress = client.address.useCreate({ optimisticUpdate: true });
+  const [hasValidAddress, setHasValidAddress] = useState<boolean>(false);
+
+  const [addressLine, setAddressLine] = useState<string>('');
   const [addressDlg, setAddressDlg] = useState<boolean>(false);
+  const [countryList, setCountryList] = useState<ISO3166CountryUI[]>(countries);
+  const [coaSet, setCoaSet] = useState<CoaType[]>(coaList);
   const toast = useRef<Toast | null>(null);
 
-  const session = useSession();
-  console.log(`session ${JSON.stringify(session.data, null, 2)}`);
   const showToast = (
     severity: ToastMessage['severity'],
     summary: string,
@@ -100,33 +103,57 @@ export default function NewCompanyUI({
     return OrgIdentificationType.Company_Number; // safe default
   }
 
+  const getUkCountryId = (name: string): number => {
+    const gb = countries.find((c) => {
+      return c.name === name;
+    });
+
+    return gb?.id ?? 0;
+  };
+
   const emptyCompany: CompanyUI = {
-    id: 0,
-    ref: '',
     tradingName: '',
     legalName: '',
+    ref: '',
     legalForm: toOrgLegalForm(orgUI.legalForm), // ✓ always OrgLegalForm
-    legalType: organisationCategoryEnum.Company,
+    // legalType: organisationCategoryEnum.Company,
     idtype: toIdTypeForm(orgUI.idType),
-    fiscYear: '',
-    identification: '',
-    charityNumber: '',
-    fiscalPeriodRuleId: 0,
-    vatNumber: '',
-    organizationId: '',
+
+    identification: '', // fiscYear: '',
+
+    // charityNumber: '',
+    // fiscalPeriodRuleId: 0,
+    vatRegNumber: '',
+    // organizationId: '',
     chartOfAccountsId: 0,
-    companyGroupId: 0,
-    registeredOfficeAddressId: 0,
-    addressLine: '',
+    // companyGroupId: 0,
+    registeredCountryId: getUkCountryId(
+      'United Kingdom of Great Britain and Northern Ireland',
+    ),
+    // registeredOfficeAddressId: 0,
+    // addressLine: '',
   };
 
   const emptyAddress: AddressUI = {
-    addressID: 0,
+    id: 0,
+    buildingCode: '',
+
+    room: '',
+    careOf: '',
     street: '',
+    street2: '',
+    street3: '',
 
+    houseNumber: 0,
+    houseName: '',
+    town: '',
+    county: '',
     postCode: '',
+    isoCountryId: getUkCountryId(
+      'United Kingdom of Great Britain and Northern Ireland',
+    ),
   };
-
+  const [address, setAddress] = useState<AddressUI>(emptyAddress);
   const {
     control,
     trigger,
@@ -136,8 +163,22 @@ export default function NewCompanyUI({
     setValues,
   } = useForm<companyNewFormValues>({
     resolver: zodResolver(companyNewSchema),
+
     defaultValues: emptyCompany,
+    mode: 'onChange',
+    reValidateMode: 'onChange',
   });
+  // useEffect(() => {
+  //   setValues(
+  //     {
+  //       chartOfAccountsId: coaSet[0].id,
+  //       // registeredCountryId: getUkCountryId(
+  //       //   'United Kingdom of Great Britain and Northern Ireland',
+  //       // ),
+  //     },
+  //     { shouldValidate: true, shouldDirty: true, shouldTouch: true },
+  //   );
+  // }, []);
 
   const {
     control: controlAddress,
@@ -161,6 +202,21 @@ export default function NewCompanyUI({
       <div className='ml-2'>
         <Button type='reset' severity='danger' onClick={() => reset()}>
           Reset Company
+        </Button>
+      </div>
+    </div>
+  );
+
+  const DialogFooter = () => (
+    <div className='flex flex-row space-x-10'>
+      <div>
+        <Button type='submit' severity='success'>
+          Add Address
+        </Button>
+      </div>
+      <div className='ml-2'>
+        <Button type='reset' severity='danger' onClick={() => resetAddress()}>
+          Reset
         </Button>
       </div>
     </div>
@@ -230,25 +286,155 @@ export default function NewCompanyUI({
       </div>
     );
   };
-  const onSubmitAdd = async (data: companyNewFormValues) => {
-    alert(`onSubmitAdd called with`);
-    setValues(data);
+
+  const selectedCountryStatusTemplate = (
+    option: ISO3166CountryUI,
+    props: any,
+  ) => {
+    if (option) {
+      return (
+        <div className='flex align-items-center'>
+          <div>{option.name}</div>
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const countryOptionTemplate = (option: ISO3166CountryUI) => {
+    return (
+      <div className='flex align-items-center'>
+        {/* <div className='mr-2'>Fiscal Rule:</div> */}
+        <div>{option.name}</div>
+      </div>
+    );
+  };
+
+  const onSubmitCompany = async (data: companyNewFormValues) => {
+    try {
+      //createCompany
+
+      const selectedCoa = coaList.find((c) => c.id === data.chartOfAccountsId);
+      let updatedCompany;
+      if (selectedCoa) {
+        let companyData;
+        if (hasValidAddress) {
+          let registeredOfficeAddressId: number | undefined;
+
+          if (address) {
+            const createdAddress = await createAddress.mutateAsync({
+              data: {
+                houseNumber: address.houseNumber ?? 0,
+                houseName: address.houseName ?? '',
+                street: address.street ?? '',
+                county: address.county ?? '',
+                postCode: address.postCode ?? '',
+                isoCountryId: address.isoCountryId ?? 0,
+                createdById: userId,
+                organizationId: orgUI.id,
+              },
+            });
+            registeredOfficeAddressId = createdAddress.id;
+          }
+          companyData = {
+            companyCode: data.ref,
+            tradingName: data.tradingName,
+            // legalForm: data.legalForm,
+            companyName: data.legalName,
+
+            chartOfAccountsId: data.chartOfAccountsId,
+            registeredCountryId: data.registeredCountryId,
+            createdById: userId,
+            organizationId: orgUI.id,
+            fiscalPeriodRuleId: selectedCoa?.fiscalPeriodRuleId ?? 0,
+            ...(registeredOfficeAddressId !== undefined && {
+              registeredOfficeAddressId,
+            }),
+          };
+
+          updatedCompany = await createCompany.mutateAsync({
+            data: companyData,
+          });
+        } else {
+          companyData = {
+            companyCode: data.ref,
+            tradingName: data.tradingName,
+            // legalForm: data.legalForm,
+            companyName: data.legalName,
+
+            chartOfAccountsId: data.chartOfAccountsId,
+            registeredCountryId: data.registeredCountryId,
+            createdById: userId,
+            organizationId: orgUI.id,
+            fiscalPeriodRuleId: selectedCoa?.fiscalPeriodRuleId ?? 0,
+          };
+
+          updatedCompany = await createCompany.mutateAsync({
+            data: companyData,
+          });
+        }
+
+        setValues(data);
+        showToast(
+          'success',
+          'Company Created',
+          `Created company with trading name ${JSON.stringify(updatedCompany.tradingName)}`,
+          false,
+        );
+      } else {
+        showToast(
+          'error',
+          'No chart of accounts',
+          `Please select a chart of accounts`,
+          false,
+        );
+      }
+    } catch (err) {
+      showToast(
+        'error',
+        'Could  not save Company',
+        `Error ${JSON.stringify(err, null, 2)}`,
+        true,
+      );
+    }
   };
 
   const onSubmitAddress = async (addressData: AddressFormValues) => {
-    alert(
-      `onSubmitAddress called with ${JSON.stringify(addressData, null, 2)}`,
-    );
+    const _address: AddressUI = {
+      houseNumber: addressData.houseNumber,
+      houseName: addressData.houseName,
+
+      street: addressData.street,
+      town: addressData.town,
+      county: addressData.county,
+      postCode: addressData.postCode,
+      isoCountryId: addressData.isoCountryId,
+    };
+    let _addrline: string = '';
+    if (addressData.houseName) {
+      _addrline.concat(addressData.houseName, addressData.street);
+    } else if (addressData.houseNumber) {
+      _addrline.concat(addressData.houseNumber.toString(), addressData.street);
+    }
+
+    setAddressLine(_addrline);
+    setAddress(_address);
+    setHasValidAddress(true);
+    setAddressDlg(false);
   };
 
   const onClickcopyFromOrg = () => {
-    console.log(
-      `onClickcopyFromOrg called Org passed in ${JSON.stringify(orgUI, null, 2)} `,
-    );
+    const _legalForm = orgUI.legalForm;
+
     setValues(
       {
+        legalForm: 'Company',
         tradingName: orgUI.tradingName ?? '',
         legalName: orgUI.legalName ?? '',
+        registeredCountryId: getUkCountryId(
+          'United Kingdom of Great Britain and Northern Ireland',
+        ),
       },
       {
         shouldValidate: true, // re-runs zod resolver on changed fields
@@ -267,12 +453,14 @@ export default function NewCompanyUI({
     <div className='flex justify-content-center align-items-center'>
       <Toast ref={toast} position='top-right' />
       <div className='flex '>
-        <form onSubmit={handleSubmit(onSubmitAdd)} className='p-fluid'>
+        <form
+          onSubmit={handleSubmit(onSubmitCompany, (errors) =>
+            console.warn('RHF errors:', errors),
+          )}
+          className='p-fluid'
+        >
           <Card
             pt={{
-              // root: {
-              //   className: 'w-full md:w-full',
-              // },
               title: {
                 className:
                   'flex justify-content-center align-items-center text-primary',
@@ -294,9 +482,6 @@ export default function NewCompanyUI({
             </div>
 
             <div className='formgrid grid mt-4'>
-              {/* Legal form block and ref row */}
-
-              {/* Legal form dropdown */}
               <div className='field col-6'>
                 <Controller
                   name='legalForm'
@@ -332,7 +517,6 @@ export default function NewCompanyUI({
                 />
               </div>
 
-              {/* company ref field */}
               <div className='field col-6'>
                 <Controller
                   name='ref'
@@ -364,9 +548,6 @@ export default function NewCompanyUI({
                 />
               </div>
 
-              {/* Name row */}
-
-              {/* Trading name field */}
               <div className='field col-6'>
                 <Controller
                   name='tradingName'
@@ -398,7 +579,6 @@ export default function NewCompanyUI({
                 />
               </div>
 
-              {/* Legal name field */}
               <div className='field col-6'>
                 <Controller
                   name='legalName'
@@ -430,11 +610,9 @@ export default function NewCompanyUI({
                 />
               </div>
 
-              {/* Address and Vat number row */}
-
-              {/* Address */}
               <div className='field col-6'>
                 {/* Address display */}
+
                 <div className='flex flex-row align-items-end gap-2'>
                   <div className='flex-1'>
                     <label htmlFor='addressLine'>Address Line</label>
@@ -442,7 +620,7 @@ export default function NewCompanyUI({
                       {addressLine}
                     </InputText>
                   </div>
-                  {/* Address button */}
+
                   <div>
                     <Button onClick={() => setAddressDlg(true)} type='button'>
                       Add address
@@ -451,7 +629,6 @@ export default function NewCompanyUI({
                 </div>
               </div>
 
-              {/* VAT number */}
               <div className='field col-6'>
                 <Controller
                   name='vatRegNumber'
@@ -483,9 +660,6 @@ export default function NewCompanyUI({
                 />
               </div>
 
-              {/* Identification row */}
-
-              {/* Identification type dropdown */}
               <div className='field col-6'>
                 <Controller
                   name='idtype'
@@ -521,7 +695,6 @@ export default function NewCompanyUI({
                 />
               </div>
 
-              {/* Indentification value */}
               <div className='field col-6'>
                 <Controller
                   name='identification'
@@ -553,9 +726,6 @@ export default function NewCompanyUI({
                 />
               </div>
 
-              {/* Period rule and chart of accounts line */}
-
-              {/* Chart of Accounts */}
               <div className='field col-6'>
                 <Controller
                   name='chartOfAccountsId'
@@ -574,11 +744,13 @@ export default function NewCompanyUI({
                           value={field.value}
                           focusInputRef={field.ref}
                           onBlur={field.onBlur}
-                          options={coaList}
+                          options={coaSet}
                           optionLabel='name'
                           optionValue='id'
-                          placeholder='Chart of'
-                          onChange={(e) => field.onChange(e.value)}
+                          placeholder='Chart of accounts'
+                          onChange={(e) => {
+                            field.onChange(e.value);
+                          }}
                           className={classNames({
                             'p-invalid': fieldState.error,
                           })}
@@ -592,193 +764,347 @@ export default function NewCompanyUI({
                   )}
                 />
               </div>
+
+              <div className='field col-6'>
+                <Controller
+                  name='registeredCountryId'
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <>
+                      <label
+                        htmlFor={field.name}
+                        className={classNames({
+                          'p-error': errors.registeredCountryId,
+                        })}
+                      ></label>
+                      <span className='p-float-label'>
+                        <Dropdown
+                          id={field.name}
+                          value={field.value}
+                          focusInputRef={field.ref}
+                          onBlur={field.onBlur}
+                          options={countryList}
+                          optionLabel='name'
+                          optionValue='id'
+                          placeholder='Company Country'
+                          emptyMessage='No available countries'
+                          onChange={(e) => field.onChange(e.value)}
+                          className={classNames({
+                            'p-invalid': fieldState.error,
+                          })}
+                          valueTemplate={selectedCountryStatusTemplate}
+                          itemTemplate={countryOptionTemplate}
+                        />
+                        {getFormErrorMessage(field.name)}
+                        <label htmlFor={field.name}>Country</label>
+                      </span>
+                    </>
+                  )}
+                />
+              </div>
+
+              {/* fiscal period rule
+              <div className='field col-6'>
+                <Controller
+                  name='fiscalPeriodRuleId'
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <>
+                      <label
+                        htmlFor={field.name}
+                        className={classNames({
+                          'p-error': errors.fiscalPeriodRuleId,
+                        })}
+                      ></label>
+                      <span className='p-float-label'>
+                        <Dropdown
+                          id={field.name}
+                          value={field.value}
+                          focusInputRef={field.ref}
+                          onBlur={field.onBlur}
+                          options={fiscRuleList}
+                          optionLabel='title'
+                          optionValue='id'
+                          placeholder='Fiscal Period rule'
+                          emptyMessage='No period rules'
+                          onChange={(e) => field.onChange(e.value)}
+                          className={classNames({
+                            'p-invalid': fieldState.error,
+                          })}
+                          valueTemplate={selectedFiscalPeriodStatusTemplate}
+                          itemTemplate={fiscalRuleOptionTemplate}
+                        />
+                        {getFormErrorMessage(field.name)}
+                        <label htmlFor={field.name}>Fiscal Period rule</label>
+                      </span>
+                    </>
+                  )}
+                />
+              </div> */}
             </div>
           </Card>
-          <Dialog
-            visible={addressDlg}
-            style={{ width: '50vw' }}
-            breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-            header='Add Registered Address'
-            modal
-            className='p-fluid'
-            onHide={onHideAddressDlg}
-            pt={{
-              headerTitle: {
-                className: 'flex items-center justify-center ',
-              },
-            }}
-          >
-            <form
-              onSubmit={handleSubmitAddress(onSubmitAddress)}
-              className='p-fluid'
-            >
-              <div className='formgrid grid mt-4'>
-                {/* Street block */}
-                {/* House Name / Number */}
-                {/* house Number */}
-                <div className='field col-2'>
-                  <Controller
-                    name='houseNumber'
-                    control={controlAddress}
-                    render={({ field, fieldState }) => (
-                      <>
-                        <label
-                          htmlFor={field.name}
-                          className={classNames({
-                            'p-error': errorsAddess.houseNumber,
-                          })}
-                        />
-                        <span className='p-float-label'>
-                          <InputNumber
-                            id={field.name}
-                            value={field.value}
-                            // disabled={watchedCalendarBased}
-                            autoFocus
-                            onChange={(e) => field.onChange(e.value)}
-                            className={classNames({
-                              'p-invalid': fieldState.error,
-                            })}
-                          />
-                          <label htmlFor={field.name}>Number</label>
-                        </span>
-                        {getFormErrorMessageAddress(field.name)}
-                      </>
-                    )}
-                  />
-                </div>
-                {/*end house number */}
-                {/* house name */}
-                <div className='field col-5'>
-                  <Controller
-                    name='houseName'
-                    control={controlAddress}
-                    render={({ field, fieldState }) => (
-                      <>
-                        <label
-                          htmlFor={field.name}
-                          className={classNames({
-                            'p-error': errorsAddess.houseName,
-                          })}
-                        />
-                        <span className='p-float-label'>
-                          <InputText
-                            id={field.name}
-                            value={field.value}
-                            // disabled={watchedCalendarBased}
-                            autoFocus
-                            onChange={(e) => field.onChange(e.target.value)}
-                            className={classNames({
-                              'p-invalid': fieldState.error,
-                            })}
-                          />
-                          <label htmlFor={field.name}>House Name</label>
-                        </span>
-                        {getFormErrorMessageAddress(field.name)}
-                      </>
-                    )}
-                  />
-                </div>{' '}
-                {/*End house name */}
-              </div>
-
-              {/* Street  */}
-              <div className='field col-7'>
-                <Controller
-                  name='street'
-                  control={controlAddress}
-                  render={({ field, fieldState }) => (
-                    <>
-                      <label
-                        htmlFor={field.name}
-                        className={classNames({
-                          'p-error': errorsAddess.street,
-                        })}
-                      />
-                      <span className='p-float-label'>
-                        <InputText
-                          id={field.name}
-                          value={field.value}
-                          // disabled={watchedCalendarBased}
-                          autoFocus
-                          onChange={(e) => field.onChange(e.target.value)}
-                          className={classNames({
-                            'p-invalid': fieldState.error,
-                          })}
-                        />
-                        <label htmlFor={field.name}>Street</label>
-                      </span>
-                      {getFormErrorMessageAddress(field.name)}
-                    </>
-                  )}
-                />
-              </div>
-
-              {/* Town */}
-              <div className='field col-7'>
-                <Controller
-                  name='town'
-                  control={controlAddress}
-                  render={({ field, fieldState }) => (
-                    <>
-                      <label
-                        htmlFor={field.name}
-                        className={classNames({
-                          'p-error': errorsAddess.town,
-                        })}
-                      />
-                      <span className='p-float-label'>
-                        <InputText
-                          id={field.name}
-                          value={field.value}
-                          // disabled={watchedCalendarBased}
-                          autoFocus
-                          onChange={(e) => field.onChange(e.target.value)}
-                          className={classNames({
-                            'p-invalid': fieldState.error,
-                          })}
-                        />
-                        <label htmlFor={field.name}>Town</label>
-                      </span>
-                      {getFormErrorMessageAddress(field.name)}
-                    </>
-                  )}
-                />
-              </div>
-
-              {/* County */}
-              <div className='field col-7'>
-                <Controller
-                  name='county'
-                  control={controlAddress}
-                  render={({ field, fieldState }) => (
-                    <>
-                      <label
-                        htmlFor={field.name}
-                        className={classNames({
-                          'p-error': errorsAddess.county,
-                        })}
-                      />
-                      <span className='p-float-label'>
-                        <InputText
-                          id={field.name}
-                          value={field.value}
-                          // disabled={watchedCalendarBased}
-                          autoFocus
-                          onChange={(e) => field.onChange(e.target.value)}
-                          className={classNames({
-                            'p-invalid': fieldState.error,
-                          })}
-                        />
-                        <label htmlFor={field.name}>County</label>
-                      </span>
-                      {getFormErrorMessageAddress(field.name)}
-                    </>
-                  )}
-                />
-              </div>
-            </form>
-          </Dialog>
         </form>
+
+        <Dialog
+          visible={addressDlg}
+          style={{ width: '50vw' }}
+          breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+          header='Add Registered Address'
+          modal
+          className='p-fluid'
+          onHide={onHideAddressDlg}
+          // footer={DialogFooter}
+          pt={{
+            headerTitle: {
+              className: 'flex items-center justify-center ',
+            },
+          }}
+        >
+          <form
+            onSubmit={handleSubmitAddress(onSubmitAddress, (errors) =>
+              console.warn('RHF errors:', errors),
+            )}
+            className='p-fluid'
+          >
+            <div className='formgrid grid mt-4'>
+              {/* Street block */}
+              {/* House Name / Number */}
+              {/* house Number */}
+              <div className='field col-2'>
+                <Controller
+                  name='houseNumber'
+                  control={controlAddress}
+                  render={({ field, fieldState }) => (
+                    <>
+                      <label
+                        htmlFor={field.name}
+                        className={classNames({
+                          'p-error': errorsAddess.houseNumber,
+                        })}
+                      />
+                      <span className='p-float-label'>
+                        <InputNumber
+                          id={field.name}
+                          value={field.value}
+                          // disabled={watchedCalendarBased}
+                          autoFocus
+                          onChange={(e) => field.onChange(e.value)}
+                          className={classNames({
+                            'p-invalid': fieldState.error,
+                          })}
+                        />
+                        <label htmlFor={field.name}>Number</label>
+                      </span>
+                      {getFormErrorMessageAddress(field.name)}
+                    </>
+                  )}
+                />
+              </div>
+              {/*end house number */}
+              {/* house name */}
+              <div className='field col-5'>
+                <Controller
+                  name='houseName'
+                  control={controlAddress}
+                  render={({ field, fieldState }) => (
+                    <>
+                      <label
+                        htmlFor={field.name}
+                        className={classNames({
+                          'p-error': errorsAddess.houseName,
+                        })}
+                      />
+                      <span className='p-float-label'>
+                        <InputText
+                          id={field.name}
+                          value={field.value}
+                          // disabled={watchedCalendarBased}
+                          autoFocus
+                          onChange={(e) => field.onChange(e.target.value)}
+                          className={classNames({
+                            'p-invalid': fieldState.error,
+                          })}
+                        />
+                        <label htmlFor={field.name}>House Name</label>
+                      </span>
+                      {getFormErrorMessageAddress(field.name)}
+                    </>
+                  )}
+                />
+              </div>{' '}
+              {/*End house name */}
+            </div>
+
+            {/* Street  */}
+            <div className='field col-7'>
+              <Controller
+                name='street'
+                control={controlAddress}
+                render={({ field, fieldState }) => (
+                  <>
+                    <label
+                      htmlFor={field.name}
+                      className={classNames({
+                        'p-error': errorsAddess.street,
+                      })}
+                    />
+                    <span className='p-float-label'>
+                      <InputText
+                        id={field.name}
+                        value={field.value}
+                        // disabled={watchedCalendarBased}
+                        autoFocus
+                        onChange={(e) => field.onChange(e.target.value)}
+                        className={classNames({
+                          'p-invalid': fieldState.error,
+                        })}
+                      />
+                      <label htmlFor={field.name}>Street</label>
+                    </span>
+                    {getFormErrorMessageAddress(field.name)}
+                  </>
+                )}
+              />
+            </div>
+
+            {/* Town */}
+            <div className='field col-7'>
+              <Controller
+                name='town'
+                control={controlAddress}
+                render={({ field, fieldState }) => (
+                  <>
+                    <label
+                      htmlFor={field.name}
+                      className={classNames({
+                        'p-error': errorsAddess.town,
+                      })}
+                    />
+                    <span className='p-float-label'>
+                      <InputText
+                        id={field.name}
+                        value={field.value}
+                        // disabled={watchedCalendarBased}
+                        autoFocus
+                        onChange={(e) => field.onChange(e.target.value)}
+                        className={classNames({
+                          'p-invalid': fieldState.error,
+                        })}
+                      />
+                      <label htmlFor={field.name}>Town</label>
+                    </span>
+                    {getFormErrorMessageAddress(field.name)}
+                  </>
+                )}
+              />
+            </div>
+
+            {/* County */}
+            <div className='field col-7'>
+              <Controller
+                name='county'
+                control={controlAddress}
+                render={({ field, fieldState }) => (
+                  <>
+                    <label
+                      htmlFor={field.name}
+                      className={classNames({
+                        'p-error': errorsAddess.county,
+                      })}
+                    />
+                    <span className='p-float-label'>
+                      <InputText
+                        id={field.name}
+                        value={field.value}
+                        // disabled={watchedCalendarBased}
+                        autoFocus
+                        onChange={(e) => field.onChange(e.target.value)}
+                        className={classNames({
+                          'p-invalid': fieldState.error,
+                        })}
+                      />
+                      <label htmlFor={field.name}>County</label>
+                    </span>
+                    {getFormErrorMessageAddress(field.name)}
+                  </>
+                )}
+              />
+            </div>
+
+            {/* Post code*/}
+            <div className='field col-7'>
+              <Controller
+                name='postCode'
+                control={controlAddress}
+                render={({ field, fieldState }) => (
+                  <>
+                    <label
+                      htmlFor={field.name}
+                      className={classNames({
+                        'p-error': errorsAddess.postCode,
+                      })}
+                    />
+                    <span className='p-float-label'>
+                      <InputText
+                        id={field.name}
+                        value={field.value}
+                        // disabled={watchedCalendarBased}
+                        autoFocus
+                        onChange={(e) => field.onChange(e.target.value)}
+                        className={classNames({
+                          'p-invalid': fieldState.error,
+                        })}
+                      />
+                      <label htmlFor={field.name}>Post Code</label>
+                    </span>
+                    {getFormErrorMessageAddress(field.name)}
+                  </>
+                )}
+              />
+            </div>
+
+            {/* country */}
+            <div className='field col-6'>
+              <Controller
+                name='isoCountryId'
+                control={controlAddress}
+                render={({ field, fieldState }) => (
+                  <>
+                    <label
+                      htmlFor={field.name}
+                      className={classNames({
+                        'p-error': errorsAddess.isoCountryId,
+                      })}
+                    ></label>
+                    <span className='p-float-label'>
+                      <Dropdown
+                        id={field.name}
+                        value={field.value}
+                        focusInputRef={field.ref}
+                        onBlur={field.onBlur}
+                        options={countryList}
+                        optionLabel='name'
+                        optionValue='id'
+                        placeholder='Country'
+                        emptyMessage='No available countries'
+                        onChange={(e) => field.onChange(e.value)}
+                        className={classNames({
+                          'p-invalid': fieldState.error,
+                        })}
+                        valueTemplate={selectedCountryStatusTemplate}
+                        itemTemplate={countryOptionTemplate}
+                      />
+                      {getFormErrorMessage(field.name)}
+                      <label htmlFor={field.name}>Country</label>
+                    </span>
+                  </>
+                )}
+              />
+            </div>
+
+            {DialogFooter()}
+          </form>
+        </Dialog>
       </div>
     </div>
   );

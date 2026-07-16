@@ -39,7 +39,7 @@ export default function CoaCreateUI({
     name: '',
     fiscalPeriodRuleId: null,
     organizationId: '',
-    createdById: 0,
+    createdById: '',
   };
 
   const {

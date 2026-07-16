@@ -388,6 +388,18 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "updatedBy", name: "companyGroupUpdatedBy" }
                 },
+                addressCreated: {
+                    name: "addressCreated",
+                    type: "Address",
+                    array: true,
+                    relation: { opposite: "createdBy", name: "addressCreatedBy" }
+                },
+                addressUpdated: {
+                    name: "addressUpdated",
+                    type: "Address",
+                    array: true,
+                    relation: { opposite: "updatedBy", name: "addressUpdatedBy" }
+                },
                 lastLoginMethod: {
                     name: "lastLoginMethod",
                     type: "String",
@@ -678,6 +690,12 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "organization", name: "coaOrganisation" }
                 },
+                address: {
+                    name: "address",
+                    type: "Address",
+                    array: true,
+                    relation: { opposite: "organization", name: "orgAddress" }
+                },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
@@ -959,8 +977,8 @@ export class SchemaType implements SchemaDef {
         ISO3166Country: {
             name: "ISO3166Country",
             fields: {
-                countryId: {
-                    name: "countryId",
+                id: {
+                    name: "id",
                     type: "Int",
                     id: true,
                     default: ExpressionUtils.call("autoincrement") as FieldDefault
@@ -1015,6 +1033,12 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "country" }
                 },
+                companies: {
+                    name: "companies",
+                    type: "Company",
+                    array: true,
+                    relation: { opposite: "registeredCountry", name: "compRegCountry" }
+                },
                 userId: {
                     name: "userId",
                     type: "String",
@@ -1028,9 +1052,9 @@ export class SchemaType implements SchemaDef {
                     relation: { opposite: "countriesCreated", name: "countryCreatedBy", fields: ["userId"], references: ["id"] }
                 }
             },
-            idFields: ["countryId"],
+            idFields: ["id"],
             uniqueFields: {
-                countryId: { type: "Int" },
+                id: { type: "Int" },
                 alpha2: { type: "String" },
                 alpha3: { type: "String" }
             }
@@ -1130,7 +1154,7 @@ export class SchemaType implements SchemaDef {
                 country: {
                     name: "country",
                     type: "ISO3166Country",
-                    relation: { opposite: "regions", fields: ["isoCountryId"], references: ["countryId"] }
+                    relation: { opposite: "regions", fields: ["isoCountryId"], references: ["id"] }
                 },
                 region: {
                     name: "region",
@@ -1161,8 +1185,8 @@ export class SchemaType implements SchemaDef {
         Address: {
             name: "Address",
             fields: {
-                addressID: {
-                    name: "addressID",
+                id: {
+                    name: "id",
                     type: "Int",
                     id: true,
                     default: ExpressionUtils.call("autoincrement") as FieldDefault
@@ -1230,28 +1254,74 @@ export class SchemaType implements SchemaDef {
                 country: {
                     name: "country",
                     type: "ISO3166Country",
-                    relation: { opposite: "addresses", fields: ["isoCountryId"], references: ["countryId"] }
+                    relation: { opposite: "addresses", fields: ["isoCountryId"], references: ["id"] }
                 },
-                partnerId: {
-                    name: "partnerId",
-                    type: "String"
-                },
-                partners: {
-                    name: "partners",
+                partner: {
+                    name: "partner",
                     type: "Partner",
                     array: true,
-                    relation: { opposite: "address" }
+                    relation: { opposite: "address", name: "partnerAddress" }
                 },
                 companyRegAddr: {
                     name: "companyRegAddr",
                     type: "Company",
                     optional: true,
-                    relation: { opposite: "regsisteredAddress", name: "registereOfficeAddress" }
+                    relation: { opposite: "registeredAddress", name: "registeredOfficeAddress" }
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                createdById: {
+                    name: "createdById",
+                    type: "String",
+                    foreignKeyFor: [
+                        "createdBy"
+                    ] as readonly string[]
+                },
+                createdBy: {
+                    name: "createdBy",
+                    type: "User",
+                    relation: { opposite: "addressCreated", name: "addressCreatedBy", fields: ["createdById"], references: ["id"] }
+                },
+                updatedById: {
+                    name: "updatedById",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "updatedBy"
+                    ] as readonly string[]
+                },
+                updatedBy: {
+                    name: "updatedBy",
+                    type: "User",
+                    optional: true,
+                    relation: { opposite: "addressUpdated", name: "addressUpdatedBy", fields: ["updatedById"], references: ["id"] }
+                },
+                organizationId: {
+                    name: "organizationId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "organization"
+                    ] as readonly string[]
+                },
+                organization: {
+                    name: "organization",
+                    type: "Organization",
+                    optional: true,
+                    relation: { opposite: "address", name: "orgAddress", fields: ["organizationId"], references: ["id"] }
                 }
             },
-            idFields: ["addressID"],
+            idFields: ["id"],
             uniqueFields: {
-                addressID: { type: "Int" }
+                id: { type: "Int" }
             }
         },
         Apikey: {
@@ -1461,7 +1531,7 @@ export class SchemaType implements SchemaDef {
                 address: {
                     name: "address",
                     type: "Address",
-                    relation: { opposite: "partners", fields: ["addressId"], references: ["addressID"] }
+                    relation: { opposite: "partner", name: "partnerAddress", fields: ["addressId"], references: ["id"] }
                 },
                 createdAt: {
                     name: "createdAt",
@@ -1547,7 +1617,7 @@ export class SchemaType implements SchemaDef {
                     name: "address",
                     type: "Address",
                     originModel: "Partner",
-                    relation: { opposite: "partners", fields: ["addressId"], references: ["addressID"] }
+                    relation: { opposite: "partner", name: "partnerAddress", fields: ["addressId"], references: ["id"] }
                 },
                 createdAt: {
                     name: "createdAt",
@@ -2025,18 +2095,24 @@ export class SchemaType implements SchemaDef {
                     name: "companyName",
                     type: "String"
                 },
+                tradingName: {
+                    name: "tradingName",
+                    type: "String"
+                },
                 registeredOfficeAddressId: {
                     name: "registeredOfficeAddressId",
                     type: "Int",
                     unique: true,
+                    optional: true,
                     foreignKeyFor: [
-                        "regsisteredAddress"
+                        "registeredAddress"
                     ] as readonly string[]
                 },
-                regsisteredAddress: {
-                    name: "regsisteredAddress",
+                registeredAddress: {
+                    name: "registeredAddress",
                     type: "Address",
-                    relation: { opposite: "companyRegAddr", name: "registereOfficeAddress", fields: ["registeredOfficeAddressId"], references: ["addressID"] }
+                    optional: true,
+                    relation: { opposite: "companyRegAddr", name: "registeredOfficeAddress", fields: ["registeredOfficeAddressId"], references: ["id"] }
                 },
                 vatNumber: {
                     name: "vatNumber",
@@ -2088,6 +2164,7 @@ export class SchemaType implements SchemaDef {
                 companyGroupId: {
                     name: "companyGroupId",
                     type: "Int",
+                    optional: true,
                     foreignKeyFor: [
                         "companyGroup"
                     ] as readonly string[]
@@ -2095,7 +2172,20 @@ export class SchemaType implements SchemaDef {
                 companyGroup: {
                     name: "companyGroup",
                     type: "CompanyGroup",
+                    optional: true,
                     relation: { opposite: "companies", name: "companyGroup", fields: ["companyGroupId"], references: ["id"] }
+                },
+                registeredCountryId: {
+                    name: "registeredCountryId",
+                    type: "Int",
+                    foreignKeyFor: [
+                        "registeredCountry"
+                    ] as readonly string[]
+                },
+                registeredCountry: {
+                    name: "registeredCountry",
+                    type: "ISO3166Country",
+                    relation: { opposite: "companies", name: "compRegCountry", fields: ["registeredCountryId"], references: ["id"] }
                 },
                 createdAt: {
                     name: "createdAt",

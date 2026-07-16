@@ -1,4 +1,5 @@
 import { Organization } from 'better-auth/client';
+import { name } from 'next/dist/server/ci-info';
 import { headers } from 'next/headers';
 import { redirect, unauthorized } from 'next/navigation';
 import { organisationIdTypeEnum } from '~/src/app/constants/constants';
@@ -7,9 +8,14 @@ import NewCompanyUI from '~/src/components/client/company/companyCreate';
 import { auth } from '~/src/lib/auth';
 import { getUserDb } from '~/src/lib/db';
 import { CoaType } from '~/src/types/ui-types/coa';
+import { ISO3166CountryUI } from '~/src/types/ui-types/country';
 import { FiscalPeriodRuleUI } from '~/src/types/ui-types/fiscal-period';
 import { OrganisationUI } from '~/src/types/ui-types/organisation';
-import { OrgIdentificationType, OrgPlanType } from '~/zenstack/models';
+import {
+  ISO3166Country,
+  OrgIdentificationType,
+  OrgPlanType,
+} from '~/zenstack/models';
 
 export default async function CreateCompany() {
   const session = await auth.api.getSession({
@@ -32,6 +38,28 @@ export default async function CreateCompany() {
 
   const coa = await userDb.chartOfAccounts.findMany({
     orderBy: { name: 'asc' },
+  });
+
+  const isoCountries: ISO3166Country[] = await userDb.iSO3166Country.findMany({
+    orderBy: { name: 'asc' },
+  });
+
+  const countries: ISO3166CountryUI[] = isoCountries.map((c) => {
+    const _country: ISO3166CountryUI = {
+      id: c.id,
+      name: c.name,
+      alpha2: c.alpha2,
+      alpha3: c.alpha3,
+      countryCode: c.countryCode,
+      iso3166: c.iso3166,
+      region: c.region,
+      subRegion: c.subRegion,
+      intermediateRegion: c.intermediateRegion,
+      intermediateRegionCode: c.intermediateRegionCode,
+
+      userId: c.userId,
+    };
+    return _country;
   });
 
   const data = await auth.api.getFullOrganization({
@@ -115,6 +143,7 @@ export default async function CreateCompany() {
         coaList={coaList}
         orgUI={orgUI}
         userId={userId}
+        countries={countries}
       />
     );
   }

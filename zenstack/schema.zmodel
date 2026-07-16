@@ -175,6 +175,8 @@ model User {
   companiesUpdated            Company[]              @relation(name:'companyUpdatedBy')
   companyGroupsCreated        CompanyGroup[]          @relation(name: 'companyGroupCreatedBy')
   companyGroupsUpdated        CompanyGroup[]         @relation(name: 'companyGroupUpdatedBy')
+  addressCreated              Address[]              @relation(name: 'addressCreatedBy')
+  addressUpdated              Address[]              @relation(name: 'addressUpdatedBy')
   lastLoginMethod             String?
   organizationId              String?
   organization                Organization?            @relation(fields: [organizationId], references: [id])
@@ -248,6 +250,7 @@ model Organization {
   periodRules    FiscalPeriodRuleHeader[]     @relation( 'orgPerionRuleHeader')
   fiscRulePeriods    FiscalPeriodRule[]        @relation('orgPerionRule')
   coaList        ChartOfAccounts[]     @relation('coaOrganisation')
+  address          Address[]            @relation(name: 'orgAddress')
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now()) @updatedAt
   @@map('organization')
@@ -331,10 +334,10 @@ model Session {
 
 
 model ISO3166Country {
-  countryId               Int             @id @default(autoincrement())
+  id                      Int             @id @default(autoincrement())
   name                    String
   alpha2                  String          @unique @length(1,  2, "Code must be length 2 char")
-  alpha3                   String          @unique @length(1,  3, "ISO address code3 must be 3 char length ")
+  alpha3                  String          @unique @length(1,  3, "ISO address code3 must be 3 char length ")
   countryCode             String          @length(1,3, '3 digit country code')
   iso3166                 String          @length(1,15, "ISO 1366 coa_update")
   region                  String
@@ -344,10 +347,14 @@ model ISO3166Country {
   
   addresses   Address[]
   regions     AddressRegion[]
+  companies               Company[]    @relation(name: 'compRegCountry')
   userId      String
   createdBy   User            @relation("countryCreatedBy",fields: [userId], references: [id])
   // global data
-  @@allow('all', true)
+  
+  //@@deny('all', auth() == null)
+  @@allow('read', auth() != null)
+  @@allow('create', auth() != null)
 }
 
 model ISO4217Currency {
@@ -372,7 +379,7 @@ model ISO4217Currency {
 model AddressRegion {
   regionId            Int        @id @default(autoincrement())
   isoCountryId        Int
-  country             ISO3166Country @relation(fields: [isoCountryId], references: [countryId])
+  country             ISO3166Country @relation(fields: [isoCountryId], references: [id])
   region              String
   subRegion           String
   intermediateRegion  String
@@ -382,7 +389,7 @@ model AddressRegion {
 }
 
 model Address {
-  addressID     Int        @id @default(autoincrement())
+  id     Int        @id @default(autoincrement())
   buildingCode  String?    @length(0,  10, 'building code can be up 10 characters')
   room          String?    @length(0,  10, 'room can be up 10 characters')
   careOf        String?    @length(0,  50, 'Care of be up 10 characters')
@@ -395,11 +402,19 @@ model Address {
   county        String?    @length(0,  50, 'County can be up 10 characters')
   postCode      String    @length(1,  10, 'Post code must be up 10 characters')
   isoCountryId  Int
-  country       ISO3166Country @relation(fields: [isoCountryId], references: [countryId])
-  partnerId     String
-  partners      Partner[]
-  // companyId String
-  companyRegAddr Company?   @relation('registereOfficeAddress')
+  country       ISO3166Country @relation(fields: [isoCountryId], references: [id])
+  partner        Partner[]  @relation(name: 'partnerAddress')
+  companyRegAddr Company?   @relation('registeredOfficeAddress')
+  createdAt                 DateTime   @default(now())
+  updatedAt                 DateTime   @default(now()) @updatedAt
+  createdById               String
+  createdBy                 User       @relation('addressCreatedBy',fields: [createdById], references: [id])
+  updatedById               String?
+  updatedBy                 User?   @relation('addressUpdatedBy',fields: [updatedById], references: [id])
+  organizationId  String
+  organization    Organization? @relation('orgAddress',fields: [organizationId], references: [id])
+
+  @@allow('all', auth().organizationId == organizationId)
 }
 
 
@@ -451,7 +466,7 @@ model Partner {
   addressId   Int
   searchTerm  String     @length(1,  20, 'Search term to find partners')
   stripeId    String
-  address     Address    @relation(fields: [addressId], references: [addressID])
+  address     Address    @relation('partnerAddress',fields: [addressId], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @default(now()) @updatedAt
   createdById String
@@ -488,6 +503,7 @@ model FiscalPeriodRuleHeader {
   deletedAt       DateTime?           @deletedAt
   @@allow('all', auth().organizationId == organizationId)
 }
+
 model FiscalPeriodRule {
   id              Int       @id @default(autoincrement())
   
@@ -561,6 +577,7 @@ model CompanyGroup {
   createdBy                 User       @relation('companyGroupCreatedBy',fields: [createdById], references: [id])
   updatedById               String?
   updatedBy                 User?   @relation('companyGroupUpdatedBy',fields: [updatedById], references: [id])
+  
   // @@allow('all',true)
   @@allow('all', auth().organizationId == organizationId)
 
@@ -570,8 +587,9 @@ model Company {
   id                        Int                    @id @default(autoincrement())
   companyCode               String
   companyName               String
-  registeredOfficeAddressId Int                    @unique
-  regsisteredAddress        Address                @relation('registereOfficeAddress',  fields: [registeredOfficeAddressId], references: [addressID])
+  tradingName               String
+  registeredOfficeAddressId Int?                    @unique
+  registeredAddress        Address?                @relation('registeredOfficeAddress',  fields: [registeredOfficeAddressId], references: [id])
   vatNumber                 String?
   
   postPeriod                CompanyPostingPeriod []
@@ -581,9 +599,10 @@ model Company {
   organization              Organization            @relation('companyOrganisation', fields:[organizationId], references: [id])
   chartOfAccountsId         Int
   ChartOfAccounts           ChartOfAccounts       @relation('chartOfAccounts',fields: [chartOfAccountsId], references: [id])
-  companyGroupId            Int
-  companyGroup              CompanyGroup          @relation('companyGroup',fields: [companyGroupId], references: [id])         
-  
+  companyGroupId            Int?
+  companyGroup              CompanyGroup?          @relation('companyGroup',fields: [companyGroupId], references: [id])         
+  registeredCountryId       Int
+  registeredCountry         ISO3166Country    @relation('compRegCountry', fields: [registeredCountryId], references: [id])
   createdAt                 DateTime   @default(now())
   updatedAt                 DateTime   @default(now()) @updatedAt
   createdById               String

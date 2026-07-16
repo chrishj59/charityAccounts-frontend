@@ -60,21 +60,21 @@ export default function LoadCountriesUI({
               subRegion: row.subRegion.trim(),
               intermediateRegion: row.intermediateRegion.trim(),
               intermediateRegionCode: row.intermediateRegionCode.trim(),
+
               userId: userId,
             };
           });
           console.log(`records read ${cleaned.length}`);
-          const created = await createCountries.mutateAsync({
+          const created: ISO3166Country[] = await createCountries.mutateAsync({
             data: cleaned,
             skipDuplicates: true,
           });
           showToast(
-            'error',
-            'No Fiscal rule selected',
-            'Fiscal Rule not found. Please check your entry',
+            'success',
+            'Countries loaded',
+            `Created ${created.length} countries`,
             false,
           );
-          console.log(`created ${JSON.stringify(created, null, 2)}`);
         } catch (err) {
           console.error(
             `error parsing FileUpload ${JSON.stringify(err, null, 2)}`,

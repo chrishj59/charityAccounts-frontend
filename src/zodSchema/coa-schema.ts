@@ -1,7 +1,7 @@
 import z, { nullable } from 'zod';
 
 export const coaSchema = z.object({
-  id: z.int(),
+  id: z.number(),
   name: z.string().min(5, 'Name greater than 5 characters length required'),
   fiscalPeriodRuleId: z
     .number()

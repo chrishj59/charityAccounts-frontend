@@ -1,5 +1,5 @@
 export type AddressUI = {
-  addressID: number;
+  id?: number;
   buildingCode?: string;
   room?: string;
   careOf?: string;
@@ -7,7 +7,7 @@ export type AddressUI = {
   street2?: string;
   street3?: string;
   houseNumber?: number;
-
+  houseName?: string;
   town?: string;
   county?: string;
   postCode: string;

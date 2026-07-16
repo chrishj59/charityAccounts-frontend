@@ -37,7 +37,6 @@ import { schema } from '~/zenstack/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getGbpFormatter } from '~/src/lib/Intl/numberFormatter';
 import { getShortDateFormatter } from '~/src/lib/Intl/dateFormatter';
-import { ISOCountryCheckedCreateInput } from '../../../../zenstack/input';
 
 import {
   FundEditFormValues,

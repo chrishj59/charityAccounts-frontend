@@ -1,6 +1,10 @@
 import { organisationIdTypeEnum } from '~/src/app/constants/constants';
 
-import { OrgIdentificationType, OrgPlanType } from '~/zenstack/models';
+import {
+  OrgIdentificationType,
+  OrgPlanType,
+  OrgLegalForm,
+} from '~/zenstack/models';
 
 export type OrganisationUI = {
   name: string | undefined;
@@ -9,7 +13,7 @@ export type OrganisationUI = {
   createdAt: Date | undefined;
   metadata: null | string | undefined;
   tradingName: string | undefined;
-  legalForm: string | undefined;
+  legalForm: OrgLegalForm;
   legalName: string | undefined;
   charityNumber: string | null | undefined;
   taxRef: null | string | undefined;
@@ -18,5 +22,5 @@ export type OrganisationUI = {
   idType: OrgIdentificationType | undefined;
   identification: string | undefined;
   accountType: OrgPlanType | undefined;
-  id: string | undefined;
+  id: string;
 };
